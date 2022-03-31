@@ -27,9 +27,9 @@ dependencies {
 tasks {
     shadowJar {
         dependencies {
-            exclude(dependency("org.spigotmc:spigot-api(:1.18.2-R0.1-SNAPSHOT"))
+            exclude(dependency("org.spigotmc:spigot-api:1.18.2-R0.1-SNAPSHOT"))
             exclude(dependency("com.discordsrv:discordsrv:1.25.0"))
-            exclude(dependency("me.clip:placeholderapi(:2.11.1"))
+            exclude(dependency("me.clip:placeholderapi:2.11.1"))
             exclude(dependency("net.essentialsx:EssentialsX:2.19.4"))
             exclude(dependency("com.github.LoneDev6:api-itemsadder:3.0.0"))
         }
