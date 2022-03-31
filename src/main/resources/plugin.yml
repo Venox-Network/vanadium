@@ -1,0 +1,81 @@
+name: Vanadium
+author: srnyx
+description: Plugin used for the VanadiumSMP server
+
+main: xyz.srnyx.vanadium.Main
+version: '${version}'
+api-version: 1.18
+
+softdepend:
+  - PlaceholderAPI
+  - EssentialsX
+depend:
+  - DiscordSRV
+
+commands:
+  bypass:
+    description: "Bypass locked blocks"
+    usage: "Usage: /<command>"
+    permission: vanadium.bypass
+  trustlist:
+    description: "Shows a list of who you've trusted (or who someone else has)"
+    usage: "Usage: /<command> [player]"
+    permission: vanadium.trustlist
+  locktool:
+    description: "Gives you (or the person specified) a Lock Tool"
+    usage: "Usage: /<command> [player]"
+    permission: vanadium.locktool
+  untrust:
+    description: "Revokes a player's access to your locked blocks"
+    usage: "Usage: /<command> [player]"
+    permission: vanadium.untrust
+  trust:
+    description: "Lets another player access your locked blocks"
+    usage: "Usage: /<command> [player]"
+    permission: vanadium.trust
+  link:
+    description: "Links your Minecraft account to a Discord account"
+    usage: "Usage: /<command>"
+    permission: vanadium.link
+  vreload:
+    description: "Reloads the plugin files"
+    usage: "Usage: /<command>"
+    permission: vanadium.reload
+
+
+permissions:
+  vanadium.*:
+    description: "Gives access to all other permissions"
+    children:
+      - vanadium.bypass
+      - vanadium.trust
+      - vanadium.link
+      - vanadium.trustlist
+      - vanadium.trustlist.others
+      - vanadium.locktool
+      - vanadium.locktool.others
+      - vanadium.bypass
+      - vanadium.untrust
+      - vanadium.reload
+  vanadium.bypass:
+    description: "Gives access to /bypass"
+  vanadium.trustlist:
+    description: "Gives access to /trustlist"
+  vanadium.trustlist.others:
+    description: "Gives access to /trustlist <player>"
+    children:
+      - vanadium.trustlist
+  vanadium.locktool:
+    description: "Gives access to /locktool"
+  vanadium.locktool.others:
+    description: "Gives access to /locktool <player>"
+    children:
+      - vanadium.locktool
+  vanadium.untrust:
+    description: "Gives access to /untrust"
+  vanadium.trust:
+    description: "Gives access to /trust"
+  vanadium.link:
+    description: "Gives access to /link"
+  vanadium.reload:
+    description: "Gives access to /reload"

@@ -1,0 +1,107 @@
+# If a message does not have any placeholders listed above it, it means it doesn't have any placeholders.
+# Placeholders may be reassigned per message so please double-check you're using each one correctly!
+
+
+plugin:
+  # This will be what %prefix% is in all the other messages
+  # %prefix% can be used in any message in this file as many times as you want
+  prefix: "&b&lSMP &8[&3&lV&8] &7"
+  reload: "%prefix%&3Vanadium &bsuccessfully reloaded"
+
+
+# %permission% = The permission the player must have
+# %player% = The inputted player that was invalid
+errors:
+  console-forbidden: "&4&lERROR! &cYou must be a player to run this command"
+  # %permission%
+  no-permission: "&4&lERROR! &cYou must have &4%permission% &cto run this command"
+  # %player%
+  invalid-player: "&4&lERROR! &4%player% &cis not a valid player"
+  invalid-arguments: "&4&lERROR! &cInvalid arguments"
+
+
+# %code% = The player's code that was generated
+# %channel% = The link channel's name (set in config.yml)
+# %discord% = The Discord account (username#tag) they are linked to
+# %minecraft% = The Minecraft account they are linked to# %uuid% = The Minecraft account's UUID they are linked to
+linking:
+  # %code%, %channel%
+  generate: "%prefix%&bYour code is &3%code%&b, send it in &3#%channel% &bto link your accounts"
+  # %code%, %channel%, %discord%
+  already-linked: "%prefix%&bYour account is already linked to &3%discord%&b, send &3%code% &bin &3#%channel% &bto relink"
+
+  success:
+    # %discord%
+    minecraft: "%prefix%&bYou've successfully linked your account to &3%discord%"
+    # %minecraft%, %uuid%
+    discord: "You've successfully linked your account to **`%minecraft%`** *(`%uuid%`)*"
+
+
+# %count% = Number of slots given
+# %type% = Type of slot
+# %total% = Total number of slots (of the type)
+# %next% = Amount of time (in minutes) until next slot (of the same type) is given
+# %target% = The block/player they tried to lock/trust
+slots:
+  # %count%, %type%, %total%, %next%
+  add: "%prefix%&bYou've gained &3%count% %type% &bslot(s) for being online (new total: &3%total%&b)! Next one in &3%next% &bminute(s)."
+  # %count%
+  afk: "%prefix%&cSince you're AFK, you didn't get your &4%count% &cslot. Please un-AFK to continue getting slots."
+  # %type%, %target%, %total%
+  limit: "%prefix%&cFailed to %type% &4%target%&c! You've reached your limit of &4%total% %type%s&c."
+
+
+# %block% = The block that was targeted
+# %player% = The player that locked/placed the block
+locking:
+  # %block%, %player%
+  block-locked: "%prefix%&3%block% &bis locked by &3%player%"
+
+  lock:
+    # %block%
+    success: "%prefix%&bSuccessfully locked &3%block%"
+    # %block%, %player%
+    fail: "%prefix%&4%block% &cwas placed by &4%player%"
+    # %block%
+    invalid: "%prefix%&4%block% &cis not a lockable block"
+    # %block%, %player%
+    again: "%prefix%&4%block% &cis already locked by &4%player%"
+
+  unlock:
+    # %block%
+    success: "%prefix%&bSuccessfully unlocked &3%block%"
+    # %block%, %player%
+    fail: "%prefix%&4%block% &cwas placed by &4%player%"
+    # %block%
+    invalid: "%prefix%&4%block% &cis not locked"
+
+  lock-tool:
+    # %player% = The player that gave the Lock Tool
+    get: "%prefix%&bYou have been given a &3Lock Tool &bby &3%player%"
+    # %player% = The player that got the Lock Tool
+    give: "%prefix%&bYou have given &3%player% &ba &3Lock Tool"
+
+  bypass:
+    enabled: "%prefix%&bSuccessfully enabled bypass"
+    actionbar: "&bBypass is currently enabled"
+    disabled: "%prefix%&bSuccessfully disabled bypass"
+
+
+# %player% = The targeted player in the command
+trusting:
+  list:
+    # %player% = The player that used /trustlist or the first argument of /trustlist
+    header: "&3&l%player%'s Trustlist"
+    empty: "&b&oNo players trusted"
+    # %player% = A player that's trusted
+    item: "&3- &b%player%"
+
+  # %player%
+  trust:
+    success: "%prefix%&bSuccessfully trusted &3%player%"
+    fail: "%prefix%&4%player% &cis already trusted"
+
+  # %player%
+  untrust:
+    success: "%prefix%&bSuccessfully untrusted &3%player%"
+    fail: "%prefix%&cYou don't have &4%player% &ctrusted"

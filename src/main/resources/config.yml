@@ -1,0 +1,23 @@
+# Whether to allow players to lock blocks that don't have any placer data.
+allow-unplaced-locking: false
+
+
+# The channel where players will send link codes to link their Minecraft and Discord accounts.
+# Must be a valid channel ID, names are not supported.
+link-channel: "000000000000000000"
+
+
+lock-tool:
+  # Whether the recipe for the Lock Tool will be enabled.
+  # If false, the only way to get a Lock Tool would be through the /locktool command.
+  # Only takes affect if lock-tool.custom is false.
+  recipe: true
+  # If the lock tool is going to use the custom Vanadium items (vanadium:vanadium_ingot and vanadium:lock_tool)
+  custom: false
+
+
+# Amount of time to wait before giving a new slot.
+# Time unit is minutes.
+slot-cooldowns:
+  locks: 10
+  trusts: 30

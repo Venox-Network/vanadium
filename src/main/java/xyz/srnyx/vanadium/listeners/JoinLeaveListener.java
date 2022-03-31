@@ -1,0 +1,37 @@
+package xyz.srnyx.vanadium.listeners;
+
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+
+import xyz.srnyx.vanadium.commands.CommandBypass;
+import xyz.srnyx.vanadium.managers.PlayerManager;
+import xyz.srnyx.vanadium.managers.SlotManager;
+
+
+public class JoinLeaveListener implements Listener {
+    @EventHandler
+    public void onJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+
+        // Enable bypass
+        if (new PlayerManager(player).hasScoreboardTag("bypass")) {
+            CommandBypass.enable(player, true);
+        }
+
+        // Start slot cooldown
+        new SlotManager("locks", player).start();
+        new SlotManager("trusts", player).start();
+    }
+
+    @EventHandler
+    public void onLeave(PlayerQuitEvent event) {
+        Player player = event.getPlayer();
+
+        // Stop slot cooldown
+        new SlotManager("locks", player).stop();
+        new SlotManager("trusts", player).stop();
+    }
+}
