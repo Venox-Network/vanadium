@@ -1,10 +1,10 @@
 group = "xyz.srnyx"
-version = "0.0.1"
 description = "Vanadium"
+version = "0.0.1"
 
 plugins {
     id("java")
-    id("com.github.johnrengelman.shadow") version "7.1.2"
+//    id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
 repositories {
@@ -24,7 +24,9 @@ dependencies {
     compileOnly("com.github.LoneDev6:api-itemsadder:3.0.0")
 }
 
-tasks {
+
+// I'm not sure what most of this does, but I guess I'll just leave it here...
+/*tasks {
     shadowJar {
         dependencies {
             exclude(dependency("org.spigotmc:spigot-api:1.18.2-R0.1-SNAPSHOT"))
@@ -47,7 +49,7 @@ tasks {
 
     // Process Placeholders for the plugin.yml
     processResources {
-        filesMatching("**/plugin.yml") {
+        filesMatching("**\/plugin.yml") {
             expand(rootProject.project.properties)
         }
         // Always re-run this task
@@ -59,7 +61,7 @@ tasks {
         targetCompatibility = JavaVersion.VERSION_17.toString()
     }
 
-/*    val targetJavaVersion = 17
+    val targetJavaVersion = 17
     java {
         val javaVersion = JavaVersion.toVersion(targetJavaVersion)
         sourceCompatibility = JavaVersion.VERSION_javaVersion
@@ -73,5 +75,5 @@ tasks {
         if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible) {
             options.release = targetJavaVersion
         }
-    }*/
-}
+    }
+}*/
