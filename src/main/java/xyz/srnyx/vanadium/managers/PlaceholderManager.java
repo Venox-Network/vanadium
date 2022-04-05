@@ -11,8 +11,6 @@ import java.util.concurrent.TimeUnit;
 
 public class PlaceholderManager extends PlaceholderExpansion {
 
-    public PlaceholderManager() {}
-
     @Override
     public @NotNull String getAuthor() {
         return "srnyx";

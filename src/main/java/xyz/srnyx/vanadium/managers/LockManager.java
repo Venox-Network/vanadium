@@ -195,7 +195,9 @@ public class LockManager {
                         .send(player);
                 return;
             }
-        } else attemptPlace(player);
+        } else {
+            attemptPlace(player);
+        }
 
         // Check If Block Is Already Locked
         if (isLocked()) {

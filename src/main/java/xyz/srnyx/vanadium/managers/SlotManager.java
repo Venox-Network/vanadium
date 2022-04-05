@@ -87,7 +87,7 @@ public class SlotManager {
                 for (Player online : Bukkit.getOnlinePlayers()) {
                     SlotManager slot = new SlotManager(type, online);
                     Essentials essentials = (Essentials) Bukkit.getServer().getPluginManager().getPlugin("Essentials");
-                    if (!(slot.timeLeft() > 0)) {
+                    if (slot.timeLeft() <= 0) {
                         if (essentials != null) {
                             if (!essentials.getUser(online).isAfk()) {
                                 slot.addSlot();

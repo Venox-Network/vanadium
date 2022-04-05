@@ -60,19 +60,17 @@ public class BlockListener implements Listener {
         }
 
         // Check Locked Block
-        if (!(player.hasPermission("vanadium.command.bypass") && (player.isSneaking() || CommandBypass.check(player)))) {
-            if (new LockManager(block).isLocked()) {
-                if (new LockManager(block).isLockedForPlayer(player)) {
-                    event.setCancelled(true);
-                    player.playSound(player.getLocation(), Sound.BLOCK_CHEST_LOCKED, 1, 1);
-                    new MessageManager("locking.block-locked")
-                            .replace("%block%", new LockManager(block).getName())
-                            .replace("%player%", Bukkit.getOfflinePlayer(UUID.fromString(new LockManager(block).getLocker())).getName())
-                            .send(player);
-                    return;
-                } else {
-                    new LockManager(block).attemptUnlock(player, null);
-                }
+        if (!(player.hasPermission("vanadium.command.bypass") && (player.isSneaking() || CommandBypass.check(player))) && new LockManager(block).isLocked()) {
+            if (new LockManager(block).isLockedForPlayer(player)) {
+                event.setCancelled(true);
+                player.playSound(player.getLocation(), Sound.BLOCK_CHEST_LOCKED, 1, 1);
+                new MessageManager("locking.block-locked")
+                        .replace("%block%", new LockManager(block).getName())
+                        .replace("%player%", Bukkit.getOfflinePlayer(UUID.fromString(new LockManager(block).getLocker())).getName())
+                        .send(player);
+                return;
+            } else {
+                new LockManager(block).attemptUnlock(player, null);
             }
         }
 
