@@ -1,10 +1,9 @@
-group = "xyz.srnyx"
 description = "Vanadium"
 version = "0.0.1"
+group = "xyz.srnyx"
 
 plugins {
     id("java")
-//    id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
 repositories {
@@ -23,57 +22,3 @@ dependencies {
     compileOnly("net.essentialsx:EssentialsX:2.19.4")
     compileOnly("com.github.LoneDev6:api-itemsadder:3.0.0")
 }
-
-
-// I'm not sure what most of this does, but I guess I'll just leave it here...
-/*tasks {
-    shadowJar {
-        dependencies {
-            exclude(dependency("org.spigotmc:spigot-api:1.18.2-R0.1-SNAPSHOT"))
-            exclude(dependency("com.discordsrv:discordsrv:1.25.0"))
-            exclude(dependency("me.clip:placeholderapi:2.11.1"))
-            exclude(dependency("net.essentialsx:EssentialsX:2.19.4"))
-            exclude(dependency("com.github.LoneDev6:api-itemsadder:3.0.0"))
-        }
-    }
-
-    jar {
-        dependsOn("shadowJar")
-        isEnabled = false
-    }
-
-    // Set UTF-8 as the encoding
-    compileJava {
-        options.encoding = "UTF-8"
-    }
-
-    // Process Placeholders for the plugin.yml
-    processResources {
-        filesMatching("**\/plugin.yml") {
-            expand(rootProject.project.properties)
-        }
-        // Always re-run this task
-        outputs.upToDateWhen { false }
-    }
-
-    compileJava {
-        sourceCompatibility = JavaVersion.VERSION_17.toString()
-        targetCompatibility = JavaVersion.VERSION_17.toString()
-    }
-
-    val targetJavaVersion = 17
-    java {
-        val javaVersion = JavaVersion.toVersion(targetJavaVersion)
-        sourceCompatibility = JavaVersion.VERSION_javaVersion
-        targetCompatibility = JavaVersion.VERSION_javaVersion
-        if (JavaVersion.current() < javaVersion) {
-            toolchain.languageVersion(JavaLanguageVersion.of(targetJavaVersion))
-        }
-    }
-
-    tasks.withType(JavaCompile).configureEach {
-        if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible) {
-            options.release = targetJavaVersion
-        }
-    }
-}*/
