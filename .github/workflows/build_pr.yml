@@ -34,7 +34,7 @@ jobs:
         run: ./gradlew test
       - name: Build jar with Gradle
         run: ./gradlew build
-      - name: Upload artifact
+      - name: Upload artifacts
         uses: "actions/upload-artifact@v2.2.3"
         with:
-          path: build/libs/Vanadium-*.jar
+          path: build/libs
