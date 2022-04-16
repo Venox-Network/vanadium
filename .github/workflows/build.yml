@@ -38,4 +38,5 @@ jobs:
       - name: Upload artifact
         uses: "actions/upload-artifact@v2.2.3"
         with:
+          name: Vanadium.jar
           path: build/libs/Vanadium-*.jar
