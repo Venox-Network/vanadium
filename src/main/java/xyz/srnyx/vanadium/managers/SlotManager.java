@@ -61,11 +61,29 @@ public class SlotManager {
         Main.slots.set(player.getUniqueId() + "." + type, count);
         save();
 
+        // %slot%
+        String slot;
+        if (getMultiplier() > 1) {
+            slot = "slots";
+        } else {
+            slot = "slot";
+        }
+
+        // %minute%
+        String minute;
+        if (Main.config.getInt("slot-cooldowns." + type) > 1) {
+            minute = "minutes";
+        } else {
+            minute = "minute";
+        }
+
         new MessageManager("slots.add")
                 .replace("%count%", String.valueOf(getMultiplier()).replaceAll("\\.0*$|(\\.\\d*?)0+$", "$1"))
                 .replace("%type%", type.substring(0, type.length() - 1))
+                .replace("%slot%", slot)
                 .replace("%total%", String.valueOf(count).replaceAll("\\.0*$|(\\.\\d*?)0+$", "$1"))
                 .replace("%next%", String.valueOf(Main.config.getInt("slot-cooldowns." + type)))
+                .replace("%minute%", minute)
                 .send(player);
     }
 
@@ -88,13 +106,17 @@ public class SlotManager {
                     SlotManager slot = new SlotManager(type, online);
                     Essentials essentials = (Essentials) Bukkit.getServer().getPluginManager().getPlugin("Essentials");
                     if (slot.timeLeft() <= 0) {
+                        // Check if Essentials is installed
                         if (essentials != null) {
-                            if (!essentials.getUser(online).isAfk()) {
-                                slot.addSlot();
-                            } else {
+                            // Check if player is AFK
+                            if (essentials.getUser(online).isAfk()) {
+                                slot.stop();
+                                slot.start();
                                 new MessageManager("slots.afk")
-                                        .replace("%type%", type)
-                                        .send(player);
+                                        .replace("%type%", type.substring(0, type.length() - 1))
+                                        .send(online);
+                            } else {
+                                slot.addSlot();
                             }
                         } else {
                             slot.addSlot();
