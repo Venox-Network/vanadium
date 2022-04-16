@@ -39,14 +39,16 @@ linking:
 
 # %count% = Number of slots given
 # %type% = Type of slot
+# %slot% = "slot" if one, "slots" if multiple
 # %total% = Total number of slots (of the type)
 # %next% = Amount of time (in minutes) until next slot (of the same type) is given
+# %minute% = "minute" if one, "minutes" if multiple
 # %target% = The block/player they tried to lock/trust
 slots:
   # %count%, %type%, %total%, %next%
-  add: "%prefix%&bYou've gained &3%count% %type% &bslot(s) for being online (new total: &3%total%&b)! Next one in &3%next% &bminute(s)."
-  # %count%
-  afk: "%prefix%&cSince you're AFK, you didn't get your &4%count% &cslot. Please un-AFK to continue getting slots."
+  add: "%prefix%&bYou've gained &3%count% %type% &b%slot% for being online (new total: &3%total%&b)! Next one in &3%next% &b%minute%."
+  # %type%
+  afk: "%prefix%&cSince you're AFK, you didn't get your &4%type% &cslot. Please un-AFK to continue getting slots."
   # %type%, %target%, %total%
   limit: "%prefix%&cFailed to %type% &4%target%&c! You've reached your limit of &4%total% %type%s&c."
 
