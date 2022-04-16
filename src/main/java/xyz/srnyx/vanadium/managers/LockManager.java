@@ -637,9 +637,9 @@ public class LockManager {
             return ItemsAdder.getCustomItem("vanadium:lock_tool");
         } else {
             return new ItemManager(Material.GOLDEN_HOE)
-                    .name("&bLock Tool")
-                    .lore("&7Left Click &3= &7Lock")
-                    .lore("&7Right Click &3= &7Unlock")
+                    .name("&3Lock Tool")
+                    .lore("&7Left-click &b= &7Lock")
+                    .lore("&7Right-click &b= &7Unlock")
                     .enchant(Enchantment.WATER_WORKER, 1)
                     .flag(ItemFlag.HIDE_ENCHANTS)
                     .get();
