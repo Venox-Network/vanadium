@@ -1,6 +1,6 @@
 package xyz.srnyx.vanadium.managers;
 
-import dev.lone.itemsadder.api.ItemsAdder;
+import dev.lone.itemsadder.api.CustomStack;
 
 import org.bukkit.Sound;
 import org.bukkit.Color;
@@ -633,8 +633,7 @@ public class LockManager {
      */
     public static ItemStack getLockTool() {
         if (Main.config.getBoolean("lock-tool.custom")) {
-            //noinspection deprecation
-            return ItemsAdder.getCustomItem("vanadium:lock_tool");
+            return CustomStack.getInstance("vanadium:lock_tool").getItemStack();
         } else {
             return new ItemManager(Material.GOLDEN_HOE)
                     .name("&3Lock Tool")
