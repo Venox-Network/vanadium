@@ -42,12 +42,21 @@ public class SlotManager {
     }
 
     /**
-     * Remove {@code player}'s  cooldown
+     * Remove {@code player}'s cooldown
      */
     public void stop() {
         UUID uuid = player.getUniqueId();
         if (Objects.equals(type, "locks")) locksCooldown.remove(uuid);
         if (Objects.equals(type, "trusts")) trustsCooldown.remove(uuid);
+    }
+
+    /**
+     * @return  The amount of time left in the cooldown
+     */
+    public Long timeLeft() {
+        if (Objects.equals(type, "locks")) return locksCooldown.get(player.getUniqueId()) - System.currentTimeMillis();
+        if (Objects.equals(type, "trusts")) return trustsCooldown.get(player.getUniqueId()) - System.currentTimeMillis();
+        return 0L;
     }
 
     /**
@@ -85,15 +94,6 @@ public class SlotManager {
                 .replace("%next%", String.valueOf(Main.config.getInt("slot-cooldowns." + type)))
                 .replace("%minute%", minute)
                 .send(player);
-    }
-
-    /**
-     * @return  The amount of time left in the cooldown
-     */
-    public Long timeLeft() {
-        if (Objects.equals(type, "locks")) return locksCooldown.get(player.getUniqueId()) - System.currentTimeMillis();
-        if (Objects.equals(type, "trusts")) return trustsCooldown.get(player.getUniqueId()) - System.currentTimeMillis();
-        return 0L;
     }
 
     /**
