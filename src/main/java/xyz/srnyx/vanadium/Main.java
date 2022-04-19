@@ -66,6 +66,7 @@ public class Main extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new InteractListener(), this);
         getServer().getPluginManager().registerEvents(new JoinLeaveListener(), this);
         getServer().getPluginManager().registerEvents(new MoveListener(), this);
+        getServer().getPluginManager().registerEvents(new DamageListener(), this);
 
         // Register commands
         registerCommand("bypass", new CommandBypass(), new TabEmpty());

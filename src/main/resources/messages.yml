@@ -107,3 +107,14 @@ trusting:
   untrust:
     success: "%prefix%&bSuccessfully untrusted &3%player%"
     fail: "%prefix%&cYou don't have &4%player% &ctrusted"
+
+
+# %attacker% = The person attacking the defender
+# %victim% = The person being attacked / blocking
+custom-items:
+  chris_shield:
+    block:
+      # %attacker%
+      victim: "&bYou're shield has given slowness to &3%attacker%&b!"
+      # %victim%
+      attacker: "&3%victim%&b's shield has given you slowness!"
