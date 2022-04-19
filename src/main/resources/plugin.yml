@@ -3,7 +3,7 @@ author: srnyx
 description: Plugin used for the VanadiumSMP server
 
 main: xyz.srnyx.vanadium.Main
-version: '${version}'
+version: ${version}
 api-version: 1.18
 
 softdepend:

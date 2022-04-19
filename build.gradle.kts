@@ -17,8 +17,21 @@ repositories {
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.18.2-R0.1-SNAPSHOT")
+    @Suppress("VulnerableLibrariesLocal")
     compileOnly("com.discordsrv:discordsrv:1.25.0")
     compileOnly("me.clip:placeholderapi:2.11.1")
     compileOnly("net.essentialsx:EssentialsX:2.19.4")
     compileOnly("com.github.LoneDev6:api-itemsadder:3.0.0")
+}
+
+tasks {
+    compileJava {
+        options.encoding = "UTF-8"
+    }
+
+    processResources {
+        filesMatching("**/plugin.yml") {
+            expand(rootProject.project.properties)
+        }
+    }
 }
