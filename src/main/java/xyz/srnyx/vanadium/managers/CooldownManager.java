@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+@SuppressWarnings("unused")
 public class CooldownManager {
     private final UUID player;
     private static final Map<UUID, Long> cooldown = new HashMap<>();
@@ -40,7 +41,7 @@ public class CooldownManager {
      * @return  {@code true} if on cooldown, {@code false} if not
      */
     public boolean onCooldown() {
-        return !(timeLeft() <= 0);
+        return timeLeft() > 0;
     }
 
     /**
