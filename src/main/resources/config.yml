@@ -31,5 +31,3 @@ custom-items:
     block:
       # Slowness duration (seconds)
       duration: 5
-      # Amount of durability to take away when ability is used
-      durability: 2

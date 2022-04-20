@@ -33,8 +33,8 @@ public class DamageListener implements Listener {
                     attacker.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Main.config.getInt("custom-items.chris_shield.block.duration") * 20, 0));
 
                     // Decrement durability
-                    if (main != null) main.setDurability(main.getDurability() - Main.config.getInt("custom-items.chris_shield.block.durability"));
-                    if (off != null) off.setDurability(off.getDurability() - Main.config.getInt("custom-items.chris_shield.block.durability"));
+                    if (main != null) main.setDurability(main.getDurability() - 3);
+                    if (off != null) off.setDurability(off.getDurability() - 3);
 
                     // Send messages
                     victim.sendMessage(ChatColor.GREEN + "BLOCKED!");
