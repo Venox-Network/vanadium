@@ -109,12 +109,15 @@ trusting:
     fail: "%prefix%&cYou don't have &4%player% &ctrusted"
 
 
+# %seconds% = The number of seconds left in cooldown
 # %attacker% = The person attacking the defender
 # %victim% = The person being attacked / blocking
 custom-items:
+  # %seconds%
+  action-bar: "&3%seconds% seconds &bleft"
   chris_shield:
     block:
       # %attacker%
       victim: "&bYou're shield has given slowness to &3%attacker%&b!"
       # %victim%
-      attacker: "&3%victim%&b's shield has given you slowness!"
+      attacker: "&3%victim%&b's shield has given you weakness!"
