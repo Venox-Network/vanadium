@@ -9,7 +9,7 @@ link-channel: "000000000000000000"
 
 lock-tool:
   # Whether the recipe for the Lock Tool will be enabled.
-  # If false, the only way to get a Lock Tool would be through the /locktool command.
+  # If false, the only way to get a Lock Tool would be through the /locktool command. Unless you're using lock-tool.custom
   # Only takes affect if lock-tool.custom is false.
   recipe: true
   # If the lock tool is going to use the custom Vanadium items (vanadium:lock_tool). Requires ItemsAdder
@@ -25,9 +25,37 @@ slot-cooldowns:
 
 # Settings for ItemsAdder custom items
 custom-items:
+  # Cooldown for all abilities
+  cooldown: 3
+
   # vanadium:chris_shield
   chris_shield:
-    # Block ability that gives slowness
+    # Block ability that gives attacker slowness
     block:
       # Slowness duration (seconds)
       duration: 5
+    # Shift-left-click ability that damages nearby entities
+    damage:
+      # Amount to damage each entity
+      amount: 4
+      # Range entities have to be within
+      range: 5
+
+  # vanadium:nyx_wand
+  nyx_wand:
+    tnt:
+      # How long until the TNT explodes
+      fuse: 3
+      # True if the TNT should explode blocks
+      blocks: false
+
+  # vanadium:erin_axe
+  erin_axe:
+    lightning:
+      # How far the lightning can reach
+      range: 30
+    throw:
+      # Speed of the arrow
+      speed: 1
+      # How much damage the arrow will do
+      damage: 4
