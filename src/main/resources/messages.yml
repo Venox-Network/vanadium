@@ -114,7 +114,7 @@ trusting:
 # %victim% = The person being attacked / blocking
 custom-items:
   # %seconds%
-  action-bar: "&3%seconds% seconds &bleft"
+  action-bar: "&3%seconds% &bseconds left"
   chris_shield:
     block:
       # %attacker%
