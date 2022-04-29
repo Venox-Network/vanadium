@@ -10,7 +10,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemStack;
 
 import xyz.srnyx.vanadium.Main;
 import xyz.srnyx.vanadium.commands.CommandBypass;
@@ -24,15 +23,14 @@ public class InteractListener implements Listener {
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         Block block = event.getClickedBlock();
-        ItemStack item = player.getInventory().getItemInMainHand();
 
         // If Holding Lock Tool
         if (new LockManager().holdingLockTool(player) && event.getHand() == EquipmentSlot.HAND && block != null) {
             if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
-                new LockManager(block).attemptLock(player, item);
+                new LockManager(block).attemptLock(player, player.getInventory().getItemInMainHand());
                 event.setCancelled(true);
             } else if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-                new LockManager(block).attemptUnlock(player, item);
+                new LockManager(block).attemptUnlock(player, player.getInventory().getItemInMainHand());
                 event.setCancelled(true);
             }
         }
@@ -58,7 +56,6 @@ public class InteractListener implements Listener {
         // Cancel if entity interacts with locked blocked (Main.locked.getString(new LockManager(event.getBlock()).getId() + ".locked") != null)
         if (new LockManager(event.getBlock()).isLocked()) {
             event.setCancelled(true);
-            Bukkit.broadcastMessage(event.getEntity().getName() + " just triggered " + event.getBlock() + " at " + event.getBlock().getLocation());
         }
     }
 }
