@@ -1,10 +1,11 @@
 package xyz.srnyx.vanadium.managers;
 
+import dev.lone.itemsadder.api.CustomStack;
+
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EntityEquipment;
-import org.bukkit.inventory.ItemStack;
 
 
 public class DamageManager {
@@ -13,81 +14,87 @@ public class DamageManager {
         EntityEquipment inv = entity.getEquipment();
         double red = 0.0;
 
-        if (inv.getItemInMainHand().getType() != Material.SHIELD) {
-            red = red + 0.0;
-        } else if (entity instanceof Player player) {
-            if (player.isBlocking()) {
-                red = red + 0.05;
+        if (inv.getItemInMainHand().getType() == Material.SHIELD) {
+            if (entity instanceof Player player) {
+                if (player.isBlocking()) {
+                    red += 0.05;
+                }
+            } else {
+                red += 0.05;
             }
         } else {
-            red = red + 0.05;
+            red += 0.05;
         }
 
         if (inv.getItemInOffHand().getType() != Material.SHIELD) {
-            red = red + 0.0;
+            red += 0.0;
         } else if (entity instanceof Player player) {
             if (player.isBlocking()) {
-                red = red + 0.05;
+                red += 0.05;
             }
         } else {
-            red = red + 0.05;
+            red += 0.05;
         }
 
-        ItemStack helmet = inv.getHelmet();
         if (inv.getHelmet() != null) {
-            Material helmetType = helmet.getType();
-            if (helmetType == Material.LEATHER_HELMET) {
-                red = red + 0.04;
-            } else if (helmetType == Material.GOLDEN_HELMET || helmetType == Material.CHAINMAIL_HELMET || helmetType == Material.IRON_HELMET) {
-                red = red + 0.08;
-            } else if (helmetType == Material.DIAMOND_HELMET || helmetType == Material.NETHERITE_HELMET) {
-                red = red + 0.12;
+            Material helmet = inv.getHelmet().getType();
+            if (helmet == Material.LEATHER_HELMET) {
+                red += 0.04;
+            } else if (helmet == Material.GOLDEN_HELMET || helmet == Material.CHAINMAIL_HELMET || helmet == Material.IRON_HELMET || helmet == Material.TURTLE_HELMET) {
+                red += 0.08;
+            } else if (helmet == Material.DIAMOND_HELMET || helmet == Material.NETHERITE_HELMET) {
+                red += 0.12;
+            } else if (inv.getHelmet() == CustomStack.getInstance("vanadium_helmet").getItemStack()) {
+                red += 0.16;
             } else {
                 red += 0.0;
             }
         }
 
-        ItemStack chest = inv.getChestplate();
         if (inv.getChestplate() != null) {
-            Material chestType = chest.getType();
-            if (chestType == Material.LEATHER_CHESTPLATE) {
-                red = red + 0.12;
-            } else if (chestType == Material.GOLDEN_CHESTPLATE || chestType == Material.CHAINMAIL_CHESTPLATE || chestType == Material.IRON_CHESTPLATE) {
-                red = red + 0.20;
-            } else if (chestType == Material.DIAMOND_CHESTPLATE || chestType == Material.NETHERITE_CHESTPLATE) {
-                red = red + 0.32;
+            Material chestplate = inv.getChestplate().getType();
+            if (chestplate == Material.LEATHER_CHESTPLATE) {
+                red += 0.12;
+            } else if (chestplate == Material.GOLDEN_CHESTPLATE || chestplate == Material.CHAINMAIL_CHESTPLATE || chestplate == Material.IRON_CHESTPLATE) {
+                red += 0.20;
+            } else if (chestplate == Material.DIAMOND_CHESTPLATE || chestplate == Material.NETHERITE_CHESTPLATE) {
+                red += 0.32;
+            } else if (inv.getChestplate() == CustomStack.getInstance("vanadium_chestplate").getItemStack()) {
+                red += 0.16;
             } else {
                 red += 0.0;
             }
         }
 
-        ItemStack pants = inv.getLeggings();
         if (inv.getLeggings() != null) {
-            Material pantsType = pants.getType();
-            if (pants.getType() == Material.LEATHER_LEGGINGS) {
-                red = red + 0.08;
-            } else if (pantsType == Material.GOLDEN_LEGGINGS) {
-                red = red + 0.12;
-            } else if (pantsType == Material.CHAINMAIL_LEGGINGS) {
-                red = red + 0.16;
-            } else if (pantsType == Material.IRON_LEGGINGS) {
-                red = red + 0.20;
-            } else if (pantsType == Material.DIAMOND_LEGGINGS || pantsType == Material.NETHERITE_LEGGINGS) {
-                red = red + 0.24;
+            Material leggings = inv.getLeggings().getType();
+            if (leggings == Material.LEATHER_LEGGINGS) {
+                red += 0.08;
+            } else if (leggings == Material.GOLDEN_LEGGINGS) {
+                red += 0.12;
+            } else if (leggings == Material.CHAINMAIL_LEGGINGS) {
+                red += 0.16;
+            } else if (leggings == Material.IRON_LEGGINGS) {
+                red += 0.20;
+            } else if (leggings == Material.DIAMOND_LEGGINGS || leggings == Material.NETHERITE_LEGGINGS) {
+                red += 0.24;
+            } else if (inv.getLeggings() == CustomStack.getInstance("vanadium_helmet").getItemStack()) {
+                red += 0.16;
             } else {
                 red += 0.0;
             }
         }
 
-        ItemStack boots = inv.getBoots();
         if (inv.getBoots() != null) {
-            Material bootsType = boots.getType();
-            if (bootsType == Material.LEATHER_BOOTS || bootsType == Material.GOLDEN_BOOTS || bootsType == Material.CHAINMAIL_BOOTS) {
-                red = red + 0.04;
-            } else if (bootsType == Material.IRON_BOOTS) {
-                red = red + 0.08;
-            } else if (bootsType == Material.DIAMOND_BOOTS || bootsType == Material.NETHERITE_BOOTS) {
-                red = red + 0.12;
+            Material boots = inv.getBoots().getType();
+            if (boots == Material.LEATHER_BOOTS || boots == Material.GOLDEN_BOOTS || boots == Material.CHAINMAIL_BOOTS) {
+                red += 0.04;
+            } else if (boots == Material.IRON_BOOTS) {
+                red += 0.08;
+            } else if (boots == Material.DIAMOND_BOOTS || boots == Material.NETHERITE_BOOTS) {
+                red += 0.12;
+            } else if (inv.getBoots() == CustomStack.getInstance("vanadium_boots").getItemStack()) {
+                red += 0.16;
             } else {
                 red += 0.0;
             }
