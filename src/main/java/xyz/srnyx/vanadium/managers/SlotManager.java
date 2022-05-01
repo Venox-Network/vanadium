@@ -72,19 +72,15 @@ public class SlotManager {
 
         // %slot%
         String slot;
-        if (getMultiplier() > 1) {
+        if (getMultiplier() != 1) {
             slot = "slots";
-        } else {
-            slot = "slot";
-        }
+        } else slot = "slot";
 
         // %minute%
         String minute;
         if (Main.config.getInt("slot-cooldowns." + type) > 1) {
             minute = "minutes";
-        } else {
-            minute = "minute";
-        }
+        } else minute = "minute";
 
         new MessageManager("slots.add")
                 .replace("%count%", String.valueOf(getMultiplier()).replaceAll("\\.0*$|(\\.\\d*?)0+$", "$1"))
@@ -112,9 +108,6 @@ public class SlotManager {
                             if (essentials.getUser(online).isAfk()) {
                                 slot.stop();
                                 slot.start();
-                                new MessageManager("slots.afk")
-                                        .replace("%type%", type.substring(0, type.length() - 1))
-                                        .send(online);
                             } else {
                                 slot.addSlot();
                             }
@@ -135,7 +128,7 @@ public class SlotManager {
             String perm = pai.getPermission();
             if (perm.startsWith("vanadium.multiplier.")) {
                 try {
-                    return Double.parseDouble(perm.substring(perm.lastIndexOf(".") + 1)) / 100;
+                    return Double.parseDouble(perm.substring(perm.lastIndexOf(".") + 1));
                 } catch (NumberFormatException e) {
                     return 1;
                 }
