@@ -189,9 +189,12 @@ public class LockManager {
         if (!(placer == null && (Main.config.getBoolean("allow-unplaced-locking") || CommandBypass.check(player)))) {
             if (placer == null || !placer.equals(player.getUniqueId().toString())) {
                 player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1, 2);
+
+                String placerString = "N/A";
+                if (placer != null) Bukkit.getOfflinePlayer(UUID.fromString(placer)).getName();
                 new MessageManager("locking.lock.fail")
                         .replace("%block%", getName())
-                        .replace("%player%", Bukkit.getOfflinePlayer(UUID.fromString(getPlacer())).getName())
+                        .replace("%player%", placerString)
                         .send(player);
                 return;
             }
@@ -499,9 +502,7 @@ public class LockManager {
      * @return  Whoever placed {@code block}
      */
     public String getPlacer() {
-        if (Main.locked.contains(getId() + ".placer")) {
-            return Main.locked.getString(getId() + ".placer");
-        }
+        if (Main.locked.contains(getId() + ".placer")) return Main.locked.getString(getId() + ".placer");
         return null;
     }
 
@@ -657,15 +658,13 @@ public class LockManager {
     }
 
     /**
-     * Checks if locked block typed are still the same as the saved type
+     * Checks if locked block types are still the same as the saved types
      */
     public void check() {
         for (String key : Main.locked.getKeys(false)) {
             String[] split = key.split("=");
             Location loc = new Location(Bukkit.getWorld(split[0]), Double.parseDouble(split[1]), Double.parseDouble(split[2]), Double.parseDouble(split[3]));
-            if (!loc.getBlock().getType().name().equalsIgnoreCase(split[4])) {
-                Main.locked.set(key, null);
-            }
+            if (!loc.getBlock().getType().name().equalsIgnoreCase(split[4])) Main.locked.set(key, null);
         }
         save();
     }
