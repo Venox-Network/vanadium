@@ -41,6 +41,10 @@ commands:
     description: "Reloads the plugin files"
     usage: "Usage: /<command>"
     permission: vanadium.reload
+  slot:
+    description: "Manages player slots"
+    usage: "Usage: /<command> <player> <type> [action] [amount]"
+    permission: vanadium.slot
 
 
 permissions:
@@ -57,6 +61,7 @@ permissions:
       - vanadium.bypass
       - vanadium.untrust
       - vanadium.reload
+      - vanadium.slot
   vanadium.bypass:
     description: "Gives access to /bypass"
   vanadium.trustlist:
@@ -79,3 +84,7 @@ permissions:
     description: "Gives access to /link"
   vanadium.reload:
     description: "Gives access to /reload"
+  vanadium.slot:
+    description: "Gives access to /slot"
+  vanadium.multiplier.#:
+    description: "The multiplier for number of slots given"
