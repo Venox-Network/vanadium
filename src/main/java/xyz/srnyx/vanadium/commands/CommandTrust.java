@@ -19,8 +19,8 @@ import java.util.List;
 public class CommandTrust implements TabExecutor {
     @SuppressWarnings("NullableProblems")
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (!Main.isPlayer(sender)) return true;
-        if (!Main.hasPermission(sender, "vanadium.trust")) return true;
+        if (!new PlayerManager(sender).isPlayer()) return true;
+        if (!new PlayerManager(sender).hasPermission("vanadium.trust")) return true;
         Player player = (Player) sender;
 
         if (args.length == 1) {

@@ -1,24 +1,24 @@
 package xyz.srnyx.vanadium.commands;
 
-import xyz.srnyx.vanadium.Main;
-import xyz.srnyx.vanadium.managers.LockManager;
-import xyz.srnyx.vanadium.managers.MessageManager;
-
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import xyz.srnyx.vanadium.managers.LockManager;
+import xyz.srnyx.vanadium.managers.MessageManager;
+import xyz.srnyx.vanadium.managers.PlayerManager;
+
 
 public class CommandLockTool implements CommandExecutor {
     @SuppressWarnings("NullableProblems")
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (!Main.hasPermission(sender, "vanadium.locktool")) return true;
+        if (!new PlayerManager(sender).hasPermission("vanadium.locktool")) return true;
         Player player = (Player) sender;
 
         // If a player is specified, give lock tool to them instead of sender
-        if (args.length == 1 && (player.hasPermission("vanadium.locktool.others") || sender == null)) {
+        if (args.length == 1 && player.hasPermission("vanadium.locktool.others")) {
             Player target = Bukkit.getPlayer(args[0]);
             if (target != null) {
                 target.getInventory().addItem(LockManager.getLockTool());

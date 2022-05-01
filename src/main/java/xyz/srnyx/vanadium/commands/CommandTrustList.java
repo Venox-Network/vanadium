@@ -19,7 +19,7 @@ import java.util.UUID;
 public class CommandTrustList implements CommandExecutor {
     @SuppressWarnings("NullableProblems")
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (!Main.hasPermission(sender, "vanadium.trustlist")) return true;
+        if (!new PlayerManager(sender).hasPermission("vanadium.trustlist")) return true;
         Player player = (Player) sender;
 
         if (args.length == 1 && (player.hasPermission("vanadium.trustlist.others"))) {

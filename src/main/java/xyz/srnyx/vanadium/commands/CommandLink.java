@@ -8,10 +8,10 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import xyz.srnyx.vanadium.Main;
 import xyz.srnyx.vanadium.listeners.DiscordListener;
 import xyz.srnyx.vanadium.managers.CodeManager;
 import xyz.srnyx.vanadium.managers.MessageManager;
+import xyz.srnyx.vanadium.managers.PlayerManager;
 
 import java.util.UUID;
 
@@ -19,8 +19,8 @@ import java.util.UUID;
 public class CommandLink implements CommandExecutor {
     @SuppressWarnings("NullableProblems")
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (!Main.isPlayer(sender)) return true;
-        if (!Main.hasPermission(sender, "vanadium.link")) return true;
+        if (!new PlayerManager(sender).isPlayer()) return true;
+        if (!new PlayerManager(sender).hasPermission("vanadium.link")) return true;
         Player player = (Player) sender;
 
         UUID minecraft = player.getUniqueId();
