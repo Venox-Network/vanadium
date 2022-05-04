@@ -12,12 +12,12 @@ plugin:
 # %permission% = The permission the player must have
 # %player% = The inputted player that was invalid
 errors:
-  console-forbidden: "&4&lERROR! &cYou must be a player to run this command"
+  console-forbidden: "%prefix%&4&lERROR! &cYou must be a player to run this command"
   # %permission%
-  no-permission: "&4&lERROR! &cYou must have &4%permission% &cto run this command"
+  no-permission: "%prefix%&4&lERROR! &cYou must have &4%permission% &cto run this command"
   # %player%
-  invalid-player: "&4&lERROR! &4%player% &cis not a valid player"
-  invalid-arguments: "&4&lERROR! &cInvalid arguments"
+  invalid-player: "%prefix%&4&lERROR! &4%player% &cis not a valid player"
+  invalid-arguments: "%prefix%&4&lERROR! &cInvalid arguments"
 
 
 # %code% = The player's code that was generated
@@ -50,15 +50,22 @@ slots:
   # %type%, %total%, %target%
   limit: "%prefix%&cFailed to %type% &4%target%&c! You've reached your limit of &4%total% %type%s&c."
 
-  # %type%, %slot%, %total%, %target%
+  # %type%, %target%
   command:
-    get: "%prefix%&3%target% &bhas &3%total% &b%type% %slot%."
-    # %count%
+    # %slot%, %total%
+    get: "%prefix%&3%target% &bhas &3%total% &b%type% %slot%"
+    # %next% = Time remaining in seconds
+    cooldown: "%prefix%&3%target% &bhas &3%next% &bseconds until their next &3%type% &bslot"
+    # %count%, %slot%, %total%
     add: "%prefix%&bYou've given &3%count% &b%type% %slot% to &3%target% &b(new total: &3%total%&b)"
-    # %count%
+    # %count%, %slot%, %total%
     remove: "%prefix%&bYou've taken &3%count% &b%type% %slot% from &3%target% &b(new total: &3%total%&b)"
-    # %count%
+    # %count%, %slot%, %total%
     set: "%prefix%&bYou've set &3%target%&b's %type% %slot% to &3%count%"
+    # %type%, %target%
+    start: "%prefix%&bYou've started &3%type% &bslot gaining for &3%target%"
+    # %type%, %target%
+    stop: "%prefix%&bYou've stopped &3%type% &bslot gaining for &3%target%"
 
 
 # %block% = The block that was targeted

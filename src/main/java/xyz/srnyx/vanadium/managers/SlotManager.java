@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 public class SlotManager {
     private Player player;
-    private final String type;
+    private String type;
 
     private static final Map<UUID, Long> locksCooldown = new HashMap<>();
     private static final Map<UUID, Long> trustsCooldown = new HashMap<>();
@@ -31,6 +31,8 @@ public class SlotManager {
     public SlotManager(String type) {
         this.type = type;
     }
+
+    public SlotManager() {}
 
     /**
      * Start {@code player}'s cooldown
@@ -45,9 +47,8 @@ public class SlotManager {
      * Remove {@code player}'s cooldown
      */
     public void stop() {
-        UUID uuid = player.getUniqueId();
-        if (Objects.equals(type, "locks")) locksCooldown.remove(uuid);
-        if (Objects.equals(type, "trusts")) trustsCooldown.remove(uuid);
+        if (Objects.equals(type, "locks")) locksCooldown.remove(player.getUniqueId());
+        if (Objects.equals(type, "trusts")) trustsCooldown.remove(player.getUniqueId());
     }
 
     /**
@@ -57,6 +58,15 @@ public class SlotManager {
         if (Objects.equals(type, "locks")) return locksCooldown.get(player.getUniqueId()) - System.currentTimeMillis();
         if (Objects.equals(type, "trusts")) return trustsCooldown.get(player.getUniqueId()) - System.currentTimeMillis();
         return 0L;
+    }
+
+    /**
+     * @return  True if cooldown map contains player, false if not
+     */
+    public boolean contains() {
+        if (Objects.equals(type, "locks")) return locksCooldown.containsKey(player.getUniqueId());
+        if (Objects.equals(type, "trusts")) return trustsCooldown.containsKey(player.getUniqueId());
+        return false;
     }
 
     /**
@@ -100,20 +110,14 @@ public class SlotManager {
             public void run() {
                 for (Player online : Bukkit.getOnlinePlayers()) {
                     SlotManager slot = new SlotManager(type, online);
-                    Essentials essentials = (Essentials) Bukkit.getServer().getPluginManager().getPlugin("Essentials");
-                    if (slot.timeLeft() <= 0) {
-                        // Check if Essentials is installed
+                    if (slot.contains() && slot.timeLeft() <= 0) {
+                        Essentials essentials = (Essentials) Bukkit.getServer().getPluginManager().getPlugin("Essentials");
                         if (essentials != null) {
-                            // Check if player is AFK
                             if (essentials.getUser(online).isAfk()) {
                                 slot.stop();
                                 slot.start();
-                            } else {
-                                slot.addSlot();
-                            }
-                        } else {
-                            slot.addSlot();
-                        }
+                            } else slot.addSlot();
+                        } else slot.addSlot();
                     }
                 }
             }
@@ -147,7 +151,7 @@ public class SlotManager {
     /**
      * Saves {@code slots.yml}
      */
-    private void save() {
+    public void save() {
         new ConfigManager("slots.yml", true).saveData(Main.slots);
     }
 }
