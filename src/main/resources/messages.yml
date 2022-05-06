@@ -54,8 +54,8 @@ slots:
   command:
     # %slot%, %total%
     get: "%prefix%&3%target% &bhas &3%total% &b%type% %slot%"
-    # %next% = Time remaining in seconds
-    cooldown: "%prefix%&3%target% &bhas &3%next% &bseconds until their next &3%type% &bslot"
+    # %next% = Time remaining
+    cooldown: "%prefix%&3%target% &bhas &3%next% &buntil their next &3%type% &bslot"
     # %count%, %slot%, %total%
     add: "%prefix%&bYou've given &3%count% &b%type% %slot% to &3%target% &b(new total: &3%total%&b)"
     # %count%, %slot%, %total%

@@ -1,7 +1,9 @@
 package xyz.srnyx.vanadium.managers;
 
+import com.earth2me.essentials.Essentials;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +25,7 @@ public class PlaceholderManager extends PlaceholderExpansion {
 
     @Override
     public @NotNull String getVersion() {
-        return "0.0.1";
+        return "0.0.2";
     }
 
     @Override
@@ -33,25 +35,44 @@ public class PlaceholderManager extends PlaceholderExpansion {
 
     @Override
     public String onPlaceholderRequest(Player player, String params) {
-        if (params.equalsIgnoreCase("blocks")) {
-            return String.valueOf(new LockManager().getLockedCount(player));
+        Essentials essentials = (Essentials) Bukkit.getServer().getPluginManager().getPlugin("Essentials");
+
+        // %v_locked%
+        if (params.equalsIgnoreCase("locked")) return String.valueOf(new LockManager().getLockedCount(player));
+        // %v_trusted%
+        if (params.equalsIgnoreCase("trusted")) return String.valueOf(new TrustManager(player).getTrustedCount());
+
+
+        // %v_locks%
+        if (params.equalsIgnoreCase("locks")) return String.valueOf(new SlotManager("locks", player).getCount());
+        // %v_locks_gain%
+        if (params.equalsIgnoreCase("locks_gain")) {
+            if (essentials != null && essentials.getUser(player).isAfk()) {
+                return "false";
+            } else return String.valueOf(new SlotManager("locks", player).contains());
         }
-        if (params.equalsIgnoreCase("slots_locks")) {
-            return String.valueOf(new SlotManager("locks", player).getCount());
-        }
-        if (params.equalsIgnoreCase("slots_locks_time")) {
-            return String.valueOf(TimeUnit.MILLISECONDS.toMinutes(new SlotManager("locks", player).timeLeft()));
+        // %v_locks_time%
+        if (params.equalsIgnoreCase("locks_time")) {
+            if (new SlotManager("locks", player).timeLeft(true) != null) {
+                return String.valueOf(TimeUnit.MILLISECONDS.toMinutes(new SlotManager("locks", player).timeLeft(true)));
+            } else return "N/A";
         }
 
-        if (params.equalsIgnoreCase("trusted")) {
-            return String.valueOf(new TrustManager(player).getTrustedCount());
+        // %v_trusts%
+        if (params.equalsIgnoreCase("trusts")) return String.valueOf(new SlotManager("trusts", player).getCount());
+        // %v_trusts_gain%
+        if (params.equalsIgnoreCase("trusts_gain")) {
+            if (essentials != null && essentials.getUser(player).isAfk()) {
+                return "false";
+            } else return String.valueOf(new SlotManager("trusts", player).contains());
         }
-        if (params.equalsIgnoreCase("slots_trusts")) {
-            return String.valueOf(new SlotManager("trusts", player).getCount());
+        // %v_trusts_time%
+        if (params.equalsIgnoreCase("trusts_time")) {
+            if (new SlotManager("trusts", player).timeLeft(true) != null) {
+                return String.valueOf(TimeUnit.MILLISECONDS.toMinutes(new SlotManager("trusts", player).timeLeft(true)));
+            } else return "N/A";
         }
-        if (params.equalsIgnoreCase("slots_trusts_time")) {
-            return String.valueOf(TimeUnit.MILLISECONDS.toMinutes(new SlotManager("trusts", player).timeLeft()));
-        }
+
         return null;
     }
 }

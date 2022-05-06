@@ -7,6 +7,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import xyz.srnyx.vanadium.commands.CommandBypass;
+import xyz.srnyx.vanadium.commands.CommandSlot;
 import xyz.srnyx.vanadium.managers.PlayerManager;
 import xyz.srnyx.vanadium.managers.SlotManager;
 
@@ -22,8 +23,8 @@ public class JoinLeaveListener implements Listener {
         }
 
         // Start slot cooldown
-        new SlotManager("locks", player).start();
-        new SlotManager("trusts", player).start();
+        if (!CommandSlot.stopLocks.contains(player.getUniqueId())) new SlotManager("locks", player).start();
+        if (!CommandSlot.stopTrusts.contains(player.getUniqueId())) new SlotManager("trusts", player).start();
     }
 
     @EventHandler

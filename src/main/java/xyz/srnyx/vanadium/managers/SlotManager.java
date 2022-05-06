@@ -54,9 +54,12 @@ public class SlotManager {
     /**
      * @return  The amount of time left in the cooldown
      */
-    public Long timeLeft() {
-        if (Objects.equals(type, "locks")) return locksCooldown.get(player.getUniqueId()) - System.currentTimeMillis();
-        if (Objects.equals(type, "trusts")) return trustsCooldown.get(player.getUniqueId()) - System.currentTimeMillis();
+    public Long timeLeft(boolean papi) {
+        if (new SlotManager(type, player).contains()) {
+            if (Objects.equals(type, "locks")) return locksCooldown.get(player.getUniqueId()) - System.currentTimeMillis();
+            if (Objects.equals(type, "trusts")) return trustsCooldown.get(player.getUniqueId()) - System.currentTimeMillis();
+        }
+        if (papi) return null;
         return 0L;
     }
 
@@ -110,7 +113,7 @@ public class SlotManager {
             public void run() {
                 for (Player online : Bukkit.getOnlinePlayers()) {
                     SlotManager slot = new SlotManager(type, online);
-                    if (slot.contains() && slot.timeLeft() <= 0) {
+                    if (slot.contains() && slot.timeLeft(false) <= 0) {
                         Essentials essentials = (Essentials) Bukkit.getServer().getPluginManager().getPlugin("Essentials");
                         if (essentials != null) {
                             if (essentials.getUser(online).isAfk()) {

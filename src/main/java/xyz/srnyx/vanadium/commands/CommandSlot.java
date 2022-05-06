@@ -14,11 +14,15 @@ import xyz.srnyx.vanadium.managers.SlotManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 
 @SuppressWarnings("NullableProblems")
 public class CommandSlot implements TabExecutor {
+    public static final List<UUID> stopLocks = new ArrayList<>();
+    public static final List<UUID> stopTrusts = new ArrayList<>();
+
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!new PlayerManager(sender).hasPermission("vanadium.slot")) return true;
 
@@ -55,11 +59,13 @@ public class CommandSlot implements TabExecutor {
                     }
 
                     //<player> <cooldown> <locks|trusts>
+                    String timeLeft = TimeUnit.MILLISECONDS.toSeconds(new SlotManager(type, player).timeLeft(false)) + " seconds";
+                    if (new SlotManager(type, player).timeLeft(true) == null) timeLeft = "N/A (stopped)";
                     if (action.equalsIgnoreCase("cooldown")) {
                         new MessageManager("slots.command.cooldown")
                                 .replace("%target%", player.getName())
                                 .replace("%type%", type.substring(0, type.length() - 1))
-                                .replace("%next%", String.valueOf(TimeUnit.MILLISECONDS.toSeconds(new SlotManager(type, player).timeLeft())))
+                                .replace("%next%", timeLeft)
                                 .send(sender);
                         return true;
                     }
@@ -70,13 +76,29 @@ public class CommandSlot implements TabExecutor {
                             if (type.equalsIgnoreCase("all")) {
                                 new SlotManager("locks", player).start();
                                 new SlotManager("trusts", player).start();
-                            } else new SlotManager(type, player).start();
+                                stopLocks.remove(player.getUniqueId());
+                                stopTrusts.remove(player.getUniqueId());
+                            } else if (type.equalsIgnoreCase("locks")) {
+                                new SlotManager(type, player).start();
+                                stopLocks.remove(player.getUniqueId());
+                            } else if (type.equalsIgnoreCase("trusts")) {
+                                new SlotManager(type, player).start();
+                                stopTrusts.remove(player.getUniqueId());
+                            }
                         }
                         if (action.equalsIgnoreCase("stop")) {
                             if (type.equalsIgnoreCase("all")) {
                                 new SlotManager("locks", player).stop();
                                 new SlotManager("trusts", player).stop();
-                            } else new SlotManager(type, player).stop();
+                                stopLocks.add(player.getUniqueId());
+                                stopTrusts.add(player.getUniqueId());
+                            } else if (type.equalsIgnoreCase("locks")) {
+                                new SlotManager(type, player).stop();
+                                stopLocks.add(player.getUniqueId());
+                            } else if (type.equalsIgnoreCase("trusts")) {
+                                new SlotManager(type, player).stop();
+                                stopTrusts.add(player.getUniqueId());
+                            }
                         }
 
                         // %type%
