@@ -103,10 +103,10 @@ public class ItemsAdderListener implements Listener {
             }
 
             // erin_axe
-            if (ItemsAdderManager.holdingItem(false, "erin_axe")) {
+            if (ItemsAdderManager.holdingItem(false, "chris_axe")) {
                 // Lightning
                 if (leftClick) {
-                    player.getWorld().strikeLightning(player.getTargetBlock(null, Main.config.getInt("custom-items.erin_axe.lightning.range")).getLocation());
+                    player.getWorld().strikeLightning(player.getTargetBlock(null, Main.config.getInt("custom-items.chris_axe.lightning.range")).getLocation());
                     ItemsAdderManager.durability(false, 4);
                 }
 
@@ -118,8 +118,8 @@ public class ItemsAdderListener implements Listener {
 
                     // Spawn arrow
                     Location eye = player.getEyeLocation();
-                    Arrow arrow = player.getWorld().spawnArrow(eye, eye.getDirection(), Main.config.getInt("custom-items.erin_axe.throw.speed"), 0);
-                    arrow.setDamage(Main.config.getInt("custom-items.erin_axe.throw.damage"));
+                    Arrow arrow = player.getWorld().spawnArrow(eye, eye.getDirection(), Main.config.getInt("custom-items.chris_axe.throw.speed"), 0);
+                    arrow.setDamage(Main.config.getInt("custom-items.chris_axe.throw.damage"));
                     arrow.setCustomName(ChatColor.DARK_AQUA + "" + ChatColor.BOLD + "AXE");
                     arrow.setColor(Color.fromRGB(80, 80, 80));
                     arrow.setCustomNameVisible(true);
