@@ -35,7 +35,7 @@ public class PlaceholderManager extends PlaceholderExpansion {
 
     @Override
     public String onPlaceholderRequest(Player player, String params) {
-        Essentials essentials = (Essentials) Bukkit.getServer().getPluginManager().getPlugin("Essentials");
+        Essentials essentials = (Essentials) Bukkit.getPluginManager().getPlugin("Essentials");
 
         // %v_locked%
         if (params.equalsIgnoreCase("locked")) return String.valueOf(new LockManager().getLockedCount(player));
@@ -54,7 +54,12 @@ public class PlaceholderManager extends PlaceholderExpansion {
         // %v_locks_time%
         if (params.equalsIgnoreCase("locks_time")) {
             if (new SlotManager("locks", player).timeLeft(true) != null) {
-                return String.valueOf(TimeUnit.MILLISECONDS.toMinutes(new SlotManager("locks", player).timeLeft(true)));
+                String value = String.valueOf(TimeUnit.MILLISECONDS.toMinutes(new SlotManager("locks", player).timeLeft(true)));
+                if (essentials != null) {
+                    if (!essentials.getUser(player).isAfk()) {
+                        return value;
+                    } else return "N/A";
+                } else return value;
             } else return "N/A";
         }
 
@@ -69,7 +74,12 @@ public class PlaceholderManager extends PlaceholderExpansion {
         // %v_trusts_time%
         if (params.equalsIgnoreCase("trusts_time")) {
             if (new SlotManager("trusts", player).timeLeft(true) != null) {
-                return String.valueOf(TimeUnit.MILLISECONDS.toMinutes(new SlotManager("trusts", player).timeLeft(true)));
+                String value = String.valueOf(TimeUnit.MILLISECONDS.toMinutes(new SlotManager("trusts", player).timeLeft(true)));
+                if (essentials != null) {
+                    if (!essentials.getUser(player).isAfk()) {
+                        return value;
+                    } else return "N/A";
+                } else return value;
             } else return "N/A";
         }
 
