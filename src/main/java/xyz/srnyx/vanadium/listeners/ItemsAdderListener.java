@@ -24,24 +24,22 @@ import java.util.concurrent.TimeUnit;
 
 
 public class ItemsAdderListener implements Listener {
-    private final Map<UUID, ItemStack> axes = new HashMap<>();
-
     /**
      * Called when a player interacts
      */
     @EventHandler
     public void interact(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        ItemsAdderManager ItemsAdderManager = new ItemsAdderManager(player);
+        ItemsAdderManager iam = new ItemsAdderManager(player);
         boolean leftClick = (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK);
         boolean rightClick = (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK);
 
         if (player.isSneaking()) {
-            if (ItemsAdderManager.notOnCooldown()) {
+            if (iam.notOnCooldown()) {
                 // nyx_wand
-                if (leftClick && ItemsAdderManager.holdingItem(false, "nyx_wand")) {
-                    ItemsAdderManager.cooldown();
-                    ItemsAdderManager.durability(false, 2);
+                if (leftClick && iam.holdingItem(false, "nyx_wand")) {
+                    iam.cooldown();
+                    iam.durability(false, 2);
 
                     // TNT item
                     Item tnt = player.getWorld().dropItem(player.getEyeLocation(), new ItemStack(Material.TNT));
@@ -81,14 +79,14 @@ public class ItemsAdderListener implements Listener {
                 }
 
                 // chris_shield
-                if (rightClick && ItemsAdderManager.holdingItem(true, "chris_shield")) {
-                    ItemsAdderManager.cooldown();
+                if (rightClick && iam.holdingItem(true, "chris_shield")) {
+                    iam.cooldown();
                     player.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, player.getLocation(), 20, 1, 1, 1);
-                    ItemsAdderManager.durability(true, 6);
+                    iam.durability(true, 6);
 
                     // Damage entities
-                    //noinspection ConstantConditions
-                    for (Entity entity : player.getLocation().getWorld().getEntities()) {
+                    World world = player.getWorld();
+                    for (Entity entity : world.getEntities()) {
                         if (entity instanceof LivingEntity entityLiving && entityLiving != player && entityLiving.hasLineOfSight(player)) {
                             if (entityLiving.getLocation().distance(player.getLocation()) <= Main.config.getInt("custom-items.chris_shield.damage.range")) {
                                 if (entityLiving instanceof Player livingPlayer) {
@@ -102,18 +100,18 @@ public class ItemsAdderListener implements Listener {
                 }
             }
 
-            // erin_axe
-            if (ItemsAdderManager.holdingItem(false, "chris_axe")) {
+            // chris_axe
+            if (iam.holdingItem(false, "chris_axe")) {
                 // Lightning
                 if (leftClick) {
                     player.getWorld().strikeLightning(player.getTargetBlock(null, Main.config.getInt("custom-items.chris_axe.lightning.range")).getLocation());
-                    ItemsAdderManager.durability(false, 4);
+                    iam.durability(false, 4);
                 }
 
                 // Throw
                 if (rightClick) {
                     // Remove axe
-                    axes.put(player.getUniqueId(), player.getInventory().getItemInMainHand().clone());
+                    ItemsAdderManager.axes.put(player.getUniqueId(), player.getInventory().getItemInMainHand().clone());
                     player.getInventory().setItemInMainHand(new ItemStack(Material.AIR));
 
                     // Spawn arrow
@@ -121,11 +119,17 @@ public class ItemsAdderListener implements Listener {
                     Arrow arrow = player.getWorld().spawnArrow(eye, eye.getDirection(), Main.config.getInt("custom-items.chris_axe.throw.speed"), 0);
                     arrow.setDamage(Main.config.getInt("custom-items.chris_axe.throw.damage"));
                     arrow.setCustomName(ChatColor.DARK_AQUA + "" + ChatColor.BOLD + "AXE");
-                    arrow.setColor(Color.fromRGB(80, 80, 80));
                     arrow.setCustomNameVisible(true);
                     arrow.setPersistent(true);
                     arrow.setShooter(player);
                     arrow.setGlowing(true);
+
+                    // Remove arrow after a few seconds
+                    new BukkitRunnable() {
+                        public void run() {
+                            if (arrow.isValid()) ItemsAdderManager.axe(player, arrow);
+                        }
+                    }.runTaskLater(Main.plugin, Main.config.getInt("custom-items.chris_axe.throw.return") * 20L);
                 }
             }
         }
@@ -154,9 +158,7 @@ public class ItemsAdderListener implements Listener {
                                 .replace("%victim%", victim.getPlayerListName())
                                 .send(attackerPlayer);
                     }
-                } else {
-                    ItemsAdderManager.durability(true, 1);
-                }
+                } else ItemsAdderManager.durability(true, 1);
             }
         }
     }
@@ -168,12 +170,10 @@ public class ItemsAdderListener implements Listener {
     public void projectile(ProjectileHitEvent event) {
         if (event.getEntity() instanceof Arrow arrow && arrow.getShooter() instanceof Player player) {
             if (arrow.getCustomName() != null && arrow.getCustomName().equals(ChatColor.DARK_AQUA + "" + ChatColor.BOLD + "AXE")) {
-                // Add axe back to inventory
-                player.getInventory().addItem(axes.get(player.getUniqueId()));
-                axes.remove(player.getUniqueId());
+                ItemsAdderManager.axe(player, arrow);
 
-                new ItemsAdderManager(player).durability(false, 2);
-                arrow.remove();
+                // Play hit sound
+                if (event.getHitEntity() != null) player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, (float) 0.1, 1);
             }
         }
     }
@@ -184,6 +184,8 @@ public class ItemsAdderListener implements Listener {
     @EventHandler
     public void explode(EntityExplodeEvent event) {
         boolean name = Objects.equals(event.getEntity().getCustomName(), ChatColor.DARK_AQUA + "" + ChatColor.BOLD + "SRNYX BOMB");
-        if (!Main.config.getBoolean("custom-items.nyx_wand.tnt.blocks") && event.getEntity().getType() == EntityType.CREEPER && name) event.blockList().clear();
+        if (!Main.config.getBoolean("custom-items.nyx_wand.tnt.blocks") && event.getEntity().getType() == EntityType.CREEPER && name) {
+            event.blockList().clear();
+        }
     }
 }

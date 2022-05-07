@@ -41,6 +41,19 @@ custom-items:
       # Range entities have to be within
       range: 5
 
+  # vanadium:chris_axe
+  chris_axe:
+    lightning:
+      # How far the lightning can reach
+      range: 30
+    throw:
+      # Speed of the arrow
+      speed: 2
+      # How much damage the arrow will do
+      damage: 4
+      # Time in seconds before it returns to the inventory
+      return: 3
+
   # vanadium:nyx_wand
   nyx_wand:
     tnt:
@@ -48,14 +61,3 @@ custom-items:
       fuse: 3
       # True if the TNT should explode blocks
       blocks: false
-
-  # vanadium:erin_axe
-  erin_axe:
-    lightning:
-      # How far the lightning can reach
-      range: 30
-    throw:
-      # Speed of the arrow
-      speed: 1
-      # How much damage the arrow will do
-      damage: 4

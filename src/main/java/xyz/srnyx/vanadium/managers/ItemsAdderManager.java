@@ -5,7 +5,10 @@ import dev.lone.itemsadder.api.CustomStack;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import xyz.srnyx.vanadium.Main;
@@ -25,6 +28,7 @@ public class ItemsAdderManager {
     }
 
     private final Map<UUID, Long> cooldown = new HashMap<>();
+    public static final Map<UUID, ItemStack> axes = new HashMap<>();
 
     /**
      * Does the universal cooldown stuff
@@ -88,5 +92,20 @@ public class ItemsAdderManager {
             @Nullable CustomStack offCustom = CustomStack.byItemStack(player.getInventory().getItemInOffHand());
             if (offCustom != null) offCustom.setDurability(offCustom.getDurability() - durability);
         }
+    }
+
+    /**
+     * Returns axe to the player
+     *
+     * @param   arrow   The arrow representing the axe
+     */
+    public static void axe(Player player, Arrow arrow) {
+        Damageable axe = (Damageable) axes.get(player.getUniqueId()).getItemMeta();
+        if (axe != null) axe.setDamage(axe.getDamage() - 2);
+        player.getInventory().addItem(axes.get(player.getUniqueId()));
+        axes.remove(player.getUniqueId());
+
+        new ItemsAdderManager(player).durability(false, 2);
+        arrow.remove();
     }
 }
