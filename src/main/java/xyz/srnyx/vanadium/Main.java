@@ -55,17 +55,16 @@ public class Main extends JavaPlugin {
         new SlotManager("trusts").check();
 
         // Startup messages
-        getLogger().info(ChatColor.DARK_AQUA + "=======================");
-        getLogger().info(ChatColor.AQUA + "    Vanadium Plugin");
-        getLogger().info(ChatColor.AQUA + "" + ChatColor.ITALIC + "With code from GeekSMP");
-        getLogger().info(ChatColor.DARK_AQUA + "=======================");
+        getLogger().info(ChatColor.DARK_AQUA + "=================");
+        getLogger().info(ChatColor.AQUA + " Vanadium Plugin");
+        getLogger().info(ChatColor.DARK_AQUA + "=================");
 
         // Register listeners
-        getServer().getPluginManager().registerEvents(new BlockListener(), this);
-        getServer().getPluginManager().registerEvents(new InteractListener(), this);
-        getServer().getPluginManager().registerEvents(new JoinLeaveListener(), this);
-        getServer().getPluginManager().registerEvents(new MoveListener(), this);
-        getServer().getPluginManager().registerEvents(new ItemsAdderListener(), this);
+        Bukkit.getPluginManager().registerEvents(new BlockListener(), this);
+        Bukkit.getPluginManager().registerEvents(new InteractListener(), this);
+        Bukkit.getPluginManager().registerEvents(new JoinLeaveListener(), this);
+        Bukkit.getPluginManager().registerEvents(new MoveListener(), this);
+        Bukkit.getPluginManager().registerEvents(new ItemsAdderListener(), this);
 
         // Register commands
         registerCommand("bypass", new CommandBypass(), new TabEmpty());

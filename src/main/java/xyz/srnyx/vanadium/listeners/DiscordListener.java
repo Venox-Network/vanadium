@@ -12,6 +12,7 @@ import github.scarsz.discordsrv.objects.managers.AccountLinkManager;
 import github.scarsz.discordsrv.util.DiscordUtil;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import xyz.srnyx.vanadium.Main;
@@ -27,13 +28,15 @@ public class DiscordListener {
 
     @Subscribe
     public void onDiscordReady(DiscordReadyEvent event) {
+        String name = DiscordUtil.getJda().getSelfUser().getName();
+        String discrim = DiscordUtil.getJda().getSelfUser().getDiscriminator();
+        Main.plugin.getLogger().info(ChatColor.GREEN + "Successfully connected to " + ChatColor.DARK_GREEN + name + "#" + discrim);
+
         if (linkChannel != null) {
             TextChannel channel = DiscordUtil.getTextChannelById(linkChannel);
             if (channel != null) {
                 List<Message> history = new MessageHistory(channel).retrievePast(100).complete();
-                if (!history.isEmpty()) {
-                    channel.deleteMessages(history).queue();
-                }
+                if (!history.isEmpty()) channel.deleteMessages(history).queue();
             }
         }
     }
