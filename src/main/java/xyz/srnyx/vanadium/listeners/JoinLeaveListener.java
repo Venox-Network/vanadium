@@ -18,9 +18,7 @@ public class JoinLeaveListener implements Listener {
         Player player = event.getPlayer();
 
         // Enable bypass
-        if (new PlayerManager(player).hasScoreboardTag("bypass")) {
-            CommandBypass.enable(player, true);
-        }
+        if (PlayerManager.hasScoreboardTag(player, "bypass")) CommandBypass.enable(player, true);
 
         // Start slot cooldown
         if (!CommandSlot.stopLocks.contains(player.getUniqueId())) new SlotManager("locks", player).start();
@@ -29,10 +27,8 @@ public class JoinLeaveListener implements Listener {
 
     @EventHandler
     public void onLeave(PlayerQuitEvent event) {
-        Player player = event.getPlayer();
-
         // Stop slot cooldown
-        new SlotManager("locks", player).stop();
-        new SlotManager("trusts", player).stop();
+        new SlotManager("locks", event.getPlayer()).stop();
+        new SlotManager("trusts", event.getPlayer()).stop();
     }
 }

@@ -49,7 +49,7 @@ public class DiscordListener {
                 AccountLinkManager manager = DiscordSRV.getPlugin().getAccountLinkManager();
                 User author = event.getAuthor();
                 String discord = author.getId();
-                UUID minecraft = new CodeManager().getUUIDFromCode(message);
+                UUID minecraft = new CodeManager(message).getUUIDFromCode();
                 Player player = Bukkit.getPlayer(minecraft);
 
                 manager.unlink(discord);

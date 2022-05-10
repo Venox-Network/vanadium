@@ -8,7 +8,6 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import xyz.srnyx.vanadium.Main;
@@ -23,12 +22,17 @@ import java.util.concurrent.TimeUnit;
 
 public class ItemsAdderManager {
     private final Player player;
+    private final Map<UUID, Long> cooldown = new HashMap<>();
+    public static final Map<UUID, ItemStack> axes = new HashMap<>();
+
+    /**
+     * Constructor for {@link ItemsAdderManager}
+     *
+     * @param   player  The player to use in the methods
+     */
     public ItemsAdderManager(Player player) {
         this.player = player;
     }
-
-    private final Map<UUID, Long> cooldown = new HashMap<>();
-    public static final Map<UUID, ItemStack> axes = new HashMap<>();
 
     /**
      * Does the universal cooldown stuff
@@ -100,12 +104,14 @@ public class ItemsAdderManager {
      * @param   arrow   The arrow representing the axe
      */
     public static void axe(Player player, Arrow arrow) {
-        Damageable axe = (Damageable) axes.get(player.getUniqueId()).getItemMeta();
-        if (axe != null) axe.setDamage(axe.getDamage() - 2);
+        // Update durability of axe before returning it
+        @Nullable CustomStack axe = CustomStack.byItemStack(axes.get(player.getUniqueId()));
+        if (axe != null) axe.setDurability(axe.getDurability() - 2);
+        axes.put(player.getUniqueId(), axe.getItemStack());
+
+        // Return the axe and remove the arrow
         player.getInventory().addItem(axes.get(player.getUniqueId()));
         axes.remove(player.getUniqueId());
-
-        new ItemsAdderManager(player).durability(false, 2);
         arrow.remove();
     }
 }

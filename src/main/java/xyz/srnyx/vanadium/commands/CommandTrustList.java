@@ -7,42 +7,52 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import xyz.srnyx.vanadium.Main;
+import xyz.srnyx.vanadium.managers.DataManager;
 import xyz.srnyx.vanadium.managers.MessageManager;
 import xyz.srnyx.vanadium.managers.PlayerManager;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 
 public class CommandTrustList implements CommandExecutor {
     @SuppressWarnings("NullableProblems")
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (!new PlayerManager(sender).hasPermission("vanadium.trustlist")) return true;
+        if (PlayerManager.noPermission(sender, "vanadium.trustlist")) return true;
         Player player = (Player) sender;
 
         if (args.length == 1 && (player.hasPermission("vanadium.trustlist.others"))) {
-            OfflinePlayer target = new PlayerManager(args[0]).getOfflinePlayer();
-            trusted(player, Objects.requireNonNullElse(target.getUniqueId(), player.getUniqueId()));
+            Player targetPlayer = null;
+            OfflinePlayer target = PlayerManager.getOfflinePlayer(args[0]);
+            if (target != null) targetPlayer = Bukkit.getPlayer(target.getUniqueId());
+
+            if (targetPlayer == null) {
+                new MessageManager("errors.invalid-player")
+                        .replace("%player%", args[0])
+                        .send(player);
+                return true;
+            }
+
+            trusted(player, targetPlayer);
             return true;
         }
-        trusted(player, player.getUniqueId());
+
+        trusted(player, player);
         return true;
     }
 
-    private void trusted(Player player, UUID target) {
-        List<String> trusted = Main.trusted.getStringList(target.toString());
-        //noinspection ConstantConditions
+    private void trusted(Player player, Player target) {
+        List<UUID> trusted = DataManager.trusted.get(target.getUniqueId());
         new MessageManager("trusting.list.header")
-                .replace("%player%", Bukkit.getPlayer(target).getName())
+                .replace("%player%", target.getName())
                 .send(player);
         if (trusted.size() == 0) {
             new MessageManager("trusting.list.empty").send(player);
         } else {
-            for (String uuid : trusted) {
+            for (UUID id : trusted) {
+                Player idPlayer = Bukkit.getPlayer(id);
                 new MessageManager("trusting.list.item")
-                        .replace("%player%", Bukkit.getOfflinePlayer(UUID.fromString(uuid)).getName())
+                        .replace("%player%", idPlayer != null ? idPlayer.getName() : null)
                         .send(player);
             }
         }

@@ -19,8 +19,8 @@ import java.util.UUID;
 public class CommandLink implements CommandExecutor {
     @SuppressWarnings("NullableProblems")
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (!new PlayerManager(sender).isPlayer()) return true;
-        if (!new PlayerManager(sender).hasPermission("vanadium.link")) return true;
+        if (PlayerManager.isNotPlayer(sender)) return true;
+        if (PlayerManager.noPermission(sender, "vanadium.link")) return true;
         Player player = (Player) sender;
 
         UUID minecraft = player.getUniqueId();

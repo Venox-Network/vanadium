@@ -14,10 +14,10 @@ public class MoveListener implements Listener {
     @EventHandler
     public void onSneak(PlayerToggleSneakEvent event) {
         Player player = event.getPlayer();
-        if (!player.isSneaking() && new LockManager().holdingLockTool(player)) {
+        if (!player.isSneaking() && new LockManager(null, player).holdingLockTool()) {
             new BukkitRunnable() {
                 public void run() {
-                    new LockManager().showLockedLocations(player);
+                    new LockManager(null, player).showLockedLocations();
                     if (!player.isSneaking()) {
                         cancel();
                     }

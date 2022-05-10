@@ -3,18 +3,15 @@ package xyz.srnyx.vanadium.managers;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
-import xyz.srnyx.vanadium.Main;
-
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 
-@SuppressWarnings({"FieldMayBeFinal", "CanBeFinal"})
 public class TrustManager {
-    private OfflinePlayer op;
-    private Player player;
-
-    private String opId;
-    private String playerId;
+    private final Player player;
+    private UUID opId;
+    private String opName;
 
     /**
      * Constructor for {@code TrustManager}
@@ -22,93 +19,76 @@ public class TrustManager {
      * @param   op      Player trusted by {@code player} <i>(trusted)</i>
      * @param   player  Player that trusted {@code op} <i>(truster)</i>
      */
-    public TrustManager(OfflinePlayer op, Player player) {
-        this.op = op;
+    public TrustManager(Player player, OfflinePlayer op) {
         this.player = player;
-
-        this.opId = op.getUniqueId().toString();
-        this.playerId = player.getUniqueId().toString();
-    }
-
-    /**
-     * Constructor for {@code TrustManager} without {@code op}
-     *
-     * @param   player  Player to use
-     */
-    public TrustManager(Player player) {
-        this.player = player;
-
-        this.playerId = player.getUniqueId().toString();
+        if (op != null) {
+            this.opId = op.getUniqueId();
+            this.opName = op.getName();
+        }
     }
 
     /**
      * Get the number of players {@code player} has trusted
      */
     public int getTrustedCount() {
-        return Main.trusted.getStringList(playerId).size();
+        List<UUID> list = DataManager.trusted.get(player.getUniqueId());
+        return list != null ? list.size() : 0;
     }
 
     /**
-     * Check if {@code player} is trusted by {@code op}
+     * Check if {@code player} is trusted by {@code opId}
      *
      * @return  True if trusted, false if not
      */
     public boolean isTrusted() {
-        List<String> trusted = Main.trusted.getStringList(opId);
-        return trusted.contains(playerId);
+        return DataManager.trusted.get(opId).contains(player.getUniqueId());
     }
 
     /**
-     * Have {@code player} trust {@code op}
+     * Have {@code player} trust {@code opId}
      */
     public void trust() {
-        List<String> trusted = Main.trusted.getStringList(playerId);
+        List<UUID> trusted = new ArrayList<>();
+        List<UUID> list = DataManager.trusted.get(player.getUniqueId());
+        if (list != null) trusted = list;
+
         if (new SlotManager("trusts", player).getCount() > getTrustedCount()) {
-            if (!trusted.contains(opId) && op.getUniqueId() != player.getUniqueId()) {
+            if (!trusted.contains(opId) && opId != player.getUniqueId()) {
                 trusted.add(opId);
-                Main.trusted.set(playerId, trusted);
-                save();
+                DataManager.trusted.put(player.getUniqueId(), trusted);
                 new MessageManager("trusting.trust.success")
-                        .replace("%player%", op.getName())
+                        .replace("%player%", opName)
                         .send(player);
             } else {
                 new MessageManager("trusting.trust.fail")
-                        .replace("%player%", op.getName())
+                        .replace("%player%", opName)
                         .send(player);
             }
         } else {
             String type = "trusts";
             new MessageManager("slots.limit")
                     .replace("%type%", type.substring(0, type.length() - 1))
-                    .replace("%target%", op.getName())
-                    .replace("%total%", String.valueOf(Main.slots.getInt(player.getUniqueId() + "." + type)).replaceAll("\\.0*$|(\\.\\d*?)0+$", "$1"))
+                    .replace("%target%", opName)
+                    .replace("%total%", String.valueOf(new SlotManager("trusts", player).getCount())) //.replaceAll("\\.0*$|(\\.\\d*?)0+$", "$1")
                     .send(player);
         }
     }
 
     /**
-     * Have {@code player} untrust {@code op}
+     * Have {@code player} untrust {@code opId}
      */
     public void untrust() {
-        List<String> trusted = Main.trusted.getStringList(playerId);
+        List<UUID> trusted = DataManager.trusted.get(player.getUniqueId());
         if (trusted.contains(opId)) {
             trusted.remove(opId);
-            Main.trusted.set(playerId, trusted);
-            save();
+            DataManager.trusted.put(player.getUniqueId(), trusted);
             new MessageManager("trusting.untrust.success")
-                    .replace("%player%", op.getName())
+                    .replace("%player%", opName)
                     .send(player);
         } else {
             new MessageManager("trusting.untrust.fail")
-                    .replace("%player%", op.getName())
+                    .replace("%player%", opName)
                     .send(player);
         }
-    }
-
-    /**
-     * Saves {@code trusted.yml}
-     */
-    private void save() {
-        new ConfigManager("trusted.yml", true).saveData(Main.trusted);
     }
 }

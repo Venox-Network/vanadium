@@ -58,6 +58,9 @@ public class MessageManager {
         DiscordUtil.privateMessage(user, ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', message)));
     }
 
+    /**
+     * @return  The message as a string
+     */
     public String string() {
         return ChatColor.translateAlternateColorCodes('&', message);
     }

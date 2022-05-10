@@ -14,7 +14,7 @@ import xyz.srnyx.vanadium.managers.PlayerManager;
 public class CommandLockTool implements CommandExecutor {
     @SuppressWarnings("NullableProblems")
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (!new PlayerManager(sender).hasPermission("vanadium.locktool")) return true;
+        if (PlayerManager.noPermission(sender, "vanadium.locktool")) return true;
         Player player = (Player) sender;
 
         // If a player is specified, give lock tool to them instead of sender

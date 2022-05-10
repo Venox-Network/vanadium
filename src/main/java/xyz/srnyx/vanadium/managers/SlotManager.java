@@ -3,6 +3,7 @@ package xyz.srnyx.vanadium.managers;
 import com.earth2me.essentials.Essentials;
 
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -17,22 +18,32 @@ import java.util.concurrent.TimeUnit;
 
 
 public class SlotManager {
-    private Player player;
     private String type;
-
+    private Player player;
+    private OfflinePlayer op;
     private static final Map<UUID, Long> locksCooldown = new HashMap<>();
     private static final Map<UUID, Long> trustsCooldown = new HashMap<>();
 
-    public SlotManager(String type, Player player) {
-        this.type = type;
-        this.player = player;
+    /**
+     * Constructor for SlotManager
+     *
+     * @param   type    The type of slot ({@code "locks"} or {@code "trust"})
+     * @param   player  The player to manage
+     */
+    public SlotManager(String type, Object player) {
+        if (type != null) this.type = type;
+        if (player instanceof Player) this.player = (Player) player;
+        if (player instanceof OfflinePlayer) this.op = (OfflinePlayer) player;
     }
 
+    /**
+     * Constructor for SlotManager
+     *
+     * @param   type    The type of slot ({@code "locks"} or {@code "trust"})
+     */
     public SlotManager(String type) {
-        this.type = type;
+        if (type != null) this.type = type;
     }
-
-    public SlotManager() {}
 
     /**
      * Start {@code player}'s cooldown
@@ -52,7 +63,9 @@ public class SlotManager {
     }
 
     /**
-     * @return  The amount of time left in the cooldown
+     * @param   papi    If what's checking is for PAPI
+     *
+     * @return          The amount of time left in the cooldown
      */
     public Long timeLeft(boolean papi) {
         if (new SlotManager(type, player).contains()) {
@@ -79,9 +92,16 @@ public class SlotManager {
         stop();
         start();
 
-        double count = Main.slots.getInt(player.getUniqueId() + "." + type) + getMultiplier();
-        Main.slots.set(player.getUniqueId() + "." + type, count);
-        save();
+        int count = getMultiplier();
+        int[] data = DataManager.slots.get(player.getUniqueId());
+        if (Objects.equals(type, "locks")) {
+            count = (data != null ? data[0] : 0) + getMultiplier();
+            DataManager.slots.put(player.getUniqueId(), new int[]{count, new SlotManager("trusts", player).getCount()});
+        }
+        if (Objects.equals(type, "trusts")) {
+            count = (data != null ? data[1] : 0) + getMultiplier();
+            DataManager.slots.put(player.getUniqueId(), new int[]{new SlotManager("locks", player).getCount(), count});
+        }
 
         // %slot%
         String slot;
@@ -130,12 +150,12 @@ public class SlotManager {
     /**
      * @return  The {@code player}'s slot multiplier <i>({@code vanadium.multiplier.X})</i>
      */
-    private double getMultiplier() {
+    private int getMultiplier() {
         for (PermissionAttachmentInfo pai : player.getEffectivePermissions()) {
             String perm = pai.getPermission();
             if (perm.startsWith("vanadium.multiplier.")) {
                 try {
-                    return Double.parseDouble(perm.substring(perm.lastIndexOf(".") + 1));
+                    return Integer.parseInt(perm.substring(perm.lastIndexOf(".") + 1));
                 } catch (NumberFormatException e) {
                     return 1;
                 }
@@ -148,13 +168,7 @@ public class SlotManager {
      * @return  The number of {@code type} slots the player has
      */
     public int getCount() {
-        return Main.slots.getInt(player.getUniqueId() + "." + type);
-    }
-
-    /**
-     * Saves {@code slots.yml}
-     */
-    public void save() {
-        new ConfigManager("slots.yml", true).saveData(Main.slots);
+        int[] slots = DataManager.slots.get(op.getUniqueId());
+        return slots != null ? slots[Objects.equals(type, "trusts") ? 1 : 0] : 0;
     }
 }

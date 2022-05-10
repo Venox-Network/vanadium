@@ -8,78 +8,15 @@ import org.bukkit.entity.Player;
 
 
 public class PlayerManager {
-    @SuppressWarnings({"CanBeFinal"})
-    private Player player;
-    private String sPlayer;
-    private CommandSender sender;
-
-    /**
-     * Constructor for {@code PlayerManager}
-     *
-     * @param   player  The player to use for the methods
-     */
-    public PlayerManager(Player player) {
-        this.player = player;
-    }
-
-    /**
-     * Constructor for {@code PlayerManager}
-     *
-     * @param   player  The player to use for the methods
-     */
-    public PlayerManager(String player) {
-        this.sPlayer = player;
-    }
-
-    /**
-     * Constructor for {@code PlayerManager}
-     *
-     * @param   sender  The sender to use for the methods
-     */
-    public PlayerManager(CommandSender sender) {
-        this.sender = sender;
-    }
-
-    /**
-     * Check if a player is vanished
-     *
-     * @return  True if vanished, false if not
-     */
-    public boolean isVanished() {
-        for (MetadataValue meta : player.getMetadata("vanished")) {
-            if (meta.asBoolean()) return true;
-        }
-        return false;
-    }
 
     /**
      * Get the {@code OfflinePlayer} of a {@code Player}
      *
      * @return  The {@code OfflinePlayer}
      */
-    public OfflinePlayer getOfflinePlayer() {
-        for (OfflinePlayer op : Bukkit.getOfflinePlayers()) {
-            if (op.getName() != null && op.getName().equalsIgnoreCase(sPlayer)) {
-                return op;
-            }
-        }
+    public static OfflinePlayer getOfflinePlayer(String player) {
+        for (OfflinePlayer op : Bukkit.getOfflinePlayers()) if (op.getName() != null && op.getName().equalsIgnoreCase(player)) return op;
         return null;
-    }
-
-    /**
-     * Check if a player has a certain scoreboard tag
-     *
-     * @param   check   The tag to check for
-     *
-     * @return          True if yes, false if no
-     */
-    public boolean hasScoreboardTag(String check) {
-        for (String tag : player.getScoreboardTags()) {
-            if (tag.equals(check)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
@@ -87,10 +24,19 @@ public class PlayerManager {
      *
      * @return  True if player, false if non-player
      */
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    public boolean isPlayer() {
-        if (sender instanceof Player) return true;
+    public static boolean isNotPlayer(CommandSender sender) {
+        if (sender instanceof Player) return false;
         new MessageManager("errors.console-forbidden").send(sender);
+        return true;
+    }
+
+    /**
+     * Check if a player is vanished
+     *
+     * @return  True if vanished, false if not
+     */
+    public static boolean isVanished(Player player) {
+        for (MetadataValue meta : player.getMetadata("vanished")) if (meta.asBoolean()) return true;
         return false;
     }
 
@@ -101,19 +47,28 @@ public class PlayerManager {
      *
      * @return              True if player & has permission, false if non-player or doesn't have permission
      */
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    public boolean hasPermission(String permission) {
+    public static boolean noPermission(CommandSender sender, String permission) {
         if (sender instanceof Player player) {
             if (player.hasPermission(permission)) {
-                return true;
+                return false;
             } else {
                 new MessageManager("errors.no-permission")
                         .replace("%permission%", permission)
                         .send(player);
-                return false;
+                return true;
             }
-        } else {
-            return true;
-        }
+        } else return false;
+    }
+
+    /**
+     * Check if a player has a certain scoreboard tag
+     *
+     * @param   check   The tag to check for
+     *
+     * @return          True if yes, false if no
+     */
+    public static boolean hasScoreboardTag(Player player, String check) {
+        for (String tag : player.getScoreboardTags()) if (tag.equals(check)) return true;
+        return false;
     }
 }

@@ -7,6 +7,16 @@ allow-unplaced-locking: false
 link-channel: "000000000000000000"
 
 
+# Settings for plugin data auto-save
+# REQUIRES RESTART
+auto-save:
+  # Whether to save data automatically
+  enabled: true
+  # How often to save data in seconds
+  interval: 600 # 10 minutes
+
+
+# Settings for the lock tool
 lock-tool:
   # Whether the recipe for the Lock Tool will be enabled.
   # If false, the only way to get a Lock Tool would be through the /locktool command. Unless you're using lock-tool.custom

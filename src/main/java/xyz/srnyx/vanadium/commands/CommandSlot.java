@@ -6,7 +6,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
-import xyz.srnyx.vanadium.Main;
+import xyz.srnyx.vanadium.managers.DataManager;
 import xyz.srnyx.vanadium.managers.MessageManager;
 import xyz.srnyx.vanadium.managers.PlayerManager;
 import xyz.srnyx.vanadium.managers.SlotManager;
@@ -18,21 +18,24 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 
-@SuppressWarnings("NullableProblems")
 public class CommandSlot implements TabExecutor {
     public static final List<UUID> stopLocks = new ArrayList<>();
     public static final List<UUID> stopTrusts = new ArrayList<>();
 
+    @SuppressWarnings("NullableProblems")
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!new PlayerManager(sender).hasPermission("vanadium.slot")) return true;
+        if (PlayerManager.noPermission(sender, "vanadium.slot")) return true;
 
         //<player> <get|cooldown|start|stop|add|remove|set> <locks|trusts|all> [amount]
         if (args.length >= 3) {
-            Player player = Bukkit.getServer().getPlayer(args[0]);
+            Player player = Bukkit.getPlayer(args[0]);
             if (player != null) {
                 String action = args[1];
                 String type = args[2];
-                double slots = Main.slots.getInt(player.getUniqueId() + "." + type);
+
+                int slots = 0;
+                if (Objects.equals(type, "locks")) slots = new SlotManager("locks", player).getCount();
+                if (Objects.equals(type, "trusts")) slots = new SlotManager("trusts", player).getCount();
 
                 //<player> <get|cooldown|start|stop> <locks|trusts|all>
                 boolean arg3action = action.equalsIgnoreCase("get") ||
@@ -116,14 +119,14 @@ public class CommandSlot implements TabExecutor {
                 //<player> <add|remove|set> <locks|trusts> <amount>
                 boolean arg4 = action.equalsIgnoreCase("add") || action.equalsIgnoreCase("remove") || action.equalsIgnoreCase("set");
                 if (args.length == 4 && arg4) {
-                    double amount = Double.parseDouble(args[3]);
+                    int amount = Integer.parseInt(args[3]);
 
                     if (action.equalsIgnoreCase("add")) slots += amount;
                     if (action.equalsIgnoreCase("remove")) slots -= amount;
                     if (action.equalsIgnoreCase("set")) slots = amount;
 
-                    Main.slots.set(player.getUniqueId() + "." + type, slots);
-                    new SlotManager().save();
+                    if (Objects.equals(type, "locks")) DataManager.slots.put(player.getUniqueId(), new int[]{amount, new SlotManager("trusts", player).getCount()});
+                    if (Objects.equals(type, "trusts")) DataManager.slots.put(player.getUniqueId(), new int[]{new SlotManager("locks", player).getCount(), amount});
 
                     // %slot%
                     String slot;
@@ -150,6 +153,7 @@ public class CommandSlot implements TabExecutor {
         return true;
     }
 
+    @SuppressWarnings("NullableProblems")
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
         List<String> suggestions = new ArrayList<>();
         List<String> results = new ArrayList<>();

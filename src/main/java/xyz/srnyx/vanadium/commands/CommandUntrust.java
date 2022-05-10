@@ -7,7 +7,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
-import xyz.srnyx.vanadium.Main;
 import xyz.srnyx.vanadium.managers.*;
 
 import java.util.ArrayList;
@@ -18,19 +17,19 @@ import java.util.UUID;
 public class CommandUntrust implements TabExecutor {
     @SuppressWarnings("NullableProblems")
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (!new PlayerManager(sender).isPlayer()) return true;
-        if (!new PlayerManager(sender).hasPermission("vanadium.untrust")) return true;
+        if (PlayerManager.isNotPlayer(sender)) return true;
+        if (PlayerManager.noPermission(sender, "vanadium.untrust")) return true;
         Player player = (Player) sender;
 
         if (args.length == 1) {
-            OfflinePlayer target = new PlayerManager(args[0]).getOfflinePlayer();
+            OfflinePlayer target = PlayerManager.getOfflinePlayer(args[0]);
             if (target == null) {
                 new MessageManager("errors.invalid-player")
                         .replace("%player%", args[0])
                         .send(player);
                 return true;
             }
-            new TrustManager(target, player).untrust();
+            new TrustManager(player, target).untrust();
             return true;
         }
 
@@ -43,22 +42,12 @@ public class CommandUntrust implements TabExecutor {
         List<String> suggestions = new ArrayList<>();
         List<String> results = new ArrayList<>();
 
-        if (!(sender instanceof Player player)) {
-            return results;
-        }
+        if (PlayerManager.isNotPlayer(sender)) return results;
+        Player player = (Player) sender;
 
-        if (args.length == 1) {
-            List<String> trusted = Main.trusted.getStringList(player.getUniqueId().toString());
-            for (String uuid : trusted) {
-                suggestions.add(Bukkit.getOfflinePlayer(UUID.fromString(uuid)).getName());
-            }
-        }
+        if (args.length == 1) for (UUID id : DataManager.trusted.get(player.getUniqueId())) suggestions.add(Bukkit.getOfflinePlayer(id).getName());
+        for (String suggestion : suggestions) if (suggestion.toLowerCase().startsWith(args[args.length - 1].toLowerCase())) results.add(suggestion);
 
-        for (String suggestion : suggestions) {
-            if (suggestion.toLowerCase().startsWith(args[args.length - 1].toLowerCase())) {
-                results.add(suggestion);
-            }
-        }
         return results;
     }
 }

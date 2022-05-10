@@ -15,7 +15,7 @@ import xyz.srnyx.vanadium.managers.SlotManager;
 public class CommandReload implements CommandExecutor {
     @SuppressWarnings("NullableProblems")
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (!new PlayerManager(sender).hasPermission("vanadium.reload")) return true;
+        if (PlayerManager.noPermission(sender, "vanadium.reload")) return true;
 
         Main.loadFiles();
         for (Player online: Bukkit.getOnlinePlayers()) {

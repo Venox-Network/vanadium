@@ -4,11 +4,13 @@ import github.scarsz.discordsrv.DiscordSRV;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.command.*;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.PluginCommand;
+import org.bukkit.command.TabCompleter;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ShapedRecipe;
 
 import xyz.srnyx.vanadium.commands.*;
@@ -19,16 +21,9 @@ import xyz.srnyx.vanadium.managers.*;
 
 public class Main extends JavaPlugin {
     public static Main plugin;
-
-    // Config files
     public static YamlConfiguration config;
     public static YamlConfiguration messages;
     public static YamlConfiguration lists;
-
-    // Data files
-    public static YamlConfiguration locked;
-    public static YamlConfiguration trusted;
-    public static YamlConfiguration slots;
 
     /**
      * Everything done when the plugin is enabling
@@ -38,18 +33,19 @@ public class Main extends JavaPlugin {
         plugin = this;
 
         // Create config files
-        new ConfigManager("config.yml", false).create();
-        new ConfigManager("lists.yml", false).create();
-        new ConfigManager("messages.yml", false).create();
+        new FileManager("config.yml", false).create();
+        new FileManager("lists.yml", false).create();
+        new FileManager("messages.yml", false).create();
 
         // Create data files
-        new ConfigManager("locked.yml", true).create();
-        new ConfigManager("trusted.yml", true).create();
-        new ConfigManager("slots.yml", true).create();
+        new FileManager("locked.yml", true).create();
+        new FileManager("trusted.yml", true).create();
+        new FileManager("slots.yml", true).create();
 
         // Other stuff
         loadFiles();
         registerRecipes();
+        new DataManager().onEnable();
         new LockManager().check();
         new SlotManager("locks").check();
         new SlotManager("trusts").check();
@@ -89,18 +85,21 @@ public class Main extends JavaPlugin {
     }
 
     /**
-     * Load config and data files
+     * Everything done when the plugin is disabling
+     */
+    @Override
+    public void onDisable() {
+        new DataManager().save();
+    }
+
+    /**
+     * Load config files<br>
+     * Data files are loaded via {@link DataManager}
      */
     public static void loadFiles() {
-        // Load config files
-        Main.config = new ConfigManager("config.yml", false).load();
-        Main.lists = new ConfigManager("lists.yml", false).load();
-        Main.messages = new ConfigManager("messages.yml", false).load();
-
-        // Load data files
-        Main.locked = new ConfigManager("locked.yml", true).load();
-        Main.trusted = new ConfigManager("trusted.yml", true).load();
-        Main.slots = new ConfigManager("slots.yml", true).load();
+        Main.config = new FileManager("config.yml", false).load();
+        Main.lists = new FileManager("lists.yml", false).load();
+        Main.messages = new FileManager("messages.yml", false).load();
     }
 
     /**

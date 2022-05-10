@@ -12,13 +12,24 @@ import java.util.List;
 
 
 public class ItemManager {
-
     final ItemStack item;
 
+    /**
+     * Creates a new ItemManager with the given material
+     *
+     * @param   material    The material to create the item with
+     */
     public ItemManager(Material material) {
         this.item = new ItemStack(material);
     }
 
+    /**
+     * Sets the item's name
+     *
+     * @param   name    The name to give the item
+     *
+     * @return          The ItemManager instance
+     */
     public ItemManager name(String name) {
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
@@ -28,13 +39,19 @@ public class ItemManager {
         return this;
     }
 
+    /**
+     * Gives the item lore
+     *
+     * @param   lore    The lore to give the item
+     *
+     * @return          The ItemManager instance
+     */
     public ItemManager lore(String lore) {
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
             List<String> entries = new ArrayList<>();
             List<String> current = meta.getLore();
-            if (current != null)
-                entries.addAll(current);
+            if (current != null) entries.addAll(current);
 
             entries.add(ChatColor.translateAlternateColorCodes('&', lore));
 
@@ -44,6 +61,14 @@ public class ItemManager {
         return this;
     }
 
+    /**
+     * Adds an enchantment to the item
+     *
+     * @param   enchantment The enchantment to add
+     * @param   level       The level of the enchantment
+     *
+     * @return              The ItemManager instance
+     */
     public ItemManager enchant(Enchantment enchantment, int level) {
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
@@ -53,6 +78,13 @@ public class ItemManager {
         return this;
     }
 
+    /**
+     * Adds an item flag to the item
+     *
+     * @param   flag    The item flag to add
+     *
+     * @return          The ItemManager instance
+     */
     public ItemManager flag(ItemFlag flag) {
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
@@ -62,6 +94,9 @@ public class ItemManager {
         return this;
     }
 
+    /**
+     * @return  The item
+     */
     public ItemStack get() {
         return item;
     }
@@ -73,8 +108,7 @@ public class ItemManager {
         if (!one.getType().equals(two.getType())) return false;
         if (oneMeta != null && twoMeta != null) {
             if (!oneMeta.getDisplayName().equals(twoMeta.getDisplayName())) return false;
-            //noinspection RedundantIfStatement
-            if (oneMeta.getLore() != null && !oneMeta.getLore().equals(twoMeta.getLore())) return false;
+            return oneMeta.getLore() == null || oneMeta.getLore().equals(twoMeta.getLore());
         }
 
         return true;

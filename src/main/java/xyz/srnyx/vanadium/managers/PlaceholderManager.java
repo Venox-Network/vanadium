@@ -38,9 +38,9 @@ public class PlaceholderManager extends PlaceholderExpansion {
         Essentials essentials = (Essentials) Bukkit.getPluginManager().getPlugin("Essentials");
 
         // %v_locked%
-        if (params.equalsIgnoreCase("locked")) return String.valueOf(new LockManager().getLockedCount(player));
+        if (params.equalsIgnoreCase("locked")) return String.valueOf(new LockManager(null, player).getLockedCount());
         // %v_trusted%
-        if (params.equalsIgnoreCase("trusted")) return String.valueOf(new TrustManager(player).getTrustedCount());
+        if (params.equalsIgnoreCase("trusted")) return String.valueOf(new TrustManager(player, null).getTrustedCount());
 
 
         // %v_locks%

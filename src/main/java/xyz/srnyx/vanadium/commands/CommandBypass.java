@@ -19,11 +19,11 @@ public class CommandBypass implements CommandExecutor {
 
     @SuppressWarnings("NullableProblems")
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (!new PlayerManager(sender).isPlayer()) return true;
-        if (!new PlayerManager(sender).hasPermission("vanadium.bypass")) return true;
+        if (PlayerManager.isNotPlayer(sender)) return true;
+        if (PlayerManager.noPermission(sender, "vanadium.bypass")) return true;
         Player player = (Player) sender;
 
-        if (new PlayerManager(player).hasScoreboardTag(tag)) {
+        if (PlayerManager.hasScoreboardTag(player, tag)) {
             player.removeScoreboardTag(tag);
             new MessageManager("locking.bypass.disabled").send(player);
         } else {
@@ -40,7 +40,7 @@ public class CommandBypass implements CommandExecutor {
 
         new BukkitRunnable() {
             public void run() {
-                if (!new PlayerManager(player).isVanished()) {
+                if (!PlayerManager.isVanished(player)) {
                     player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(new MessageManager("locking.bypass.actionbar").toString()));
                 }
                 if (!check(player)) {
@@ -51,6 +51,6 @@ public class CommandBypass implements CommandExecutor {
     }
 
     public static boolean check(Player player) {
-        return (new PlayerManager(player).hasScoreboardTag(tag));
+        return (PlayerManager.hasScoreboardTag(player, tag));
     }
 }

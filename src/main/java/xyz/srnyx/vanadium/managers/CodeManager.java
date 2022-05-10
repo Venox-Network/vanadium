@@ -7,25 +7,23 @@ import java.util.UUID;
 
 
 public class CodeManager {
-    @SuppressWarnings({"CanBeFinal"})
     private UUID uuid;
+    private String code;
 
-    @SuppressWarnings({"CanBeFinal"})
-    public static Map<UUID, String> linkingCodes = new HashMap<>();
+    public static final Map<UUID, String> linkingCodes = new HashMap<>();
 
     /**
      * Initializes a new {@code CodeManager}
      *
-     * @param   uuid    The UUID to use
+     * @param   object  The UUId/code to use for the methods
      */
-    public CodeManager(UUID uuid) {
-        this.uuid = uuid;
+    public CodeManager(Object object) {
+        if (object instanceof UUID) {
+            this.uuid = (UUID) object;
+        } else if (object instanceof String) {
+            this.code = (String) object;
+        }
     }
-
-    /**
-     * Initializes a new {@code CodeManager} without any parameters
-     */
-    public CodeManager() {}
 
     public String generateCode() {
         String code = String.valueOf(
@@ -47,14 +45,10 @@ public class CodeManager {
     /**
      * Gets the {@code UUID} associated with the specified {@code code}
      *
-     * @param   code    The code to get the UUID from
-     *
      * @return          The {@code UUID} associated with the {@code code}
      */
-    public UUID getUUIDFromCode(String code) {
-        for (Map.Entry<UUID, String> entry : linkingCodes.entrySet()) if (entry.getValue().equals(code)) {
-            return entry.getKey();
-        }
+    public UUID getUUIDFromCode() {
+        for (Map.Entry<UUID, String> entry : linkingCodes.entrySet()) if (entry.getValue().equals(code)) return entry.getKey();
         return null;
     }
 }

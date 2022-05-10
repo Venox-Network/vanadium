@@ -9,9 +9,16 @@ import org.bukkit.inventory.EntityEquipment;
 
 
 public class DamageManager {
-    @SuppressWarnings("ConstantConditions")
+    //TODO: Account for enchantments
+    /**
+     * Damages an entity and accounts for armor
+     *
+     * @param   entity  The entity to damage
+     * @param   dmg     The base damage to deal
+     */
     public static void damage(LivingEntity entity, double dmg) {
         EntityEquipment inv = entity.getEquipment();
+        if (inv == null) return;
         double red = 0.0;
 
         if (inv.getItemInMainHand().getType() == Material.SHIELD) {

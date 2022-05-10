@@ -2,19 +2,16 @@ package xyz.srnyx.vanadium.managers;
 
 import dev.lone.itemsadder.api.CustomStack;
 
-import org.bukkit.Sound;
-import org.bukkit.Color;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.block.data.Bisected;
 import org.bukkit.block.data.type.Door;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.*;
+import org.bukkit.inventory.DoubleChestInventory;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 
 import xyz.srnyx.vanadium.Main;
@@ -26,21 +23,26 @@ import java.util.*;
 
 
 public class LockManager {
-    @SuppressWarnings({"CanBeFinal"})
     private Block block;
+    private String name;
+    private Player player;
 
     /**
      * Constructor for {@code LockManager}
      *
      * @param   block   The block to use for the methods
+     * @param   player  The player to use for the methods
      */
-    public LockManager(Block block) {
-        this.block = block;
-
+    public LockManager(Block block, Player player) {
+        if (block != null) {
+            this.block = block;
+            this.name = WordUtils.capitalizeFully(block.getType().name().replace("_", " "));
+        }
+        if (player != null) this.player = player;
     }
 
     /**
-     * Constructor for {@code LockManager} without parameters
+     * Constructor for {@code LockManager}
      */
     public LockManager() {}
 
@@ -50,22 +52,16 @@ public class LockManager {
      * @return  True if the block is locked, false if not
      */
     public boolean isLocked() {
-        return Main.locked.contains(getId() + ".locker");
+        return DataManager.locked.containsKey(block) && getLocker() != null;
     }
 
     /**
      * Checks if the block is locked for the {@code player}
      *
-     * @param   player  The player to check for
-     * @return          True if yes, false if no
+     * @return  True if yes, false if no
      */
-    public boolean isLockedForPlayer(Player player) {
-        if (isLocked()) {
-            String owner = getLocker();
-            if (owner != null) {
-                return !owner.equalsIgnoreCase(player.getUniqueId().toString());
-            }
-        }
+    public boolean isLockedForPlayer() {
+        if (isLocked()) return !getLocker().equals(player.getUniqueId());
         return false;
     }
 
@@ -74,11 +70,8 @@ public class LockManager {
      *
      * @return  The locker
      */
-    public String getLocker() {
-        if (isLocked()) {
-            return Main.locked.getString(getId() + ".locker");
-        }
-        return null;
+    public UUID getLocker() {
+        return DataManager.locked.get(block)[1];
     }
 
     /**
@@ -88,49 +81,47 @@ public class LockManager {
      */
     public boolean isLockable() {
         for (String lockableBlock : Main.lists.getStringList("lockable-blocks")) {
-            Material material = Material.getMaterial(lockableBlock.toUpperCase());
-            if (material == null) continue;
-
-            if (block.getType() == material) {
-                return true;
-            }
+            if (block.getType() == Material.getMaterial(lockableBlock.toUpperCase())) return true;
         }
         return false;
     }
 
     /**
      * Show the owned, trusted, and locked blocks around a player using particles
-     *
-     * @param   player  The player to show the particles to
      */
-    public void showLockedLocations(Player player) {
+    public void showLockedLocations() {
         List<Location> owned = new ArrayList<>();
         List<Location> trusted = new ArrayList<>();
         List<Location> locked = new ArrayList<>();
-        for (String key : Main.locked.getKeys(false)) {
-            String[] split = key.split("=");
-            Location loc = new Location(Bukkit.getWorld(split[0]), Double.parseDouble(split[1]), Double.parseDouble(split[2]), Double.parseDouble(split[3]));
-            if (loc.getWorld() == player.getLocation().getWorld() && loc.distance(player.getLocation()) <= 15) {
-                String owner = new LockManager(loc.getBlock()).getLocker();
+        for (Block key : DataManager.locked.keySet()) {
+            if (key.getLocation().getWorld() == player.getLocation().getWorld() && key.getLocation().distance(player.getLocation()) <= 15) {
+                UUID owner = new LockManager(key.getLocation().getBlock(), null).getLocker();
                 if (owner != null) {
-                    if (owner.equals(player.getUniqueId().toString())) {
-                        owned.add(loc);
-                    } else if (new TrustManager(Bukkit.getOfflinePlayer(UUID.fromString(owner)), player).isTrusted()) {
-                        trusted.add(loc);
+                    if (owner.equals(player.getUniqueId())) {
+                        owned.add(key.getLocation());
+                    } else if (new TrustManager(player, Bukkit.getOfflinePlayer(owner)).isTrusted()) {
+                        trusted.add(key.getLocation());
                     } else {
-                        locked.add(loc);
+                        locked.add(key.getLocation());
                     }
                 }
             }
         }
 
         List<List<Location>> locations = Arrays.asList(owned, trusted, locked);
-        particleCube(player, locations.get(0), Color.LIME, 0.25);
-        particleCube(player, locations.get(1), Color.YELLOW, 0.25);
-        particleCube(player, locations.get(2), Color.RED, 0.25);
+        particleCube(locations.get(0), Color.LIME, 0.25);
+        particleCube(locations.get(1), Color.YELLOW, 0.25);
+        particleCube(locations.get(2), Color.RED, 0.25);
     }
 
-    public void particleCube(Player player, List<Location> locations, Color color, double distance) {
+    /**
+     * Shows a cube of particles for a block
+     *
+     * @param   locations   The locations to spawn particles at
+     * @param   color       The color of the particles
+     * @param   distance    The distance from the blocks to spawn particles (maybe)
+     */
+    public void particleCube(List<Location> locations, Color color, double distance) {
         List<Location> result = new ArrayList<>();
         for (Location loc : locations) {
             Location corner1 = loc.clone();
@@ -154,94 +145,88 @@ public class LockManager {
                             Location add = new Location(loc.getWorld(), x, y, z);
                             if (result.contains(add)) {
                                 result.remove(add);
-                            } else {
-                                result.add(add);
-                            }
+                            } else result.add(add);
                         }
                     }
                 }
             }
         }
         Particle.DustOptions dust = new Particle.DustOptions(color, 0.7f);
-        for (Location loc : result) {
-            player.spawnParticle(Particle.REDSTONE, loc, 0, 0, 0, 0, dust);
-        }
+        for (Location loc : result) player.spawnParticle(Particle.REDSTONE, loc, 0, 0, 0, 0, dust);
     }
 
     /**
      * Attempts to lock a block
      *
-     * @param   player  Player that triggered the lock
+     * @param   item    The item to damage
      */
-    public void attemptLock(Player player, ItemStack item) {
+    public void attemptLock(ItemStack item) {
 
         // Check If Block Is Lockable
         if (!isLockable()) {
             player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1, 2);
             new MessageManager("locking.lock.invalid")
-                    .replace("%block%", getName())
+                    .replace("%block%", name)
                     .send(player);
             return;
         }
 
         // Check If Player Placed Block
-        String placer = getPlacer();
-        if (!(placer == null && (Main.config.getBoolean("allow-unplaced-locking") || CommandBypass.check(player)))) {
-            if (placer == null || !placer.equals(player.getUniqueId().toString())) {
+        if (!Main.config.getBoolean("allow-unplaced-locking") || !CommandBypass.check(player)) {
+            UUID placer = new PlaceManager(block).getPlacer();
+            if (placer == null || !placer.equals(player.getUniqueId())) {
                 player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1, 2);
 
                 String placerString = "N/A";
-                if (placer != null) Bukkit.getOfflinePlayer(UUID.fromString(placer)).getName();
+                if (placer != null) placerString = Bukkit.getOfflinePlayer(placer).getName();
                 new MessageManager("locking.lock.fail")
-                        .replace("%block%", getName())
+                        .replace("%block%", name)
                         .replace("%player%", placerString)
                         .send(player);
                 return;
             }
-        } else {
-            attemptPlace(player);
-        }
+        } else new PlaceManager(block).attemptPlace(player);
 
         // Check If Block Is Already Locked
         if (isLocked()) {
             player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1, 2);
             new MessageManager("locking.lock.again")
-                    .replace("%block%", getName())
-                    .replace("%player%", Bukkit.getOfflinePlayer(UUID.fromString(getLocker())).getName())
+                    .replace("%block%", name)
+                    .replace("%player%", Bukkit.getOfflinePlayer(getLocker()).getName())
                     .send(player);
             return;
         }
 
         // Check if player has enough empty slots
-        if (getLockedCount(player) >= new SlotManager("locks", player).getCount()) {
-            String type = "locks";
+        int slotCount = new SlotManager("locks", player).getCount();
+        if (getLockedCount() >= slotCount) {
             new MessageManager("slots.limit")
-                    .replace("%type%", type.substring(0, type.length() - 1))
-                    .replace("%target%", getName())
-                    .replace("%total%", String.valueOf(Main.slots.getInt(player.getUniqueId() + "." + type)).replaceAll("\\.0*$|(\\.\\d*?)0+$", "$1"))
+                    .replace("%type%", "lock")
+                    .replace("%target%", name)
+                    .replace("%total%", String.valueOf(slotCount)) //.replaceAll("\\.0*$|(\\.\\d*?)0+$", "$1")
                     .send(player);
             return;
         }
 
         // Attempt to lock double chest / door
-        if (attemptLockDoubleChest(player, item) || attemptLockDoor(player, item)) return;
+        if (attemptLockDoubleChest(item) || attemptLockDoor(item)) return;
 
         if (!(block.getState() instanceof Chest chest && chest.getInventory() instanceof DoubleChestInventory) && !block.getType().toString().contains("_DOOR")) {
-            lock(player, item);
+            lock(item);
 
             player.playSound(player.getLocation(), Sound.BLOCK_CHEST_LOCKED, 1, 2);
             new MessageManager("locking.lock.success")
-                    .replace("%block%", getName())
+                    .replace("%block%", name)
                     .send(player);
         }
     }
 
     /**
-     * Removes lock data
+     * Locks a block
      *
-     * @param   player  Player that triggered the lock
+     * @param   item    The item to damage
      */
-    public void lock(Player player, ItemStack item) {
+    public void lock(ItemStack item) {
         if (item != null && item.getItemMeta() instanceof Damageable damage) {
             int current = damage.getDamage();
             if (current + 1 <= item.getType().getMaxDurability()) {
@@ -252,36 +237,36 @@ public class LockManager {
                 item.setAmount(0);
             }
         }
-        Main.locked.set(getId() + ".locker", player.getUniqueId().toString());
-        save();
+        if (block != null) DataManager.locked.put(block, new UUID[]{new PlaceManager(block).getPlacer(), player.getUniqueId()});
     }
 
     /**
      * Attempts to lock a double chest
      *
-     * @param   player  Player that triggered the lock
+     * @param   item    The item to damage
      *
      * @return          True if successful, false if not
      */
-    public boolean attemptLockDoubleChest(Player player, ItemStack item) {
+    public boolean attemptLockDoubleChest(ItemStack item) {
         // Check if block is a double chest
         if (block.getState() instanceof Chest chest && chest.getInventory() instanceof DoubleChestInventory doubleChest) {
-            if (new SlotManager("locks", player).getCount() > (getLockedCount(player) + 1)) {
+            int slotCount = new SlotManager("locks", player).getCount();
+            if (slotCount > getLockedCount() + 1) {
                 for (Location location : new Location[]{doubleChest.getLeftSide().getLocation(), doubleChest.getRightSide().getLocation()}) {
-                    new LockManager(location.getBlock()).lock(player, item);
+                    new LockManager(location.getBlock(), player).lock(null);
                 }
+                new LockManager(null, player).lock(item);
 
                 player.playSound(player.getLocation(), Sound.BLOCK_CHEST_LOCKED, 1, 2);
                 new MessageManager("locking.lock.success")
-                        .replace("%block%", getName())
+                        .replace("%block%", name)
                         .send(player);
                 return true;
             } else {
-                String type = "locks";
                 new MessageManager("slots.limit")
-                        .replace("%type%", type.substring(0, type.length() - 1))
-                        .replace("%target%", getName())
-                        .replace("%total%", String.valueOf(Main.slots.getInt(player.getUniqueId() + "." + type)).replaceAll("\\.0*$|(\\.\\d*?)0+$", "$1"))
+                        .replace("%type%", "lock")
+                        .replace("%target%", name)
+                        .replace("%total%", String.valueOf(slotCount)) //.replaceAll("\\.0*$|(\\.\\d*?)0+$", "$1")
                         .send(player);
             }
         }
@@ -291,87 +276,82 @@ public class LockManager {
     /**
      * Attempts to lock a door
      *
-     * @param   player  Player that triggered the lock
-     *
-     * @return          True if successful, false if not
+     * @return  True if successful, false if not
      */
-    public boolean attemptLockDoor(Player player, ItemStack item) {
+    public boolean attemptLockDoor(ItemStack item) {
         if (block.getType().toString().contains("_DOOR")) {
-            if (new SlotManager("locks", player).getCount() > (getLockedCount(player) + 1)) {
+            if (new SlotManager("locks", player).getCount() > (getLockedCount() + 1)) {
                 //noinspection DuplicatedCode
                 Door door = (Door) block.getState().getBlockData();
                 Location top = block.getLocation();
                 Location bottom = block.getLocation();
 
-                if (door.getHalf() == Bisected.Half.TOP) {
-                    bottom = block.getLocation().subtract(0, 1, 0);
-                }
-                if (door.getHalf() == Bisected.Half.BOTTOM) {
-                    top = block.getLocation().add(0, 1, 0);
-                }
+                if (door.getHalf() == Bisected.Half.TOP) bottom = block.getLocation().subtract(0, 1, 0);
+                if (door.getHalf() == Bisected.Half.BOTTOM) top = block.getLocation().add(0, 1, 0);
 
-                for (Location location : new Location[]{top, bottom}) {
-                    new LockManager(location.getBlock()).lock(player, item);
-                }
+                for (Location location : new Location[]{top, bottom}) new LockManager(location.getBlock(), player).lock(null);
+                new LockManager(null, player).lock(item);
 
                 player.playSound(player.getLocation(), Sound.BLOCK_CHEST_LOCKED, 1, 2);
                 new MessageManager("locking.lock.success")
-                        .replace("%block%", getName())
+                        .replace("%block%", name)
                         .send(player);
                 return true;
             } else {
-                String type = "locks";
                 new MessageManager("slots.limit")
-                        .replace("%type%", type.substring(0, type.length() - 1))
-                        .replace("%target%", getName())
-                        .replace("%total%", String.valueOf(Main.slots.getInt(player.getUniqueId() + "." + type)).replaceAll("\\.0*$|(\\.\\d*?)0+$", "$1"))
+                        .replace("%type%", "lock")
+                        .replace("%target%", name)
+                        .replace("%total%", String.valueOf(DataManager.slots.get(player.getUniqueId())[0])) //.replaceAll("\\.0*$|(\\.\\d*?)0+$", "$1"))
                         .send(player);
             }
         }
         return false;
     }
 
-    public void checkLockDoubleChest(Player player) {
+    /**
+     * Checks if a double chest is locked
+     */
+    public void checkLockDoubleChest() {
         if (block.getState() instanceof Chest chest && chest.getInventory() instanceof DoubleChestInventory doubleChest) {
-            location(player, doubleChest.getRightSide().getLocation(), doubleChest.getLeftSide().getLocation());
+            location(doubleChest.getRightSide().getLocation(), doubleChest.getLeftSide().getLocation());
         }
     }
 
-    public void checkLockDoor(Player player) {
+    /**
+     * Checks if a door is locked
+     */
+    public void checkLockDoor() {
         if (block.getType().toString().contains("_DOOR")) {
             //noinspection DuplicatedCode
             Door door = (Door) block.getState().getBlockData();
             Location top = block.getLocation();
             Location bottom = block.getLocation();
 
-            if (door.getHalf() == Bisected.Half.TOP) {
-                bottom = block.getLocation().subtract(0, 1, 0);
-            }
-            if (door.getHalf() == Bisected.Half.BOTTOM) {
-                top = block.getLocation().add(0, 1, 0);
-            }
+            if (door.getHalf() == Bisected.Half.TOP) bottom = block.getLocation().subtract(0, 1, 0);
+            if (door.getHalf() == Bisected.Half.BOTTOM) top = block.getLocation().add(0, 1, 0);
 
-            location(player, top, bottom);
+            location(top, bottom);
         }
     }
 
-    private void location(Player player, Location one, Location two) {
+    /**
+     * Locks 2 blocks, used for double chests and doors
+     *
+     * @param   one Location of the first block
+     * @param   two Location of the second block
+     */
+    private void location(Location one, Location two) {
         Location[] locations = {one, two};
         for (Location loc : locations) {
-            Block locBlock = loc.getBlock();
-            if (new LockManager(locBlock).isLocked()) {
-                String owner = new LockManager(locBlock).getLocker();
-                String block0 = new LockManager(locations[0].getBlock()).getId();
-                String block1 = new LockManager(locations[0].getBlock()).getId();
+            if (new LockManager(loc.getBlock(), null).isLocked()) {
+                UUID owner = new LockManager(loc.getBlock(), null).getLocker();
+                Block block0 = locations[0].getBlock();
+                Block block1 = locations[0].getBlock();
 
-                Main.locked.set(block0 + ".locker", owner);
-                Main.locked.set(block1 + ".locker", owner);
-                Main.locked.set(block0 + ".placer", owner);
-                Main.locked.set(block1 + ".placer", owner);
-                save();
+                DataManager.locked.put(block0, new UUID[]{owner, owner});
+                DataManager.locked.put(block1, new UUID[]{owner, owner});
 
                 player.playSound(player.getLocation(), Sound.BLOCK_CHEST_LOCKED, 1, 2);
-                return;
             }
         }
     }
@@ -379,73 +359,74 @@ public class LockManager {
     /**
      * Attempts to unlock a block
      *
-     * @param   player  The player to play sounds for
+     * @param   item    The item to repair
      */
-    public void attemptUnlock(Player player, ItemStack item) {
+    public void attemptUnlock(ItemStack item) {
 
         // Check If Block Is Locked
         if (!isLocked()) {
             player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1, 2);
             new MessageManager("locking.unlock.invalid")
-                    .replace("%block%", getName())
+                    .replace("%block%", name)
                     .send(player);
             return;
         }
 
         // Check If Player Placed Block
-        String placer = getPlacer();
-        if ((placer == null || !placer.equals(player.getUniqueId().toString())) && !player.hasPermission("vanadium.command.bypass")) {
-            player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1, 2);
+        UUID placer = new PlaceManager(block).getPlacer();
+        if ((placer == null || !placer.equals(player.getUniqueId())) && !player.hasPermission("vanadium.command.bypass")) {
+            String username = "N/A";
+            if (placer != null) username = Bukkit.getOfflinePlayer(placer).getName();
             new MessageManager("locking.unlock.fail")
-                    .replace("%block%", getName())
-                    .replace("%player%", Bukkit.getOfflinePlayer(UUID.fromString(getPlacer())).getName())
+                    .replace("%block%", name)
+                    .replace("%player%", username)
                     .send(player);
+
+            player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1, 2);
             return;
         }
 
         // Attempt to unlock double chest / door
-        if (attemptUnlockDoubleChest(player, item) || attemptUnlockDoor(player, item)) return;
+        if (attemptUnlockDoubleChest(item) || attemptUnlockDoor(item)) return;
 
         if (!(block.getState() instanceof Chest chest && chest.getInventory() instanceof DoubleChestInventory) && !block.getType().toString().contains("_DOOR")) {
-            unlock(player, item);
+            unlock(item);
 
             player.playSound(player.getLocation(), Sound.BLOCK_CHEST_LOCKED, 1, 2);
             new MessageManager("locking.unlock.success")
-                    .replace("%block%", getName())
+                    .replace("%block%", name)
                     .send(player);
         }
     }
 
     /**
-     * Removes {@code locker} data
+     * Unlocks a block
      *
-     * @param   player  The player to play the unlock sound for
+     * @param   item    The item to repair
      */
-    public void unlock(Player player, ItemStack item) {
+    public void unlock(ItemStack item) {
         if (item != null && item.getItemMeta() instanceof Damageable damage) {
-            int current = damage.getDamage();
-            if (current - 1 <= item.getType().getMaxDurability()) {
-                damage.setDamage(current - 1);
+            if (damage.getDamage() - 1 <= item.getType().getMaxDurability()) {
+                damage.setDamage(damage.getDamage() - 1);
                 item.setItemMeta(damage);
             } else {
                 player.playSound(player.getLocation(),Sound.ENTITY_ITEM_BREAK,1,1);
                 item.setAmount(0);
             }
         }
-        Main.locked.set(getId() + ".locker", null);
-        save();
+        if (block != null) DataManager.locked.put(block, new UUID[]{new PlaceManager(block).getPlacer(), null});
     }
 
     /**
      * Attempts to unlock a double chest
      *
-     * @param   player  Player to use in the {@code unlock} method
+     * @param   item    The item to repair
      *
      * @return          True if unlock was successful, false if not
      */
-    public boolean attemptUnlockDoubleChest(Player player, ItemStack item) {
+    public boolean attemptUnlockDoubleChest(ItemStack item) {
         if (block.getState() instanceof Chest chest && chest.getInventory() instanceof DoubleChestInventory doubleChest) {
-            attemptUnlockDouble(player, item, doubleChest.getLeftSide().getLocation(), doubleChest.getRightSide().getLocation());
+            attemptUnlockDouble(item, doubleChest.getLeftSide().getLocation(), doubleChest.getRightSide().getLocation());
             return true;
         }
         return false;
@@ -454,178 +435,51 @@ public class LockManager {
     /**
      * Attempts to unlock a door
      *
-     * @param   player  Player to use in the {@code unlock} method
+     * @param   item    The item to repair
      *
      * @return          True if unlock was successful, false if not
      */
-    public boolean attemptUnlockDoor(Player player, ItemStack item) {
+    public boolean attemptUnlockDoor(ItemStack item) {
         if (block.getType().toString().contains("_DOOR")) {
             //noinspection DuplicatedCode
             Door door = (Door) block.getState().getBlockData();
             Location top = block.getLocation();
             Location bottom = block.getLocation();
 
-            if (door.getHalf() == Bisected.Half.TOP) {
-                bottom = block.getLocation().subtract(0, 1, 0);
-            }
-            if (door.getHalf() == Bisected.Half.BOTTOM) {
-                top = block.getLocation().add(0, 1, 0);
-            }
+            if (door.getHalf() == Bisected.Half.TOP) bottom = block.getLocation().subtract(0, 1, 0);
+            if (door.getHalf() == Bisected.Half.BOTTOM) top = block.getLocation().add(0, 1, 0);
 
-            attemptUnlockDouble(player, item, top, bottom);
+            attemptUnlockDouble(item, top, bottom);
             return true;
         }
         return false;
     }
 
-    private void attemptUnlockDouble(Player player, ItemStack item, Location one, Location two) {
-        for (Location location : new Location[]{one, two}) {
-            new LockManager(location.getBlock()).unlock(player, item);
-        }
+    /**
+     * Used to unlock a double chest or door
+     *
+     * @param   item    The item to repair
+     * @param   one     The first block to unlock
+     * @param   two     The second block to unlock
+     */
+    private void attemptUnlockDouble(ItemStack item, Location one, Location two) {
+        for (Location location : new Location[]{one, two}) new LockManager(location.getBlock(), player).unlock(null);
+        new LockManager(null, player).unlock(item);
 
         player.playSound(player.getLocation(), Sound.BLOCK_CHEST_LOCKED, 1, 2);
         new MessageManager("locking.unlock.success")
-                .replace("%block%", getName())
+                .replace("%block%", name)
                 .send(player);
-    }
-
-    /**
-     * Checks if a block has place data
-     *
-     * @return  True if yes, false if no
-     */
-    public boolean isPlaced() {
-        return Main.locked.contains(getId());
-    }
-
-    /**
-     * @return  Whoever placed {@code block}
-     */
-    public String getPlacer() {
-        if (Main.locked.contains(getId() + ".placer")) return Main.locked.getString(getId() + ".placer");
-        return null;
-    }
-
-    /**
-     * Saves place data
-     *
-     * @param   player  The player to set as the placer
-     */
-    public void place(Player player) {
-        Main.locked.set(getId() + ".placer", player.getUniqueId().toString());
-        save();
-    }
-
-    /**
-     * Attempts to place a block
-     */
-    public void attemptPlace(Player player) {
-        if (attemptPlaceDoor(player)) return;
-
-        place(player);
-    }
-
-    /**
-     * Attempts to place a door
-     *
-     * @param   player  Player that triggered the place
-     *
-     * @return          True if successful, false if not
-     */
-    public boolean attemptPlaceDoor(Player player) {
-        if (block.getType().toString().contains("_DOOR")) {
-            //noinspection DuplicatedCode
-            Door door = (Door) block.getState().getBlockData();
-            Location top = block.getLocation();
-            Location bottom = block.getLocation();
-
-            if (door.getHalf() == Bisected.Half.TOP) {
-                bottom = block.getLocation().subtract(0, 1, 0);
-            }
-            if (door.getHalf() == Bisected.Half.BOTTOM) {
-                top = block.getLocation().add(0, 1, 0);
-            }
-
-            for (Location location : new Location[]{top, bottom}) {
-                new LockManager(location.getBlock()).place(player);
-            }
-
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Removes place data
-     */
-    public void unplace() {
-        Main.locked.set(getId(), null);
-        save();
-    }
-
-    /**
-     * Attempts to place a block
-     */
-    public void attemptUnplace() {
-        if (attemptUnplaceDoor()) return;
-
-        unplace();
-    }
-
-    /**
-     * Attempts to place a door
-     *
-     * @return  True if successful, false if not
-     */
-    public boolean attemptUnplaceDoor() {
-        if (block.getType().toString().contains("_DOOR")) {
-            //noinspection DuplicatedCode
-            Door door = (Door) block.getState().getBlockData();
-            Location top = block.getLocation();
-            Location bottom = block.getLocation();
-
-            if (door.getHalf() == Bisected.Half.TOP) {
-                bottom = block.getLocation().subtract(0, 1, 0);
-            }
-            if (door.getHalf() == Bisected.Half.BOTTOM) {
-                top = block.getLocation().add(0, 1, 0);
-            }
-
-            for (Location location : new Location[]{top, bottom}) {
-                new LockManager(location.getBlock()).unplace();
-            }
-
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * @return  The ID of the block in the data file
-     */
-    public String getId() {
-        return block.getWorld().getName() + "=" + block.getX() + "=" + block.getY() + "=" + block.getZ() + "=" + block.getType().name();
-    }
-
-    /**
-     * @return  The name of the block
-     */
-    public String getName() {
-        return WordUtils.capitalizeFully(block.getType().name().toLowerCase().replaceAll("_", " "));
     }
 
     /**
      * Get the current number of blocks {@code player} has locked
      *
-     * @param   player  The player
-     *
-     * @return          How many blocks {@code player} currently has locked
+     * @return  How many blocks {@code player} currently has locked
      */
-    public int getLockedCount(Player player) {
+    public int getLockedCount() {
         int i = 0;
-        for (String key : Main.locked.getKeys(false)) if (Objects.equals(Main.locked.getString(key + ".locker"), player.getUniqueId().toString())) {
-            i++;
-        }
+        for (Block key : DataManager.locked.keySet()) if (Objects.equals(new LockManager(key, null).getLocker(), player.getUniqueId())) i++;
         return i;
     }
 
@@ -649,11 +503,9 @@ public class LockManager {
     /**
      * Checks if a player is holding a Lock Tool
      *
-     * @param   player  The player to check
-     *
-     * @return          True if holding, false if not
+     * @return  True if holding, false if not
      */
-    public boolean holdingLockTool(Player player) {
+    public boolean holdingLockTool() {
         return ItemManager.isSame(player.getInventory().getItemInMainHand(), getLockTool());
     }
 
@@ -661,18 +513,11 @@ public class LockManager {
      * Checks if locked block types are still the same as the saved types
      */
     public void check() {
-        for (String key : Main.locked.getKeys(false)) {
-            String[] split = key.split("=");
-            Location loc = new Location(Bukkit.getWorld(split[0]), Double.parseDouble(split[1]), Double.parseDouble(split[2]), Double.parseDouble(split[3]));
-            if (!loc.getBlock().getType().name().equalsIgnoreCase(split[4])) Main.locked.set(key, null);
+        for (Block key : DataManager.locked.keySet()) {
+            if (!key.getType().equals(DataManager.lockedType.get(key))) {
+                DataManager.locked.remove(key);
+                DataManager.lockedType.remove(key);
+            }
         }
-        save();
-    }
-
-    /**
-     * Saves {@code locked.yml}
-     */
-    private void save() {
-        new ConfigManager("locked.yml", true).saveData(Main.locked);
     }
 }
