@@ -22,7 +22,7 @@ public class CommandLink implements CommandExecutor {
         Player player = (Player) sender;
 
         String discord = DiscordSRV.getPlugin().getAccountLinkManager().getDiscordId(player.getUniqueId());
-        String code = new CodeManager(player.getUniqueId()).generateCode();
+        String code = CodeManager.generateCode(player.getUniqueId());
         String channel = DiscordUtil.getTextChannelById(DiscordListener.linkChannel).getName();
 
         if (discord == null) {

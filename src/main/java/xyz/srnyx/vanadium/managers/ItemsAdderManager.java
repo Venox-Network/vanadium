@@ -106,8 +106,10 @@ public class ItemsAdderManager {
     public static void axe(Player player, Arrow arrow) {
         // Update durability of axe before returning it
         @Nullable CustomStack axe = CustomStack.byItemStack(axes.get(player.getUniqueId()));
-        if (axe != null) axe.setDurability(axe.getDurability() - 2);
-        axes.put(player.getUniqueId(), axe.getItemStack());
+        if (axe != null) {
+            axe.setDurability(axe.getDurability() - 2);
+            axes.put(player.getUniqueId(), axe.getItemStack());
+        }
 
         // Return the axe and remove the arrow
         player.getInventory().addItem(axes.get(player.getUniqueId()));

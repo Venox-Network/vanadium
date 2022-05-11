@@ -107,11 +107,11 @@ public class DataManager {
 
         // trusted.yml
         YamlConfiguration trustedYaml = new YamlConfiguration();
-        for (UUID player : trusted.keySet()) {
+        for (Map.Entry<UUID, List<UUID>> map : trusted.entrySet()) {
             List<String> trustedPlayers = new ArrayList<>();
-            for (UUID trustedPlayer : trusted.get(player)) trustedPlayers.add(trustedPlayer.toString());
+            for (UUID trustedPlayer : map.getValue()) trustedPlayers.add(trustedPlayer.toString());
 
-            trustedYaml.set(player.toString(), trustedPlayers);
+            trustedYaml.set(map.toString(), trustedPlayers);
         }
         // Save to file
         try {

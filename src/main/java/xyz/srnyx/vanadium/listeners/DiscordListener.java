@@ -55,25 +55,27 @@ public class DiscordListener {
                 AccountLinkManager manager = DiscordSRV.getPlugin().getAccountLinkManager();
                 User author = event.getAuthor();
                 String discord = author.getId();
-                UUID minecraft = new CodeManager(message).getUUIDFromCode();
-                Player player = Bukkit.getPlayer(minecraft);
+                UUID minecraft = CodeManager.getUUIDFromCode(message);
+                Player player = null;
+                if (minecraft != null) player = Bukkit.getPlayer(minecraft);
 
                 manager.unlink(discord);
                 manager.unlink(minecraft);
                 manager.link(discord, minecraft);
-                new CodeManager(minecraft).removeCode();
+                CodeManager.removeCode(minecraft);
 
-                // Send success message to player on Minecraft
-                //noinspection ConstantConditions
-                new MessageManager("linking.success.minecraft")
-                        .replace("%discord%", author.getAsTag())
-                        .send(player);
+                if (player != null) {
+                    // Send success message to player on Minecraft
+                    new MessageManager("linking.success.minecraft")
+                            .replace("%discord%", author.getAsTag())
+                            .send(player);
 
-                // Send success message to user on Discord
-                new MessageManager("linking.success.discord")
-                        .replace("%minecraft%", player.getName())
-                        .replace("%uuid%", player.getUniqueId().toString())
-                        .send(author);
+                    // Send success message to user on Discord
+                    new MessageManager("linking.success.discord")
+                            .replace("%minecraft%", player.getName())
+                            .replace("%uuid%", player.getUniqueId().toString())
+                            .send(author);
+                }
             }
             event.getMessage().delete().queue();
         }

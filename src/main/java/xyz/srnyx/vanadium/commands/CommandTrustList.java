@@ -46,7 +46,7 @@ public class CommandTrustList implements CommandExecutor {
         new MessageManager("trusting.list.header")
                 .replace("%player%", target.getName())
                 .send(player);
-        if (trusted.size() == 0) {
+        if (trusted.isEmpty()) {
             new MessageManager("trusting.list.empty").send(player);
         } else {
             for (UUID id : trusted) {

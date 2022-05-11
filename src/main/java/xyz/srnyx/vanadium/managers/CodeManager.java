@@ -7,26 +7,10 @@ import java.util.UUID;
 
 
 public class CodeManager {
-    private UUID uuid;
-    private String code;
-
     public static final Map<UUID, String> linkingCodes = new HashMap<>();
 
-    /**
-     * Initializes a new {@code CodeManager}
-     *
-     * @param   object  The UUId/code to use for the methods
-     */
-    public CodeManager(Object object) {
-        if (object instanceof UUID) {
-            this.uuid = (UUID) object;
-        } else if (object instanceof String) {
-            this.code = (String) object;
-        }
-    }
-
-    public String generateCode() {
-        String code = String.valueOf(
+    public static String generateCode(UUID uuid) {
+        final String code = String.valueOf(
                 new Random().nextInt(9)) +
                 new Random().nextInt(9) +
                 new Random().nextInt(9) +
@@ -38,7 +22,7 @@ public class CodeManager {
     /**
      * Remove a code
      */
-    public void removeCode() {
+    public static void removeCode(UUID uuid) {
         linkingCodes.remove(uuid);
     }
 
@@ -47,7 +31,7 @@ public class CodeManager {
      *
      * @return          The {@code UUID} associated with the {@code code}
      */
-    public UUID getUUIDFromCode() {
+    public static UUID getUUIDFromCode(String code) {
         for (Map.Entry<UUID, String> entry : linkingCodes.entrySet()) if (entry.getValue().equals(code)) return entry.getKey();
         return null;
     }

@@ -8,11 +8,10 @@ import org.bukkit.entity.Player;
 
 
 public class PlayerManager {
-
     /**
      * @param   player  The player to get the {@code OfflinePlayer} of
      *
-     * @return  The {@code OfflinePlayer}
+     * @return          The {@code OfflinePlayer}
      */
     public static OfflinePlayer getOfflinePlayer(String player) {
         for (OfflinePlayer op : Bukkit.getOfflinePlayers()) if (op.getName() != null && op.getName().equalsIgnoreCase(player)) return op;

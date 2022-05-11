@@ -32,8 +32,8 @@ public class SlotManager {
      */
     public SlotManager(String type, Object player) {
         if (type != null) this.type = type;
-        if (player instanceof Player) this.player = (Player) player;
-        if (player instanceof OfflinePlayer) this.op = (OfflinePlayer) player;
+        if (player instanceof Player player2) this.player = player2;
+        if (player instanceof OfflinePlayer offlinePlayer) this.op = offlinePlayer;
     }
 
     /**
@@ -167,6 +167,7 @@ public class SlotManager {
      */
     public int getCount() {
         int[] slots = DataManager.slots.get(op.getUniqueId());
-        return slots != null ? slots[Objects.equals(type, "trusts") ? 1 : 0] : 0;
+        int id = Objects.equals(type, "trusts") ? 1 : 0;
+        return slots != null ? slots[id] : 0;
     }
 }
