@@ -46,7 +46,7 @@ public class Main extends JavaPlugin {
         loadFiles();
         registerRecipes();
         new DataManager().onEnable();
-        new LockManager().check();
+        new LockManager(null, null).check();
         new SlotManager("locks").check();
         new SlotManager("trusts").check();
 
@@ -125,7 +125,7 @@ public class Main extends JavaPlugin {
     private void registerRecipes() {
         // Lock Tool
         if (config.getBoolean("lock-tool.recipe") && !config.getBoolean("lock-tool.custom")) {
-            ShapedRecipe locktool = new ShapedRecipe(NamespacedKey.minecraft("lock_tool"), LockManager.getLockTool());
+            final ShapedRecipe locktool = new ShapedRecipe(NamespacedKey.minecraft("lock_tool"), LockManager.getLockTool());
             locktool
                     .shape(
                             "  A",

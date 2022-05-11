@@ -11,6 +11,9 @@ import xyz.srnyx.vanadium.managers.LockManager;
 
 
 public class MoveListener implements Listener {
+    /**
+     * Called when a player sneaks
+     */
     @EventHandler
     public void onSneak(PlayerToggleSneakEvent event) {
         Player player = event.getPlayer();

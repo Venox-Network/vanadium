@@ -15,42 +15,37 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 
 public class CommandBypass implements CommandExecutor {
-    private static final String tag = "bypass";
-
     @SuppressWarnings("NullableProblems")
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (PlayerManager.isNotPlayer(sender)) return true;
         if (PlayerManager.noPermission(sender, "vanadium.bypass")) return true;
         Player player = (Player) sender;
 
-        if (PlayerManager.hasScoreboardTag(player, tag)) {
-            player.removeScoreboardTag(tag);
+        if (PlayerManager.hasScoreboardTag(player, "bypass")) {
+            player.removeScoreboardTag("bypass");
             new MessageManager("locking.bypass.disabled").send(player);
-        } else {
-            enable(player, false);
-        }
+        } else enable(player, false);
+
         return true;
     }
 
+    /**
+     * Enables bypass
+     *
+     * @param   player  Player to enable bypass for
+     * @param   join    Whether it was activated by the {@code player} joining
+     */
     public static void enable(Player player, boolean join) {
         if (!join) {
-            player.addScoreboardTag(tag);
+            player.addScoreboardTag("bypass");
             new MessageManager("locking.bypass.enabled").send(player);
         }
 
         new BukkitRunnable() {
             public void run() {
-                if (!PlayerManager.isVanished(player)) {
-                    player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(new MessageManager("locking.bypass.actionbar").toString()));
-                }
-                if (!check(player)) {
-                    cancel();
-                }
+                if (!PlayerManager.isVanished(player)) player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(new MessageManager("locking.bypass.actionbar").toString()));
+                if (!PlayerManager.hasScoreboardTag(player, "bypass")) cancel();
             }
         }.runTaskTimer(Main.plugin, 0, 40);
-    }
-
-    public static boolean check(Player player) {
-        return (PlayerManager.hasScoreboardTag(player, tag));
     }
 }

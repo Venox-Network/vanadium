@@ -16,16 +16,18 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import xyz.srnyx.vanadium.Main;
-import xyz.srnyx.vanadium.commands.CommandBypass;
 import xyz.srnyx.vanadium.managers.LockManager;
 import xyz.srnyx.vanadium.managers.MessageManager;
 import xyz.srnyx.vanadium.managers.PlaceManager;
+import xyz.srnyx.vanadium.managers.PlayerManager;
 
 import java.util.UUID;
 
 
 public class BlockListener implements Listener {
-
+    /**
+     * Called when a block is placed
+     */
     @EventHandler
     public void onPlaceBlock(BlockPlaceEvent event) {
         Player player = event.getPlayer();
@@ -50,8 +52,11 @@ public class BlockListener implements Listener {
         }.runTaskLater(Main.plugin, 1);
     }
 
+    /**
+     * Called when a block is broken
+     */
     @EventHandler
-    public void onDestroyBlock(BlockBreakEvent event) {
+    public void onBreakBlock(BlockBreakEvent event) {
         Player player = event.getPlayer();
         Block block = event.getBlock();
 
@@ -62,7 +67,7 @@ public class BlockListener implements Listener {
         }
 
         // Check Locked Block
-        if (!(player.hasPermission("vanadium.command.bypass") && (player.isSneaking() || CommandBypass.check(player))) && new LockManager(block, null).isLocked()) {
+        if (!(player.hasPermission("vanadium.command.bypass") && (player.isSneaking() || PlayerManager.hasScoreboardTag(player, "bypass"))) && new LockManager(block, null).isLocked()) {
             if (new LockManager(block, player).isLockedForPlayer()) {
                 event.setCancelled(true);
                 player.playSound(player.getLocation(), Sound.BLOCK_CHEST_LOCKED, 1, 1);
@@ -82,11 +87,17 @@ public class BlockListener implements Listener {
         }
     }
 
+    /**
+     * Called when an entity explodes
+     */
     @EventHandler
     public void onExplode(EntityExplodeEvent event) {
         event.blockList().removeIf(block -> new LockManager(block, null).isLocked());
     }
 
+    /**
+     * Called when a block burns
+     */
     @EventHandler
     public void onFire(BlockBurnEvent event) {
         Block block = event.getBlock();
@@ -95,6 +106,9 @@ public class BlockListener implements Listener {
         }
     }
 
+    /**
+     * Called when an item is moved from one inventory to another
+     */
     @EventHandler
     public void onHopper(InventoryMoveItemEvent event) {
         if (event.getSource().getLocation() != null && event.getDestination().getLocation() != null && event.getDestination().getType() == InventoryType.HOPPER) {

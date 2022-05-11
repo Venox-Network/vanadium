@@ -15,7 +15,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 
 import xyz.srnyx.vanadium.Main;
-import xyz.srnyx.vanadium.commands.CommandBypass;
 
 import org.apache.commons.lang.WordUtils;
 
@@ -40,11 +39,6 @@ public class LockManager {
         }
         if (player != null) this.player = player;
     }
-
-    /**
-     * Constructor for {@code LockManager}
-     */
-    public LockManager() {}
 
     /**
      * Checks if the block is locked
@@ -127,12 +121,12 @@ public class LockManager {
             Location corner1 = loc.clone();
             Location corner2 = loc.clone().add(1, 1, 1);
 
-            double minX = Math.min(corner1.getX(), corner2.getX());
-            double minY = Math.min(corner1.getY(), corner2.getY());
-            double minZ = Math.min(corner1.getZ(), corner2.getZ());
-            double maxX = Math.max(corner1.getX(), corner2.getX());
-            double maxY = Math.max(corner1.getY(), corner2.getY());
-            double maxZ = Math.max(corner1.getZ(), corner2.getZ());
+            final double minX = Math.min(corner1.getX(), corner2.getX());
+            final double minY = Math.min(corner1.getY(), corner2.getY());
+            final double minZ = Math.min(corner1.getZ(), corner2.getZ());
+            final double maxX = Math.max(corner1.getX(), corner2.getX());
+            final double maxY = Math.max(corner1.getY(), corner2.getY());
+            final double maxZ = Math.max(corner1.getZ(), corner2.getZ());
 
             for (double x = minX; x <= maxX; x += distance) {
                 for (double y = minY; y <= maxY; y += distance) {
@@ -172,7 +166,7 @@ public class LockManager {
         }
 
         // Check If Player Placed Block
-        if (!Main.config.getBoolean("allow-unplaced-locking") || !CommandBypass.check(player)) {
+        if (!Main.config.getBoolean("allow-unplaced-locking") || !PlayerManager.hasScoreboardTag(player, "bypass")) {
             UUID placer = new PlaceManager(block).getPlacer();
             if (placer == null || !placer.equals(player.getUniqueId())) {
                 player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1, 2);
@@ -345,8 +339,8 @@ public class LockManager {
         for (Location loc : locations) {
             if (new LockManager(loc.getBlock(), null).isLocked()) {
                 UUID owner = new LockManager(loc.getBlock(), null).getLocker();
-                Block block0 = locations[0].getBlock();
-                Block block1 = locations[0].getBlock();
+                final Block block0 = locations[0].getBlock();
+                final Block block1 = locations[0].getBlock();
 
                 DataManager.locked.put(block0, new UUID[]{owner, owner});
                 DataManager.locked.put(block1, new UUID[]{owner, owner});

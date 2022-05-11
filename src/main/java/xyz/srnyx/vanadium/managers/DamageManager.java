@@ -17,7 +17,7 @@ public class DamageManager {
      * @param   dmg     The base damage to deal
      */
     public static void damage(LivingEntity entity, double dmg) {
-        EntityEquipment inv = entity.getEquipment();
+        final EntityEquipment inv = entity.getEquipment();
         if (inv == null) return;
         double red = 0.0;
 
@@ -93,7 +93,7 @@ public class DamageManager {
         }
 
         if (inv.getBoots() != null) {
-            Material boots = inv.getBoots().getType();
+            final Material boots = inv.getBoots().getType();
             if (boots == Material.LEATHER_BOOTS || boots == Material.GOLDEN_BOOTS || boots == Material.CHAINMAIL_BOOTS) {
                 red += 0.04;
             } else if (boots == Material.IRON_BOOTS) {

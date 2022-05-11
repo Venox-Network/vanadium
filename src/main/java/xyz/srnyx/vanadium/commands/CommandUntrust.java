@@ -22,7 +22,7 @@ public class CommandUntrust implements TabExecutor {
         Player player = (Player) sender;
 
         if (args.length == 1) {
-            OfflinePlayer target = PlayerManager.getOfflinePlayer(args[0]);
+            final OfflinePlayer target = PlayerManager.getOfflinePlayer(args[0]);
             if (target == null) {
                 new MessageManager("errors.invalid-player")
                         .replace("%player%", args[0])
@@ -41,8 +41,6 @@ public class CommandUntrust implements TabExecutor {
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         List<String> suggestions = new ArrayList<>();
         List<String> results = new ArrayList<>();
-
-        if (PlayerManager.isNotPlayer(sender)) return results;
         Player player = (Player) sender;
 
         if (args.length == 1) for (UUID id : DataManager.trusted.get(player.getUniqueId())) suggestions.add(Bukkit.getOfflinePlayer(id).getName());

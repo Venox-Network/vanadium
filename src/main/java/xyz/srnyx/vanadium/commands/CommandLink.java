@@ -13,8 +13,6 @@ import xyz.srnyx.vanadium.managers.CodeManager;
 import xyz.srnyx.vanadium.managers.MessageManager;
 import xyz.srnyx.vanadium.managers.PlayerManager;
 
-import java.util.UUID;
-
 
 public class CommandLink implements CommandExecutor {
     @SuppressWarnings("NullableProblems")
@@ -23,9 +21,8 @@ public class CommandLink implements CommandExecutor {
         if (PlayerManager.noPermission(sender, "vanadium.link")) return true;
         Player player = (Player) sender;
 
-        UUID minecraft = player.getUniqueId();
-        String discord = DiscordSRV.getPlugin().getAccountLinkManager().getDiscordId(minecraft);
-        String code = new CodeManager(minecraft).generateCode();
+        String discord = DiscordSRV.getPlugin().getAccountLinkManager().getDiscordId(player.getUniqueId());
+        String code = new CodeManager(player.getUniqueId()).generateCode();
         String channel = DiscordUtil.getTextChannelById(DiscordListener.linkChannel).getName();
 
         if (discord == null) {

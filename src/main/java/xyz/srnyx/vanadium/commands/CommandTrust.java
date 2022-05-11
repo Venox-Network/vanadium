@@ -44,8 +44,7 @@ public class CommandTrust implements TabExecutor {
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         List<String> suggestions = new ArrayList<>();
         List<String> results = new ArrayList<>();
-
-        if (!(sender instanceof Player player)) return results;
+        Player player = (Player) sender;
 
         if (args.length == 1) {
             List<UUID> trusted = DataManager.trusted.get(player.getUniqueId());

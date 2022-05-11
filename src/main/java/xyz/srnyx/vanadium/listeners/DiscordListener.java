@@ -26,6 +26,9 @@ import java.util.UUID;
 public class DiscordListener {
     public static final String linkChannel = Main.config.getString("link-channel");
 
+    /**
+     * Called when the bot is ready
+     */
     @Subscribe
     public void onDiscordReady(DiscordReadyEvent event) {
         String name = DiscordUtil.getJda().getSelfUser().getName();
@@ -35,12 +38,15 @@ public class DiscordListener {
         if (linkChannel != null) {
             TextChannel channel = DiscordUtil.getTextChannelById(linkChannel);
             if (channel != null) {
-                List<Message> history = new MessageHistory(channel).retrievePast(100).complete();
+                final List<Message> history = new MessageHistory(channel).retrievePast(100).complete();
                 if (!history.isEmpty()) channel.deleteMessages(history).queue();
             }
         }
     }
 
+    /**
+     * Called when a server message is received
+     */
     @Subscribe
     public void onGuildMessageReceive(DiscordGuildMessageReceivedEvent event) {
         if (linkChannel != null && event.getChannel().getId().equals(linkChannel)) {

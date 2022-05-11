@@ -53,8 +53,8 @@ public class PlaceholderManager extends PlaceholderExpansion {
         }
         // %v_locks_time%
         if (params.equalsIgnoreCase("locks_time")) {
-            if (new SlotManager("locks", player).timeLeft(true) != null) {
-                String value = String.valueOf(TimeUnit.MILLISECONDS.toMinutes(new SlotManager("locks", player).timeLeft(true)));
+            if (new SlotManager("locks", player).timeLeft() != null) {
+                final String value = String.valueOf(TimeUnit.MILLISECONDS.toMinutes(new SlotManager("locks", player).timeLeft()));
                 if (essentials != null) {
                     if (!essentials.getUser(player).isAfk()) {
                         return value;
@@ -73,8 +73,8 @@ public class PlaceholderManager extends PlaceholderExpansion {
         }
         // %v_trusts_time%
         if (params.equalsIgnoreCase("trusts_time")) {
-            if (new SlotManager("trusts", player).timeLeft(true) != null) {
-                String value = String.valueOf(TimeUnit.MILLISECONDS.toMinutes(new SlotManager("trusts", player).timeLeft(true)));
+            if (new SlotManager("trusts", player).timeLeft() != null) {
+                String value = String.valueOf(TimeUnit.MILLISECONDS.toMinutes(new SlotManager("trusts", player).timeLeft()));
                 if (essentials != null) {
                     if (!essentials.getUser(player).isAfk()) {
                         return value;

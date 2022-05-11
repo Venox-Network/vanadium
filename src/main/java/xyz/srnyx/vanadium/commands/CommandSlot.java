@@ -14,14 +14,10 @@ import xyz.srnyx.vanadium.managers.SlotManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 
 public class CommandSlot implements TabExecutor {
-    public static final List<UUID> stopLocks = new ArrayList<>();
-    public static final List<UUID> stopTrusts = new ArrayList<>();
-
     @SuppressWarnings("NullableProblems")
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (PlayerManager.noPermission(sender, "vanadium.slot")) return true;
@@ -38,11 +34,14 @@ public class CommandSlot implements TabExecutor {
                 if (Objects.equals(type, "trusts")) slots = new SlotManager("trusts", player).getCount();
 
                 //<player> <get|cooldown|start|stop> <locks|trusts|all>
-                boolean arg3action = action.equalsIgnoreCase("get") ||
-                        action.equalsIgnoreCase("cooldown") ||
-                        action.equalsIgnoreCase("start") ||
-                        action.equalsIgnoreCase("stop");
-                boolean arg3type = type.equalsIgnoreCase("all") || type.equalsIgnoreCase("locks") || type.equalsIgnoreCase("trusts");
+                boolean arg3action = action.equalsIgnoreCase("get")
+                        || action.equalsIgnoreCase("cooldown")
+                        || action.equalsIgnoreCase("start")
+                        || action.equalsIgnoreCase("stop");
+                boolean arg3type = type.equalsIgnoreCase("all")
+                        || type.equalsIgnoreCase("locks")
+                        || type.equalsIgnoreCase("trusts");
+
                 if (args.length == 3 && arg3action && arg3type) {
                     //<player> <get> <locks|trusts>
                     if (action.equalsIgnoreCase("get")) {
@@ -62,13 +61,14 @@ public class CommandSlot implements TabExecutor {
                     }
 
                     //<player> <cooldown> <locks|trusts>
-                    String timeLeft = TimeUnit.MILLISECONDS.toSeconds(new SlotManager(type, player).timeLeft(false)) + " seconds";
-                    if (new SlotManager(type, player).timeLeft(true) == null) timeLeft = "N/A (stopped)";
+                    String timeLeftString = "N/A (stopped)";
+                    Long timeLeft = new SlotManager(type, player).timeLeft();
+                    if (timeLeft != null) timeLeftString = TimeUnit.MILLISECONDS.toSeconds(timeLeft) + " seconds";
                     if (action.equalsIgnoreCase("cooldown")) {
                         new MessageManager("slots.command.cooldown")
                                 .replace("%target%", player.getName())
                                 .replace("%type%", type.substring(0, type.length() - 1))
-                                .replace("%next%", timeLeft)
+                                .replace("%next%", timeLeftString)
                                 .send(sender);
                         return true;
                     }
@@ -79,28 +79,22 @@ public class CommandSlot implements TabExecutor {
                             if (type.equalsIgnoreCase("all")) {
                                 new SlotManager("locks", player).start();
                                 new SlotManager("trusts", player).start();
-                                stopLocks.remove(player.getUniqueId());
-                                stopTrusts.remove(player.getUniqueId());
-                            } else if (type.equalsIgnoreCase("locks")) {
+                                player.removeScoreboardTag("stop-locks");
+                                player.removeScoreboardTag("stop-trusts");
+                            } else  {
                                 new SlotManager(type, player).start();
-                                stopLocks.remove(player.getUniqueId());
-                            } else if (type.equalsIgnoreCase("trusts")) {
-                                new SlotManager(type, player).start();
-                                stopTrusts.remove(player.getUniqueId());
+                                player.removeScoreboardTag("stop-" + type);
                             }
                         }
                         if (action.equalsIgnoreCase("stop")) {
                             if (type.equalsIgnoreCase("all")) {
                                 new SlotManager("locks", player).stop();
                                 new SlotManager("trusts", player).stop();
-                                stopLocks.add(player.getUniqueId());
-                                stopTrusts.add(player.getUniqueId());
-                            } else if (type.equalsIgnoreCase("locks")) {
+                                player.addScoreboardTag("stop-locks");
+                                player.addScoreboardTag("stop-trusts");
+                            } else  {
                                 new SlotManager(type, player).stop();
-                                stopLocks.add(player.getUniqueId());
-                            } else if (type.equalsIgnoreCase("trusts")) {
-                                new SlotManager(type, player).stop();
-                                stopTrusts.add(player.getUniqueId());
+                                player.addScoreboardTag("stop-" + type);
                             }
                         }
 
@@ -155,14 +149,11 @@ public class CommandSlot implements TabExecutor {
 
     @SuppressWarnings("NullableProblems")
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
-        List<String> suggestions = new ArrayList<>();
+        final List<String> suggestions = new ArrayList<>();
         List<String> results = new ArrayList<>();
 
-        if (args.length == 1) {
-            for (Player online : Bukkit.getOnlinePlayers()) {
-                suggestions.add(online.getName());
-            }
-        }
+        if (args.length == 1) for (Player online : Bukkit.getOnlinePlayers()) suggestions.add(online.getName());
+
         if (args.length == 2) {
             suggestions.add("get");
             suggestions.add("cooldown");
@@ -178,11 +169,7 @@ public class CommandSlot implements TabExecutor {
             if (Objects.equals(args[1], "start") || Objects.equals(args[1], "stop")) suggestions.add("all");
         }
 
-        for (String suggestion : suggestions) {
-            if (suggestion.toLowerCase().startsWith(args[args.length - 1].toLowerCase())) {
-                results.add(suggestion);
-            }
-        }
+        for (String suggestion : suggestions) if (suggestion.toLowerCase().startsWith(args[args.length - 1].toLowerCase())) results.add(suggestion);
         return results;
     }
 }

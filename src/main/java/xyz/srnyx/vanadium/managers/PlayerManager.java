@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 public class PlayerManager {
 
     /**
-     * Get the {@code OfflinePlayer} of a {@code Player}
+     * @param   player  The player to get the {@code OfflinePlayer} of
      *
      * @return  The {@code OfflinePlayer}
      */
@@ -22,7 +22,9 @@ public class PlayerManager {
     /**
      * Check if a {@code CommandSender} is a player
      *
-     * @return  True if player, false if non-player
+     * @param   sender  The {@code CommandSender} to check
+     *
+     * @return          True if player, false if non-player
      */
     public static boolean isNotPlayer(CommandSender sender) {
         if (sender instanceof Player) return false;
@@ -33,7 +35,9 @@ public class PlayerManager {
     /**
      * Check if a player is vanished
      *
-     * @return  True if vanished, false if not
+     * @param   player  The player to check
+     *
+     * @return          True if vanished, false if not
      */
     public static boolean isVanished(Player player) {
         for (MetadataValue meta : player.getMetadata("vanished")) if (meta.asBoolean()) return true;
@@ -43,6 +47,7 @@ public class PlayerManager {
     /**
      * Check if a {@code CommandSender} is a player and has a certain permission
      *
+     * @param   sender      The {@code CommandSender} to check
      * @param   permission  The permission to check them for
      *
      * @return              True if player & has permission, false if non-player or doesn't have permission

@@ -122,7 +122,7 @@ public class DataManager {
 
 
         // slots.yml
-        YamlConfiguration slotsYaml = new YamlConfiguration();
+        final YamlConfiguration slotsYaml = new YamlConfiguration();
         for (UUID id : slots.keySet()) {
             String idString = id.toString();
             int locks = new SlotManager("locks", Bukkit.getOfflinePlayer(id)).getCount();

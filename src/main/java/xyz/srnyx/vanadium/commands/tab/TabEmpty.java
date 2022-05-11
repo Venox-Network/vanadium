@@ -9,7 +9,7 @@ import java.util.List;
 
 
 /**
- * Returns an empty table complete
+ * Returns an empty tab complete
  */
 public class TabEmpty implements TabCompleter {
     @SuppressWarnings("NullableProblems")

@@ -27,7 +27,7 @@ public class SlotManager {
     /**
      * Constructor for SlotManager
      *
-     * @param   type    The type of slot ({@code "locks"} or {@code "trust"})
+     * @param   type    The type of slot ({@code locks} or {@code trusts})
      * @param   player  The player to manage
      */
     public SlotManager(String type, Object player) {
@@ -39,7 +39,7 @@ public class SlotManager {
     /**
      * Constructor for SlotManager
      *
-     * @param   type    The type of slot ({@code "locks"} or {@code "trust"})
+     * @param   type    The type of slot ({@code locks} or {@code trusts})
      */
     public SlotManager(String type) {
         if (type != null) this.type = type;
@@ -63,17 +63,14 @@ public class SlotManager {
     }
 
     /**
-     * @param   papi    If what's checking is for PAPI
-     *
-     * @return          The amount of time left in the cooldown
+     * @return  The amount of time left in the cooldown
      */
-    public Long timeLeft(boolean papi) {
+    public Long timeLeft() {
         if (new SlotManager(type, player).contains()) {
             if (Objects.equals(type, "locks")) return locksCooldown.get(player.getUniqueId()) - System.currentTimeMillis();
             if (Objects.equals(type, "trusts")) return trustsCooldown.get(player.getUniqueId()) - System.currentTimeMillis();
         }
-        if (papi) return null;
-        return 0L;
+        return null;
     }
 
     /**
@@ -133,7 +130,7 @@ public class SlotManager {
             public void run() {
                 for (Player online : Bukkit.getOnlinePlayers()) {
                     SlotManager slot = new SlotManager(type, online);
-                    if (slot.contains() && slot.timeLeft(false) <= 0) {
+                    if (slot.contains() && (slot.timeLeft() == null || slot.timeLeft() <= 0)) {
                         Essentials essentials = (Essentials) Bukkit.getPluginManager().getPlugin("Essentials");
                         if (essentials != null) {
                             if (essentials.getUser(online).isAfk()) {
@@ -157,6 +154,7 @@ public class SlotManager {
                 try {
                     return Integer.parseInt(perm.substring(perm.lastIndexOf(".") + 1));
                 } catch (NumberFormatException e) {
+                    e.printStackTrace();
                     return 1;
                 }
             }

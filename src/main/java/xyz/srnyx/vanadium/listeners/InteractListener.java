@@ -12,13 +12,15 @@ import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
-import xyz.srnyx.vanadium.commands.CommandBypass;
 import xyz.srnyx.vanadium.managers.*;
 
 import java.util.UUID;
 
 
 public class InteractListener implements Listener {
+    /**
+     * Called when a player interacts
+     */
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
@@ -39,7 +41,7 @@ public class InteractListener implements Listener {
         if (block != null && new LockManager(block, player).isLockedForPlayer()) {
             UUID owner = new LockManager(block, null).getLocker();
             if (owner != null && !new TrustManager(player, Bukkit.getOfflinePlayer(owner)).isTrusted()) {
-                if (!(player.hasPermission("vanadium.command.bypass") && (player.isSneaking() || CommandBypass.check(player)))) {
+                if (!(player.hasPermission("vanadium.command.bypass") && (player.isSneaking() || PlayerManager.hasScoreboardTag(player, "bypass")))) {
                     player.playSound(player.getLocation(), Sound.BLOCK_CHEST_LOCKED, 1, 1);
                     event.setCancelled(true);
                 }
@@ -51,11 +53,12 @@ public class InteractListener implements Listener {
         }
     }
 
+    /**
+     * Called when an entity interacts
+     */
     @EventHandler
     public void onEntityInteract(EntityInteractEvent event) {
-        // Cancel if entity interacts with locked blocked (Main.locked.getString(new LockManager(event.getBlock()).getId() + ".locked") != null)
-        if (new LockManager(event.getBlock(), null).isLocked()) {
-            event.setCancelled(true);
-        }
+        // Cancel if entity interacts with locked blocked
+        if (new LockManager(event.getBlock(), null).isLocked()) event.setCancelled(true);
     }
 }
