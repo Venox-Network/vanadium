@@ -9,6 +9,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ShapedRecipe;
@@ -31,6 +32,8 @@ public class Main extends JavaPlugin {
     @Override
     public void onEnable() {
         plugin = this;
+
+        PluginManager pm = Bukkit.getPluginManager();
 
         // Create config files
         new FileManager("config.yml", false).create();
@@ -55,33 +58,25 @@ public class Main extends JavaPlugin {
         getLogger().info(ChatColor.AQUA + " Vanadium Plugin");
         getLogger().info(ChatColor.DARK_AQUA + "=================");
 
-        // Register listeners
-        Bukkit.getPluginManager().registerEvents(new BlockListener(), this);
-        Bukkit.getPluginManager().registerEvents(new InteractListener(), this);
-        Bukkit.getPluginManager().registerEvents(new JoinLeaveListener(), this);
-        Bukkit.getPluginManager().registerEvents(new MoveListener(), this);
-        Bukkit.getPluginManager().registerEvents(new ItemsAdderListener(), this);
-
         // Register commands
         registerCommand("bypass", new CommandBypass(), new TabEmpty());
         registerCommand("locktool", new CommandLockTool(), null);
+        registerCommand("vreload", new CommandReload(), new TabEmpty());
+        registerCommand("slot", new CommandSlot(), null);
         registerCommand("trust", new CommandTrust(), null);
         registerCommand("trustlist", new CommandTrustList(), null);
         registerCommand("untrust", new CommandUntrust(), null);
-        registerCommand("vreload", new CommandReload(), new TabEmpty());
-        registerCommand("slot", new CommandSlot(), null);
+
+        // Register listeners
+        pm.registerEvents(new BlockListener(), this);
+        pm.registerEvents(new InteractListener(), this);
+        pm.registerEvents(new JoinLeaveListener(), this);
+        pm.registerEvents(new MoveListener(), this);
+        pm.registerEvents(new ItemsAdderListener(), this);
 
         // Register plugin-specific stuff
-        // DiscordSRV
-        if (Bukkit.getPluginManager().getPlugin("DiscordSRV") != null) {
-            registerCommand("link", new CommandLink(), new TabEmpty());
-            DiscordSRV.api.subscribe(new DiscordListener());
-        }
-        // PlaceholderAPI
-        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
-            new PlaceholderManager().register();
-            getLogger().info(ChatColor.GREEN + "PlaceholderAPI expansion successfully registered!");
-        }
+        if (pm.getPlugin("DiscordSRV") != null) DiscordSRV.api.subscribe(new DiscordListener());
+        if (pm.getPlugin("PlaceholderAPI") != null) new PlaceholderManager().register();
     }
 
     /**
@@ -114,9 +109,7 @@ public class Main extends JavaPlugin {
         if (command != null) {
             command.setExecutor(executor);
             command.setTabCompleter(completer);
-        } else {
-            getLogger().warning("Could not register command \"" + name + "\"");
-        }
+        } else getLogger().warning("Could not register command " + ChatColor.DARK_RED + name);
     }
 
     /**

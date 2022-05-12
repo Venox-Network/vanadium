@@ -5,7 +5,7 @@
 plugin:
   # This will be what %prefix% is in all the other messages
   # %prefix% can be used in any message in this file as many times as you want
-  prefix: "&b&lSMP &8[&3&lV&8] &7"
+  prefix: "&b&lSMP &8[&3&lV&8] &b"
   reload: "%prefix%&3Vanadium &bsuccessfully reloaded"
 
 
@@ -20,23 +20,6 @@ errors:
   invalid-arguments: "%prefix%&4&lERROR! &cInvalid arguments"
 
 
-# %code% = The player's code that was generated
-# %channel% = The link channel's name (set in config.yml)
-# %discord% = The Discord account (username#tag) they are linked to
-# %minecraft% = The Minecraft account they are linked to# %uuid% = The Minecraft account's UUID they are linked to
-linking:
-  # %code%, %channel%
-  generate: "%prefix%&bYour code is &3%code%&b, send it in &3#%channel% &bto link your accounts"
-  # %code%, %channel%, %discord%
-  already-linked: "%prefix%&bYour account is already linked to &3%discord%&b, send &3%code% &bin &3#%channel% &bto relink"
-
-  success:
-    # %discord%
-    minecraft: "%prefix%&bYou've successfully linked your account to &3%discord%"
-    # %minecraft%, %uuid%
-    discord: "You've successfully linked your account to **`%minecraft%`** *(`%uuid%`)*"
-
-
 # %count% = Number of slots given
 # %type% = Type of slot
 # %slot% = "slot" if one, "slots" if multiple
@@ -46,7 +29,7 @@ linking:
 # %target% = The targeted player/block
 slots:
   # %count%, %type%, %slot%, %total%, %next, %minute%
-  add: "%prefix%&bYou've gained &3%count% %type% &b%slot% for being online (new total: &3%total%&b)! Next one in &3%next% &b%minute%."
+  add: "%prefix%You've gained &3%count% %type% &b%slot% for being online (new total: &3%total%&b)! Next one in &3%next% &b%minute%."
   # %type%, %total%, %target%
   limit: "%prefix%&cFailed to %type% &4%target%&c! You've reached your limit of &4%total% %type%s&c."
 
@@ -57,15 +40,15 @@ slots:
     # %next% = Time remaining
     cooldown: "%prefix%&3%target% &bhas &3%next% &buntil their next &3%type% &bslot"
     # %count%, %slot%, %total%
-    add: "%prefix%&bYou've given &3%count% &b%type% %slot% to &3%target% &b(new total: &3%total%&b)"
+    add: "%prefix%You've given &3%count% &b%type% %slot% to &3%target% &b(new total: &3%total%&b)"
     # %count%, %slot%, %total%
-    remove: "%prefix%&bYou've taken &3%count% &b%type% %slot% from &3%target% &b(new total: &3%total%&b)"
+    remove: "%prefix%You've taken &3%count% &b%type% %slot% from &3%target% &b(new total: &3%total%&b)"
     # %count%, %slot%, %total%
-    set: "%prefix%&bYou've set &3%target%&b's %type% %slot% to &3%count%"
+    set: "%prefix%You've set &3%target%&b's %type% %slot% to &3%count%"
     # %type%, %target%
-    start: "%prefix%&bYou've started &3%type% &bslot gaining for &3%target%"
+    start: "%prefix%You've started &3%type% &bslot gaining for &3%target%"
     # %type%, %target%
-    stop: "%prefix%&bYou've stopped &3%type% &bslot gaining for &3%target%"
+    stop: "%prefix%You've stopped &3%type% &bslot gaining for &3%target%"
 
 
 # %block% = The block that was targeted
@@ -76,7 +59,7 @@ locking:
 
   lock:
     # %block%
-    success: "%prefix%&bSuccessfully locked &3%block%"
+    success: "%prefix%Successfully locked &3%block%"
     # %block%, %player%
     fail: "%prefix%&4%block% &cwas placed by &4%player%"
     # %block%
@@ -86,7 +69,7 @@ locking:
 
   unlock:
     # %block%
-    success: "%prefix%&bSuccessfully unlocked &3%block%"
+    success: "%prefix%Successfully unlocked &3%block%"
     # %block%, %player%
     fail: "%prefix%&4%block% &cwas placed by &4%player%"
     # %block%
@@ -94,14 +77,24 @@ locking:
 
   lock-tool:
     # %player% = The player that gave the Lock Tool
-    get: "%prefix%&bYou have been given a &3Lock Tool &bby &3%player%"
+    get: "%prefix%You have been given a &3Lock Tool &bby &3%player%"
     # %player% = The player that got the Lock Tool
-    give: "%prefix%&bYou have given &3%player% &ba &3Lock Tool"
+    give: "%prefix%You have given &3%player% &ba &3Lock Tool"
 
-  bypass:
-    enabled: "%prefix%&bSuccessfully enabled bypass"
-    actionbar: "&bBypass is currently enabled"
-    disabled: "%prefix%&bSuccessfully disabled bypass"
+
+# %target% = The targeted player in the command
+bypass:
+  enabled:
+    self: "%prefix%Enabled bypass"
+    # %target%
+    other: "%prefix%Enabled bypass for &3%target%"
+
+  disabled:
+    self: "%prefix%Disabled bypass"
+    # %target%
+    other: "%prefix%Disabled bypass for &3%target%"
+
+  actionbar: "&bBypass is currently enabled"
 
 
 # %player% = The targeted player in the command
@@ -115,12 +108,12 @@ trusting:
 
   # %player%
   trust:
-    success: "%prefix%&bSuccessfully trusted &3%player%"
+    success: "%prefix%Successfully trusted &3%player%"
     fail: "%prefix%&4%player% &cis already trusted"
 
   # %player%
   untrust:
-    success: "%prefix%&bSuccessfully untrusted &3%player%"
+    success: "%prefix%Successfully untrusted &3%player%"
     fail: "%prefix%&cYou don't have &4%player% &ctrusted"
 
 

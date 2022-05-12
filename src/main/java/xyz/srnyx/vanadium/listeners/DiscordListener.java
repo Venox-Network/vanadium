@@ -7,7 +7,6 @@ import github.scarsz.discordsrv.api.events.DiscordReadyEvent;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Message;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.MessageHistory;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
-import github.scarsz.discordsrv.dependencies.jda.api.entities.User;
 import github.scarsz.discordsrv.objects.managers.AccountLinkManager;
 import github.scarsz.discordsrv.util.DiscordUtil;
 
@@ -16,7 +15,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import xyz.srnyx.vanadium.Main;
-import xyz.srnyx.vanadium.managers.CodeManager;
 import xyz.srnyx.vanadium.managers.MessageManager;
 
 import java.util.List;
@@ -39,7 +37,11 @@ public class DiscordListener {
             TextChannel channel = DiscordUtil.getTextChannelById(linkChannel);
             if (channel != null) {
                 final List<Message> history = new MessageHistory(channel).retrievePast(100).complete();
-                if (!history.isEmpty()) channel.deleteMessages(history).queue();
+                if (history.size() > 1) {
+                    channel.deleteMessages(history).queue();
+                } else if (history.size() == 1) {
+                    channel.deleteMessageById(history.get(0).getId()).queue();
+                }
             }
         }
     }
@@ -49,34 +51,33 @@ public class DiscordListener {
      */
     @Subscribe
     public void onGuildMessageReceive(DiscordGuildMessageReceivedEvent event) {
-        if (linkChannel != null && event.getChannel().getId().equals(linkChannel)) {
-            String message = event.getMessage().getContentStripped();
-            if (CodeManager.linkingCodes.containsValue(message)) {
-                AccountLinkManager manager = DiscordSRV.getPlugin().getAccountLinkManager();
-                User author = event.getAuthor();
-                String discord = author.getId();
-                UUID minecraft = CodeManager.getUUIDFromCode(message);
-                Player player = null;
-                if (minecraft != null) player = Bukkit.getPlayer(minecraft);
+        final AccountLinkManager manager = DiscordSRV.getPlugin().getAccountLinkManager();
+        final String message = event.getMessage().getContentStripped();
+        final String discord = event.getAuthor().getId();
 
-                manager.unlink(discord);
-                manager.unlink(minecraft);
-                manager.link(discord, minecraft);
-                CodeManager.removeCode(minecraft);
+        if (manager.getLinkingCodes().containsKey(message) && linkChannel != null && event.getChannel().getId().equals(linkChannel)) {
+            final UUID minecraft = manager.getLinkingCodes().get(message);
 
+            manager.unlink(discord);
+            manager.unlink(minecraft);
+            manager.link(discord, minecraft);
+
+            if (manager.getUuid(discord) != null) {
+                Player player = Bukkit.getPlayer(manager.getUuid(discord));
                 if (player != null) {
                     // Send success message to player on Minecraft
                     new MessageManager("linking.success.minecraft")
-                            .replace("%discord%", author.getAsTag())
+                            .replace("%discord%", event.getAuthor().getAsTag())
                             .send(player);
 
                     // Send success message to user on Discord
                     new MessageManager("linking.success.discord")
                             .replace("%minecraft%", player.getName())
                             .replace("%uuid%", player.getUniqueId().toString())
-                            .send(author);
+                            .send(event.getAuthor());
                 }
             }
+
             event.getMessage().delete().queue();
         }
     }
