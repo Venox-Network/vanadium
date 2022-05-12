@@ -103,7 +103,7 @@ public class ItemsAdderManager {
      *
      * @param   arrow   The arrow representing the axe
      */
-    public static void axe(Player player, Arrow arrow) {
+    public void axe(Arrow arrow) {
         // Update durability of axe before returning it
         @Nullable CustomStack axe = CustomStack.byItemStack(axes.get(player.getUniqueId()));
         if (axe != null) {

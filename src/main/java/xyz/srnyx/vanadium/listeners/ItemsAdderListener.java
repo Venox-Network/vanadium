@@ -1,5 +1,7 @@
 package xyz.srnyx.vanadium.listeners;
 
+import dev.lone.itemsadder.api.CustomMob;
+
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -127,7 +129,7 @@ public class ItemsAdderListener implements Listener {
                     // Remove arrow after a few seconds
                     new BukkitRunnable() {
                         public void run() {
-                            if (arrow.isValid()) ItemsAdderManager.axe(player, arrow);
+                            if (arrow.isValid()) iam.axe(arrow);
                         }
                     }.runTaskLater(Main.plugin, Main.config.getInt("custom-items.chris_axe.throw.return") * 20L);
                 }
@@ -170,7 +172,7 @@ public class ItemsAdderListener implements Listener {
     public void projectile(ProjectileHitEvent event) {
         if (event.getEntity() instanceof Arrow arrow && arrow.getShooter() instanceof Player player) {
             if (arrow.getCustomName() != null && arrow.getCustomName().equals(ChatColor.DARK_AQUA + "" + ChatColor.BOLD + "AXE")) {
-                ItemsAdderManager.axe(player, arrow);
+                new ItemsAdderManager(player).axe(arrow);
 
                 // Play hit sound
                 if (event.getHitEntity() != null) player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, (float) 0.1, 1);

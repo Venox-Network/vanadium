@@ -111,7 +111,7 @@ public class DataManager {
             List<String> trustedPlayers = new ArrayList<>();
             for (UUID trustedPlayer : map.getValue()) trustedPlayers.add(trustedPlayer.toString());
 
-            trustedYaml.set(map.toString(), trustedPlayers);
+            trustedYaml.set(map.getKey().toString(), trustedPlayers);
         }
         // Save to file
         try {
