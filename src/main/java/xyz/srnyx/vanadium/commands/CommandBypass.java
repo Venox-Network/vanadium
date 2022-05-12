@@ -1,5 +1,6 @@
 package xyz.srnyx.vanadium.commands;
 
+import org.bukkit.Bukkit;
 import xyz.srnyx.vanadium.Main;
 import xyz.srnyx.vanadium.managers.PlayerManager;
 import xyz.srnyx.vanadium.managers.MessageManager;
@@ -13,17 +14,39 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.Objects;
+
 
 public class CommandBypass implements CommandExecutor {
     @SuppressWarnings("NullableProblems")
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (PlayerManager.isNotPlayer(sender)) return true;
         if (PlayerManager.noPermission(sender, "vanadium.bypass")) return true;
         Player player = (Player) sender;
 
+        // If a player is specified, enable bypass for them instead of sender
+        if (args.length == 1 && player.hasPermission("vanadium.bypass.others") && !Objects.equals(args[0], player.getName())) {
+            Player target = Bukkit.getPlayer(args[0]);
+            if (target != null) {
+                if (PlayerManager.hasScoreboardTag(target, "bypass")) {
+                    target.removeScoreboardTag("bypass");
+                    new MessageManager("bypass.disabled.self")
+                            .send(target);
+                    new MessageManager("bypass.disabled.other")
+                            .replace("%target%", args[0])
+                            .send(sender);
+                } else {
+                    enable(target, false);
+                    new MessageManager("bypass.enabled.other")
+                            .replace("%target%", args[0])
+                            .send(sender);
+                }
+                return true;
+            }
+        }
+
         if (PlayerManager.hasScoreboardTag(player, "bypass")) {
             player.removeScoreboardTag("bypass");
-            new MessageManager("locking.bypass.disabled").send(player);
+            new MessageManager("bypass.disabled.self").send(player);
         } else enable(player, false);
 
         return true;
@@ -38,12 +61,12 @@ public class CommandBypass implements CommandExecutor {
     public static void enable(Player player, boolean join) {
         if (!join) {
             player.addScoreboardTag("bypass");
-            new MessageManager("locking.bypass.enabled").send(player);
+            new MessageManager("bypass.enabled.self").send(player);
         }
 
         new BukkitRunnable() {
             public void run() {
-                if (!PlayerManager.isVanished(player)) player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(new MessageManager("locking.bypass.actionbar").toString()));
+                if (!PlayerManager.isVanished(player)) player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(new MessageManager("bypass.actionbar").string()));
                 if (!PlayerManager.hasScoreboardTag(player, "bypass")) cancel();
             }
         }.runTaskTimer(Main.plugin, 0, 40);
