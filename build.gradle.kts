@@ -4,6 +4,7 @@ group = "xyz.srnyx"
 
 plugins {
     id("java")
+    id("org.sonarqube") version("3.3")
 }
 
 repositories {
@@ -32,6 +33,14 @@ tasks {
     processResources {
         filesMatching("**/plugin.yml") {
             expand(rootProject.project.properties)
+        }
+    }
+
+    sonarqube {
+        properties {
+            property("sonar.projectKey", "venox_vanadium")
+            property("sonar.organization", "venox")
+            property("sonar.host.url", "https://sonarcloud.io")
         }
     }
 }
