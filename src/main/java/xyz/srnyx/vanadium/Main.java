@@ -2,10 +2,10 @@ package xyz.srnyx.vanadium;
 
 import github.scarsz.discordsrv.DiscordSRV;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
+import org.bukkit.*;
+import org.bukkit.block.Block;
+import org.bukkit.block.data.Bisected;
+import org.bukkit.block.data.type.Door;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabCompleter;
@@ -129,5 +129,21 @@ public class Main extends JavaPlugin {
             // Add recipes
             Bukkit.getServer().addRecipe(locktool);
         }
+    }
+
+    /**
+     * Used for {@link LockManager} and {@link PlaceManager}
+     *
+     * @return  The top and bottom location of the door
+     */
+    public static Location[] door(Block block) {
+        final Door door = (Door) block.getState().getBlockData();
+        Location top = block.getLocation();
+        Location bottom = block.getLocation();
+
+        if (door.getHalf() == Bisected.Half.TOP) bottom = block.getLocation().subtract(0, 1, 0);
+        if (door.getHalf() == Bisected.Half.BOTTOM) top = block.getLocation().add(0, 1, 0);
+
+        return new Location[]{top, bottom};
     }
 }

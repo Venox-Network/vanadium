@@ -5,8 +5,6 @@ import dev.lone.itemsadder.api.CustomStack;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
-import org.bukkit.block.data.Bisected;
-import org.bukkit.block.data.type.Door;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.DoubleChestInventory;
@@ -226,7 +224,7 @@ public class LockManager {
                 damage.setDamage(current + 1);
                 item.setItemMeta(damage);
             } else {
-                player.playSound(player.getLocation(),Sound.ENTITY_ITEM_BREAK,1,1);
+                player.playSound(player.getLocation(),Sound.ENTITY_ITEM_BREAK, 1, 1);
                 item.setAmount(0);
             }
         }
@@ -274,15 +272,7 @@ public class LockManager {
     public boolean attemptLockDoor(ItemStack item) {
         if (block.getType().toString().contains("_DOOR")) {
             if (new SlotManager("locks", player).getCount() > (getLockedCount() + 1)) {
-                //noinspection DuplicatedCode
-                final Door door = (Door) block.getState().getBlockData();
-                Location top = block.getLocation();
-                Location bottom = block.getLocation();
-
-                if (door.getHalf() == Bisected.Half.TOP) bottom = block.getLocation().subtract(0, 1, 0);
-                if (door.getHalf() == Bisected.Half.BOTTOM) top = block.getLocation().add(0, 1, 0);
-
-                for (final Location location : new Location[]{top, bottom}) new LockManager(location.getBlock(), player).lock(null);
+                for (final Location location : Main.door(block)) new LockManager(location.getBlock(), player).lock(null);
                 new LockManager(null, player).lock(item);
 
                 player.playSound(player.getLocation(), Sound.BLOCK_CHEST_LOCKED, 1, 2);
@@ -314,17 +304,7 @@ public class LockManager {
      * Checks if a door is locked
      */
     public void checkLockDoor() {
-        if (block.getType().toString().contains("_DOOR")) {
-            //noinspection DuplicatedCode
-            final Door door = (Door) block.getState().getBlockData();
-            Location top = block.getLocation();
-            Location bottom = block.getLocation();
-
-            if (door.getHalf() == Bisected.Half.TOP) bottom = block.getLocation().subtract(0, 1, 0);
-            if (door.getHalf() == Bisected.Half.BOTTOM) top = block.getLocation().add(0, 1, 0);
-
-            location(top, bottom);
-        }
+        if (block.getType().toString().contains("_DOOR")) location(Main.door(block)[0], Main.door(block)[1]);
     }
 
     /**
@@ -366,7 +346,7 @@ public class LockManager {
         }
 
         // Check If Player Placed Block
-        UUID placer = new PlaceManager(block).getPlacer();
+        final UUID placer = new PlaceManager(block).getPlacer();
         if ((placer == null || !placer.equals(player.getUniqueId())) && !player.hasPermission("vanadium.command.bypass")) {
             String username = "N/A";
             if (placer != null) username = Bukkit.getOfflinePlayer(placer).getName();
@@ -434,15 +414,7 @@ public class LockManager {
      */
     public boolean attemptUnlockDoor(ItemStack item) {
         if (block.getType().toString().contains("_DOOR")) {
-            //noinspection DuplicatedCode
-            Door door = (Door) block.getState().getBlockData();
-            Location top = block.getLocation();
-            Location bottom = block.getLocation();
-
-            if (door.getHalf() == Bisected.Half.TOP) bottom = block.getLocation().subtract(0, 1, 0);
-            if (door.getHalf() == Bisected.Half.BOTTOM) top = block.getLocation().add(0, 1, 0);
-
-            attemptUnlockDouble(item, top, bottom);
+            attemptUnlockDouble(item, Main.door(block)[0], Main.door(block)[1]);
             return true;
         }
         return false;
@@ -506,7 +478,7 @@ public class LockManager {
      * Checks if locked block types are still the same as the saved types
      */
     public void check() {
-        for (Block key : DataManager.locked.keySet()) {
+        for (final Block key : DataManager.locked.keySet()) {
             if (!key.getType().equals(DataManager.lockedType.get(key))) {
                 DataManager.locked.remove(key);
                 DataManager.lockedType.remove(key);

@@ -34,7 +34,7 @@ public class CommandSlot implements TabExecutor {
                 if (Objects.equals(type, "trusts")) slots = new SlotManager("trusts", player).getCount();
 
                 // %slot%
-                String slot = slots == 1 ? "slot" : "slots";
+                final String slot = slots == 1 ? "slot" : "slots";
 
                 //<player> <get|cooldown|start|stop> <locks|trusts|all>
                 final boolean arg3action = action.equalsIgnoreCase("get")
@@ -88,7 +88,7 @@ public class CommandSlot implements TabExecutor {
                                 new SlotManager("trusts", player).stop();
                                 player.addScoreboardTag("stop-locks");
                                 player.addScoreboardTag("stop-trusts");
-                            } else  {
+                            } else {
                                 new SlotManager(type, player).stop();
                                 player.addScoreboardTag("stop-" + type);
                             }
@@ -138,7 +138,7 @@ public class CommandSlot implements TabExecutor {
         final List<String> suggestions = new ArrayList<>();
         final List<String> results = new ArrayList<>();
 
-        if (args.length == 1) for (Player online : Bukkit.getOnlinePlayers()) suggestions.add(online.getName());
+        if (args.length == 1) for (final Player online : Bukkit.getOnlinePlayers()) suggestions.add(online.getName());
 
         if (args.length == 2) {
             suggestions.add("get");

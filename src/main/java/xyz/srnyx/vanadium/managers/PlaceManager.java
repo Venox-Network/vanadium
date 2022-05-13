@@ -2,9 +2,9 @@ package xyz.srnyx.vanadium.managers;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.block.data.Bisected;
-import org.bukkit.block.data.type.Door;
 import org.bukkit.entity.Player;
+
+import xyz.srnyx.vanadium.Main;
 
 import java.util.UUID;
 
@@ -56,16 +56,7 @@ public record PlaceManager(Block block) {
      */
     public boolean attemptPlaceDoor(Player player) {
         if (block.getType().toString().contains("_DOOR")) {
-            //noinspection DuplicatedCode
-            final Door door = (Door) block.getState().getBlockData();
-            Location top = block.getLocation();
-            Location bottom = block.getLocation();
-
-            if (door.getHalf() == Bisected.Half.TOP) bottom = block.getLocation().subtract(0, 1, 0);
-            if (door.getHalf() == Bisected.Half.BOTTOM) top = block.getLocation().add(0, 1, 0);
-
-            for (final Location location : new Location[]{top, bottom}) new PlaceManager(location.getBlock()).place(player);
-
+            for (final Location location : Main.door(block)) new PlaceManager(location.getBlock()).place(player);
             return true;
         }
         return false;
@@ -93,16 +84,7 @@ public record PlaceManager(Block block) {
      */
     public boolean attemptUnplaceDoor() {
         if (block.getType().toString().contains("_DOOR")) {
-            //noinspection DuplicatedCode
-            final Door door = (Door) block.getState().getBlockData();
-            Location top = block.getLocation();
-            Location bottom = block.getLocation();
-
-            if (door.getHalf() == Bisected.Half.TOP) bottom = block.getLocation().subtract(0, 1, 0);
-            if (door.getHalf() == Bisected.Half.BOTTOM) top = block.getLocation().add(0, 1, 0);
-
-            for (final Location location : new Location[]{top, bottom}) new PlaceManager(location.getBlock()).unplace();
-
+            for (final Location location : Main.door(block)) new PlaceManager(location.getBlock()).unplace();
             return true;
         }
         return false;
