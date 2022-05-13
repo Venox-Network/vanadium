@@ -15,7 +15,7 @@ public class CommandLockTool implements CommandExecutor {
     @SuppressWarnings("NullableProblems")
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (PlayerManager.noPermission(sender, "vanadium.locktool")) return true;
-        Player player = (Player) sender;
+        final Player player = (Player) sender;
 
         // If a player is specified, give lock tool to them instead of sender
         if (args.length == 1 && player.hasPermission("vanadium.locktool.others")) {

@@ -11,6 +11,7 @@ import xyz.srnyx.vanadium.managers.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 
@@ -44,7 +45,7 @@ public class CommandUntrust implements TabExecutor {
         Player player = (Player) sender;
 
         if (args.length == 1) for (UUID id : DataManager.trusted.get(player.getUniqueId())) suggestions.add(Bukkit.getOfflinePlayer(id).getName());
-        for (String suggestion : suggestions) if (suggestion.toLowerCase().startsWith(args[args.length - 1].toLowerCase())) results.add(suggestion);
+        for (String suggestion : suggestions) if (suggestion.toLowerCase(Locale.ENGLISH).startsWith(args[args.length - 1].toLowerCase(Locale.ENGLISH))) results.add(suggestion);
 
         return results;
     }

@@ -1,5 +1,7 @@
 package xyz.srnyx.vanadium.managers;
 
+import com.earth2me.essentials.Essentials;
+
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -67,6 +69,7 @@ public class PlayerManager {
     /**
      * Check if a player has a certain scoreboard tag
      *
+     * @param   player  The player to check
      * @param   check   The tag to check for
      *
      * @return          True if yes, false if no
@@ -74,5 +77,17 @@ public class PlayerManager {
     public static boolean hasScoreboardTag(Player player, String check) {
         for (String tag : player.getScoreboardTags()) if (tag.equals(check)) return true;
         return false;
+    }
+
+    /**
+     * Check if a player is AFK
+     *
+     * @param   player  The player to check
+     *
+     * @return          True if AFK, false if not
+     */
+    public static boolean isAFK(Player player) {
+        final Essentials essentials = (Essentials) Bukkit.getPluginManager().getPlugin("Essentials");
+        return essentials != null && essentials.getUser(player).isAfk();
     }
 }

@@ -21,9 +21,7 @@ public class MessageManager {
         String string = Main.messages.getString(key);
         if (string != null) {
             String prefix = Main.messages.getString("plugin.prefix");
-            if (prefix != null) {
-                this.message = string.replace("%prefix%", prefix);
-            } else this.message = string;
+            this.message = prefix != null ? string.replace("%prefix%", prefix) : string;
         } else this.message = key;
     }
 

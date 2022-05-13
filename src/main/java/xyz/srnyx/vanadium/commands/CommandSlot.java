@@ -33,6 +33,9 @@ public class CommandSlot implements TabExecutor {
                 if (Objects.equals(type, "locks")) slots = new SlotManager("locks", player).getCount();
                 if (Objects.equals(type, "trusts")) slots = new SlotManager("trusts", player).getCount();
 
+                // %slot%
+                String slot = slots == 1 ? "slot" : "slots";
+
                 //<player> <get|cooldown|start|stop> <locks|trusts|all>
                 boolean arg3action = action.equalsIgnoreCase("get")
                         || action.equalsIgnoreCase("cooldown")
@@ -45,12 +48,6 @@ public class CommandSlot implements TabExecutor {
                 if (args.length == 3 && arg3action && arg3type) {
                     //<player> <get> <locks|trusts>
                     if (action.equalsIgnoreCase("get")) {
-                        // %slot%
-                        String slot;
-                        if (slots != 1) {
-                            slot = "slots";
-                        } else slot = "slot";
-
                         new MessageManager("slots.command.get")
                                 .replace("%target%", player.getName())
                                 .replace("%total%", String.valueOf(slots).replaceAll("\\.0*$|(\\.\\d*?)0+$", "$1"))
@@ -61,14 +58,12 @@ public class CommandSlot implements TabExecutor {
                     }
 
                     //<player> <cooldown> <locks|trusts>
-                    String timeLeftString = "N/A (stopped)";
                     Long timeLeft = new SlotManager(type, player).timeLeft();
-                    if (timeLeft != null) timeLeftString = TimeUnit.MILLISECONDS.toSeconds(timeLeft) + " seconds";
                     if (action.equalsIgnoreCase("cooldown")) {
                         new MessageManager("slots.command.cooldown")
                                 .replace("%target%", player.getName())
                                 .replace("%type%", type.substring(0, type.length() - 1))
-                                .replace("%next%", timeLeftString)
+                                .replace("%next%", timeLeft != null ? TimeUnit.MILLISECONDS.toSeconds(timeLeft) + " seconds" : "N/A (stopped)")
                                 .send(sender);
                         return true;
                     }
@@ -86,6 +81,7 @@ public class CommandSlot implements TabExecutor {
                                 player.removeScoreboardTag("stop-" + type);
                             }
                         }
+
                         if (action.equalsIgnoreCase("stop")) {
                             if (type.equalsIgnoreCase("all")) {
                                 new SlotManager("locks", player).stop();
@@ -98,13 +94,9 @@ public class CommandSlot implements TabExecutor {
                             }
                         }
 
-                        // %type%
-                        String typePlaceholder = type.substring(0, type.length() - 1);
-                        if (type.equalsIgnoreCase("all")) typePlaceholder = "all";
-
                         new MessageManager("slots.command." + action)
                                 .replace("%target%", player.getName())
-                                .replace("%type%", typePlaceholder)
+                                .replace("%type%", type.equalsIgnoreCase("all") ? "all" : type.substring(0, type.length() - 1))
                                 .send(sender);
                         return true;
                     }
@@ -121,12 +113,6 @@ public class CommandSlot implements TabExecutor {
 
                     if (Objects.equals(type, "locks")) DataManager.slots.put(player.getUniqueId(), new int[]{amount, new SlotManager("trusts", player).getCount()});
                     if (Objects.equals(type, "trusts")) DataManager.slots.put(player.getUniqueId(), new int[]{new SlotManager("locks", player).getCount(), amount});
-
-                    // %slot%
-                    String slot;
-                    if (amount != 1) {
-                        slot = "slots";
-                    } else slot = "slot";
 
                     new MessageManager("slots.command." + action)
                             .replace("%target%", player.getName())

@@ -3,7 +3,6 @@ package xyz.srnyx.vanadium.managers;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -48,12 +47,9 @@ public class TrustManager {
      * Have {@code player} trust {@code opId}
      */
     public void trust() {
-        List<UUID> trusted = new ArrayList<>();
-        List<UUID> list = DataManager.trusted.get(player.getUniqueId());
-        if (list != null) trusted = list;
-
         if (new SlotManager("trusts", player).getCount() > getTrustedCount()) {
-            if (!trusted.contains(opId) && opId != player.getUniqueId()) {
+            final List<UUID> trusted = DataManager.trusted.get(player.getUniqueId());
+            if (trusted != null && !trusted.contains(opId) && opId != player.getUniqueId()) {
                 trusted.add(opId);
                 DataManager.trusted.put(player.getUniqueId(), trusted);
                 new MessageManager("trusting.trust.success")
@@ -65,9 +61,8 @@ public class TrustManager {
                         .send(player);
             }
         } else {
-            String type = "trusts";
             new MessageManager("slots.limit")
-                    .replace("%type%", type.substring(0, type.length() - 1))
+                    .replace("%type%", "trust")
                     .replace("%target%", opName)
                     .replace("%total%", String.valueOf(new SlotManager("trusts", player).getCount())) //.replaceAll("\\.0*$|(\\.\\d*?)0+$", "$1")
                     .send(player);
@@ -78,8 +73,8 @@ public class TrustManager {
      * Have {@code player} untrust {@code opId}
      */
     public void untrust() {
-        List<UUID> trusted = DataManager.trusted.get(player.getUniqueId());
-        if (trusted.contains(opId)) {
+        final List<UUID> trusted = DataManager.trusted.get(player.getUniqueId());
+        if (trusted != null && trusted.contains(opId)) {
             trusted.remove(opId);
             DataManager.trusted.put(player.getUniqueId(), trusted);
             new MessageManager("trusting.untrust.success")

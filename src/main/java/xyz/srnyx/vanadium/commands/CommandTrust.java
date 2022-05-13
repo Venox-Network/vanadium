@@ -14,6 +14,7 @@ import xyz.srnyx.vanadium.managers.TrustManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 
@@ -22,10 +23,10 @@ public class CommandTrust implements TabExecutor {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (PlayerManager.isNotPlayer(sender)) return true;
         if (PlayerManager.noPermission(sender, "vanadium.trust")) return true;
-        Player player = (Player) sender;
+        final Player player = (Player) sender;
 
         if (args.length == 1) {
-            OfflinePlayer target = PlayerManager.getOfflinePlayer(args[0]);
+            final OfflinePlayer target = PlayerManager.getOfflinePlayer(args[0]);
             if (target == null) {
                 new MessageManager("errors.invalid-player")
                         .replace("%player%", args[0])
@@ -44,22 +45,22 @@ public class CommandTrust implements TabExecutor {
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         List<String> suggestions = new ArrayList<>();
         List<String> results = new ArrayList<>();
-        Player player = (Player) sender;
+        final Player player = (Player) sender;
 
         if (args.length == 1) {
-            List<UUID> trusted = DataManager.trusted.get(player.getUniqueId());
+            final List<UUID> trusted = DataManager.trusted.get(player.getUniqueId());
             if (args[0].length() == 0) {
-                for (Player online : Bukkit.getOnlinePlayers()) {
+                for (final Player online : Bukkit.getOnlinePlayers()) {
                     if (trusted == null || !trusted.contains(online.getUniqueId()) && online != player) suggestions.add(online.getName());
                 }
             } else {
-                for (OfflinePlayer offline : Bukkit.getOfflinePlayers()) {
+                for (final OfflinePlayer offline : Bukkit.getOfflinePlayers()) {
                     if (trusted == null || !trusted.contains(offline.getUniqueId()) && offline.getUniqueId() != player.getUniqueId()) suggestions.add(offline.getName());
                 }
             }
         }
 
-        for (String suggestion : suggestions) if (suggestion.toLowerCase().startsWith(args[args.length - 1].toLowerCase())) results.add(suggestion);
+        for (String suggestion : suggestions) if (suggestion.toLowerCase(Locale.ENGLISH).startsWith(args[args.length - 1].toLowerCase(Locale.ENGLISH))) results.add(suggestion);
         return results;
     }
 }

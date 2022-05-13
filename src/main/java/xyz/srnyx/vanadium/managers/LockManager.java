@@ -116,10 +116,10 @@ public class LockManager {
      * @param   distance    The distance from the blocks to spawn particles (maybe)
      */
     public void particleCube(List<Location> locations, Color color, double distance) {
-        List<Location> result = new ArrayList<>();
+        final List<Location> result = new ArrayList<>();
         for (Location loc : locations) {
-            Location corner1 = loc.clone();
-            Location corner2 = loc.clone().add(1, 1, 1);
+            final Location corner1 = loc.clone();
+            final Location corner2 = loc.clone().add(1, 1, 1);
 
             final double minX = Math.min(corner1.getX(), corner2.getX());
             final double minY = Math.min(corner1.getY(), corner2.getY());
@@ -136,7 +136,7 @@ public class LockManager {
                         if (y == minY || y == maxY) components++;
                         if (z == minZ || z == maxZ) components++;
                         if (components >= 2) {
-                            Location add = new Location(loc.getWorld(), x, y, z);
+                            final Location add = new Location(loc.getWorld(), x, y, z);
                             if (result.contains(add)) {
                                 result.remove(add);
                             } else result.add(add);
@@ -145,8 +145,7 @@ public class LockManager {
                 }
             }
         }
-        Particle.DustOptions dust = new Particle.DustOptions(color, 0.7f);
-        for (Location loc : result) player.spawnParticle(Particle.REDSTONE, loc, 0, 0, 0, 0, dust);
+        for (Location loc : result) player.spawnParticle(Particle.REDSTONE, loc, 0, 0, 0, 0, new Particle.DustOptions(color, 0.7f));
     }
 
     /**
@@ -244,9 +243,9 @@ public class LockManager {
     public boolean attemptLockDoubleChest(ItemStack item) {
         // Check if block is a double chest
         if (block.getState() instanceof Chest chest && chest.getInventory() instanceof DoubleChestInventory doubleChest) {
-            int slotCount = new SlotManager("locks", player).getCount();
+            final int slotCount = new SlotManager("locks", player).getCount();
             if (slotCount > getLockedCount() + 1) {
-                for (Location location : new Location[]{doubleChest.getLeftSide().getLocation(), doubleChest.getRightSide().getLocation()}) {
+                for (final Location location : new Location[]{doubleChest.getLeftSide().getLocation(), doubleChest.getRightSide().getLocation()}) {
                     new LockManager(location.getBlock(), player).lock(null);
                 }
                 new LockManager(null, player).lock(item);

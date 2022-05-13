@@ -31,10 +31,10 @@ public class ItemsAdderListener implements Listener {
      */
     @EventHandler
     public void interact(PlayerInteractEvent event) {
-        Player player = event.getPlayer();
-        ItemsAdderManager iam = new ItemsAdderManager(player);
-        boolean leftClick = (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK);
-        boolean rightClick = (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK);
+        final Player player = event.getPlayer();
+        final ItemsAdderManager iam = new ItemsAdderManager(player);
+        final boolean leftClick = (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK);
+        final boolean rightClick = (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK);
 
         if (player.isSneaking()) {
             if (iam.notOnCooldown()) {
@@ -51,7 +51,7 @@ public class ItemsAdderListener implements Listener {
                     tnt.setInvulnerable(true);
                     tnt.setGlowing(true);
                     // TNT item - Name
-                    Map<Item, Long> timer = new HashMap<>();
+                    final Map<Item, Long> timer = new HashMap<>();
                     timer.put(tnt, System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(Main.config.getInt("custom-items.nyx_wand.tnt.fuse")));
                     BukkitRunnable runnable = new BukkitRunnable() {
                         public void run() {
@@ -67,7 +67,7 @@ public class ItemsAdderListener implements Listener {
                             timer.remove(tnt);
                             tnt.remove();
                             runnable.cancel();
-                            Creeper creeper = (Creeper) tnt.getWorld().spawnEntity(tnt.getLocation(), EntityType.CREEPER);
+                            final Creeper creeper = (Creeper) tnt.getWorld().spawnEntity(tnt.getLocation(), EntityType.CREEPER);
                             creeper.setCustomName(ChatColor.DARK_AQUA + "" + ChatColor.BOLD + "SRNYX BOMB");
                             creeper.setExplosionRadius(2);
                             creeper.setCustomNameVisible(false);
@@ -117,8 +117,8 @@ public class ItemsAdderListener implements Listener {
                     player.getInventory().setItemInMainHand(new ItemStack(Material.AIR));
 
                     // Spawn arrow
-                    Location eye = player.getEyeLocation();
-                    Arrow arrow = player.getWorld().spawnArrow(eye, eye.getDirection(), Main.config.getInt("custom-items.chris_axe.throw.speed"), 0);
+                    final Location eye = player.getEyeLocation();
+                    final Arrow arrow = player.getWorld().spawnArrow(eye, eye.getDirection(), Main.config.getInt("custom-items.chris_axe.throw.speed"), 0);
                     arrow.setDamage(Main.config.getInt("custom-items.chris_axe.throw.damage"));
                     arrow.setCustomName(ChatColor.DARK_AQUA + "" + ChatColor.BOLD + "AXE");
                     arrow.setCustomNameVisible(true);
@@ -135,6 +135,16 @@ public class ItemsAdderListener implements Listener {
                 }
             }
         }
+
+        // nyx_dragon_spawn_egg
+        if (iam.holdingItem(false, "nyx_dragon_spawn_egg") && rightClick && event.getClickedBlock() != null) {
+            final int x = event.getBlockFace().getModX();
+            final int y = event.getBlockFace().getModY();
+            final int z = event.getBlockFace().getModZ();
+            Bukkit.broadcastMessage(String.valueOf(x) + y + z);
+
+            CustomMob.spawn("vanadium:nyx_dragon", new Location(player.getWorld(), x, y, z));
+        }
     }
 
     /**
@@ -143,7 +153,7 @@ public class ItemsAdderListener implements Listener {
     @EventHandler
     public void damageEntity(EntityDamageByEntityEvent event) {
         if (event.getEntity() instanceof Player victim && event.getDamager() instanceof LivingEntity attacker) {
-            ItemsAdderManager ItemsAdderManager = new ItemsAdderManager(victim);
+            final ItemsAdderManager ItemsAdderManager = new ItemsAdderManager(victim);
             if (victim.isBlocking() && ItemsAdderManager.holdingItem(true, "chris_shield")) {
                 if (new Random().nextInt(5) == 0) {
                     attacker.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, Main.config.getInt("custom-items.chris_shield.block.duration") * 20, 0));
@@ -185,7 +195,7 @@ public class ItemsAdderListener implements Listener {
      */
     @EventHandler
     public void explode(EntityExplodeEvent event) {
-        boolean name = Objects.equals(event.getEntity().getCustomName(), ChatColor.DARK_AQUA + "" + ChatColor.BOLD + "SRNYX BOMB");
+        final boolean name = Objects.equals(event.getEntity().getCustomName(), ChatColor.DARK_AQUA + "" + ChatColor.BOLD + "SRNYX BOMB");
         if (!Main.config.getBoolean("custom-items.nyx_wand.tnt.blocks") && event.getEntity().getType() == EntityType.CREEPER && name) {
             event.blockList().clear();
         }

@@ -1,7 +1,5 @@
 package xyz.srnyx.vanadium.managers;
 
-import com.earth2me.essentials.Essentials;
-
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -49,7 +47,7 @@ public class SlotManager {
      * Start {@code player}'s cooldown
      */
     public void start() {
-        long value = System.currentTimeMillis() + (TimeUnit.MINUTES.toMillis(Main.config.getInt("slot-cooldowns." + type)));
+        final long value = System.currentTimeMillis() + (TimeUnit.MINUTES.toMillis(Main.config.getInt("slot-cooldowns." + type)));
         if (Objects.equals(type, "locks")) locksCooldown.put(player.getUniqueId(), value);
         if (Objects.equals(type, "trusts")) trustsCooldown.put(player.getUniqueId(), value);
     }
@@ -90,7 +88,7 @@ public class SlotManager {
         start();
 
         int count = getMultiplier();
-        int[] data = DataManager.slots.get(player.getUniqueId());
+        final int[] data = DataManager.slots.get(player.getUniqueId());
         if (Objects.equals(type, "locks")) {
             count = (data != null ? data[0] : 0) + getMultiplier();
             DataManager.slots.put(player.getUniqueId(), new int[]{count, new SlotManager("trusts", player).getCount()});
@@ -100,25 +98,13 @@ public class SlotManager {
             DataManager.slots.put(player.getUniqueId(), new int[]{new SlotManager("locks", player).getCount(), count});
         }
 
-        // %slot%
-        String slot;
-        if (getMultiplier() != 1) {
-            slot = "slots";
-        } else slot = "slot";
-
-        // %minute%
-        String minute;
-        if (Main.config.getInt("slot-cooldowns." + type) > 1) {
-            minute = "minutes";
-        } else minute = "minute";
-
         new MessageManager("slots.add")
                 .replace("%count%", String.valueOf(getMultiplier()).replaceAll("\\.0*$|(\\.\\d*?)0+$", "$1"))
                 .replace("%type%", type.substring(0, type.length() - 1))
-                .replace("%slot%", slot)
+                .replace("%slot%", getMultiplier() == 1 ? "slot" : "slots")
                 .replace("%total%", String.valueOf(count).replaceAll("\\.0*$|(\\.\\d*?)0+$", "$1"))
                 .replace("%next%", String.valueOf(Main.config.getInt("slot-cooldowns." + type)))
-                .replace("%minute%", minute)
+                .replace("%minute%", Main.config.getInt("slot-cooldowns." + type) == 1 ? "minute" : "minutes")
                 .send(player);
     }
 
@@ -128,15 +114,12 @@ public class SlotManager {
     public void check() {
         new BukkitRunnable() {
             public void run() {
-                for (Player online : Bukkit.getOnlinePlayers()) {
+                for (final Player online : Bukkit.getOnlinePlayers()) {
                     SlotManager slot = new SlotManager(type, online);
                     if (slot.contains() && (slot.timeLeft() == null || slot.timeLeft() <= 0)) {
-                        Essentials essentials = (Essentials) Bukkit.getPluginManager().getPlugin("Essentials");
-                        if (essentials != null) {
-                            if (essentials.getUser(online).isAfk()) {
-                                slot.stop();
-                                slot.start();
-                            } else slot.addSlot();
+                        if (PlayerManager.isAFK(online)) {
+                            slot.stop();
+                            slot.start();
                         } else slot.addSlot();
                     }
                 }
@@ -148,7 +131,7 @@ public class SlotManager {
      * @return  The {@code player}'s slot multiplier <i>({@code vanadium.multiplier.X})</i>
      */
     private int getMultiplier() {
-        for (PermissionAttachmentInfo pai : player.getEffectivePermissions()) {
+        for (final PermissionAttachmentInfo pai : player.getEffectivePermissions()) {
             String perm = pai.getPermission();
             if (perm.startsWith("vanadium.multiplier.")) {
                 try {

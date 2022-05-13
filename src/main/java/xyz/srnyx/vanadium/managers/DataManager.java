@@ -23,23 +23,23 @@ public class DataManager {
      */
     public void onEnable() {
         // locked
-        YamlConfiguration dataLocked = new FileManager("locked.yml", true).load();
+        final YamlConfiguration dataLocked = new FileManager("locked.yml", true).load();
         for (String key : dataLocked.getKeys(false)) {
-            String[] args = key.split("=");
-            World world = Bukkit.getWorld(args[0]);
-            int x = Integer.parseInt(args[1]);
-            int y = Integer.parseInt(args[2]);
-            int z = Integer.parseInt(args[3]);
+            final String[] args = key.split("=");
+            final World world = Bukkit.getWorld(args[0]);
+            final int x = Integer.parseInt(args[1]);
+            final int y = Integer.parseInt(args[2]);
+            final int z = Integer.parseInt(args[3]);
 
-            Block block = world != null ? world.getBlockAt(x, y, z) : null;
+            final Block block = world != null ? world.getBlockAt(x, y, z) : null;
             UUID placer = null;
             UUID locker = null;
-            Material type = Material.valueOf(args[4]);
+            final Material type = Material.valueOf(args[4]);
 
-            String placerString = dataLocked.getString(key + ".placer");
+            final String placerString = dataLocked.getString(key + ".placer");
             if (placerString != null) placer = UUID.fromString(placerString);
 
-            String lockerString = dataLocked.getString(key + ".locker");
+            final String lockerString = dataLocked.getString(key + ".locker");
             if (lockerString != null) locker = UUID.fromString(lockerString);
 
             locked.put(block, new UUID[]{placer, locker});
@@ -48,27 +48,27 @@ public class DataManager {
 
 
         // trusted
-        YamlConfiguration dataTrusted = new FileManager("trusted.yml", true).load();
+        final YamlConfiguration dataTrusted = new FileManager("trusted.yml", true).load();
         for (String key : dataTrusted.getKeys(false)) {
-            List<UUID> trustedPlayers = new ArrayList<>();
+            final List<UUID> trustedPlayers = new ArrayList<>();
             for (String key2 : dataTrusted.getStringList(key)) trustedPlayers.add(UUID.fromString(key2));
             trusted.put(UUID.fromString(key), trustedPlayers);
         }
 
 
         // slots
-        YamlConfiguration dataSlots = new FileManager("slots.yml", true).load();
+        final YamlConfiguration dataSlots = new FileManager("slots.yml", true).load();
         for (String key : dataSlots.getKeys(false)) {
-            UUID player = UUID.fromString(key);
-            int locks = dataSlots.getInt(key + ".locks");
-            int trusts = dataSlots.getInt(key + ".trusts");
+            final UUID player = UUID.fromString(key);
+            final int locks = dataSlots.getInt(key + ".locks");
+            final int trusts = dataSlots.getInt(key + ".trusts");
             slots.put(player, new int[]{locks, trusts});
         }
 
 
         // Start auto-save
         if (Objects.equals(Main.config.getString("auto-save.enabled"), "true")) {
-            long interval = Main.config.getInt("auto-save.interval") * 20L;
+            final long interval = Main.config.getInt("auto-save.interval") * 20L;
             new BukkitRunnable() {
                 public void run() {
                     save();
@@ -84,14 +84,14 @@ public class DataManager {
         // locked.yml
         YamlConfiguration lockedYaml = new YamlConfiguration();
         for (Block block : locked.keySet()) {
-            String id = block.getWorld().getName() + "=" + block.getX() + "=" + block.getY() + "=" + block.getZ() + "=" + DataManager.lockedType.get(block);
+            final String id = block.getWorld().getName() + "=" + block.getX() + "=" + block.getY() + "=" + block.getZ() + "=" + DataManager.lockedType.get(block);
 
             String placerString = null;
-            UUID placer = new PlaceManager(block).getPlacer();
+            final UUID placer = new PlaceManager(block).getPlacer();
             if (placer != null) placerString = placer.toString();
 
             String lockerString = null;
-            UUID locker = new LockManager(block, null).getLocker();
+            final UUID locker = new LockManager(block, null).getLocker();
             if (locker != null) lockerString = locker.toString();
 
             lockedYaml.set(id + ".placer", placerString);
@@ -106,9 +106,9 @@ public class DataManager {
 
 
         // trusted.yml
-        YamlConfiguration trustedYaml = new YamlConfiguration();
+        final YamlConfiguration trustedYaml = new YamlConfiguration();
         for (Map.Entry<UUID, List<UUID>> map : trusted.entrySet()) {
-            List<String> trustedPlayers = new ArrayList<>();
+            final List<String> trustedPlayers = new ArrayList<>();
             for (UUID trustedPlayer : map.getValue()) trustedPlayers.add(trustedPlayer.toString());
 
             trustedYaml.set(map.getKey().toString(), trustedPlayers);
@@ -123,10 +123,10 @@ public class DataManager {
 
         // slots.yml
         final YamlConfiguration slotsYaml = new YamlConfiguration();
-        for (UUID id : slots.keySet()) {
-            String idString = id.toString();
-            int locks = new SlotManager("locks", Bukkit.getOfflinePlayer(id)).getCount();
-            int trusts = new SlotManager("trusts", Bukkit.getOfflinePlayer(id)).getCount();
+        for (final UUID id : slots.keySet()) {
+            final String idString = id.toString();
+            final int locks = new SlotManager("locks", Bukkit.getOfflinePlayer(id)).getCount();
+            final int trusts = new SlotManager("trusts", Bukkit.getOfflinePlayer(id)).getCount();
 
             slotsYaml.set(idString + ".locks", locks);
             slotsYaml.set(idString + ".trusts", trusts);

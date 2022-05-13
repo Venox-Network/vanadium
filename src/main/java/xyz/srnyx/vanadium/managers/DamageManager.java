@@ -44,7 +44,7 @@ public class DamageManager {
         }
 
         if (inv.getHelmet() != null) {
-            Material helmet = inv.getHelmet().getType();
+            final Material helmet = inv.getHelmet().getType();
             if (helmet == Material.LEATHER_HELMET) {
                 red += 0.04;
             } else if (helmet == Material.GOLDEN_HELMET || helmet == Material.CHAINMAIL_HELMET || helmet == Material.IRON_HELMET || helmet == Material.TURTLE_HELMET) {
@@ -59,7 +59,7 @@ public class DamageManager {
         }
 
         if (inv.getChestplate() != null) {
-            Material chestplate = inv.getChestplate().getType();
+            final Material chestplate = inv.getChestplate().getType();
             if (chestplate == Material.LEATHER_CHESTPLATE) {
                 red += 0.12;
             } else if (chestplate == Material.GOLDEN_CHESTPLATE || chestplate == Material.CHAINMAIL_CHESTPLATE || chestplate == Material.IRON_CHESTPLATE) {
@@ -74,7 +74,7 @@ public class DamageManager {
         }
 
         if (inv.getLeggings() != null) {
-            Material leggings = inv.getLeggings().getType();
+            final Material leggings = inv.getLeggings().getType();
             if (leggings == Material.LEATHER_LEGGINGS) {
                 red += 0.08;
             } else if (leggings == Material.GOLDEN_LEGGINGS) {
