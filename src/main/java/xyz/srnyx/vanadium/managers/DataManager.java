@@ -10,13 +10,14 @@ import xyz.srnyx.vanadium.Main;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class DataManager {
-    public static final Map<Block, UUID[]> locked = new HashMap<>();
-    public static final Map<Block, Material> lockedType = new HashMap<>();
-    public static final Map<UUID, List<UUID>> trusted = new HashMap<>();
-    public static final Map<UUID, int[]> slots = new HashMap<>();
+    public static final Map<Block, UUID[]> locked = new ConcurrentHashMap<>();
+    public static final Map<Block, Material> lockedType = new ConcurrentHashMap<>();
+    public static final Map<UUID, List<UUID>> trusted = new ConcurrentHashMap<>();
+    public static final Map<UUID, int[]> slots = new ConcurrentHashMap<>();
 
     /**
      * Converts data on file to data in maps on plugin enable
@@ -24,7 +25,7 @@ public class DataManager {
     public void onEnable() {
         // locked
         final YamlConfiguration dataLocked = new FileManager("locked.yml", true).load();
-        for (String key : dataLocked.getKeys(false)) {
+        for (final String key : dataLocked.getKeys(false)) {
             final String[] args = key.split("=");
             final World world = Bukkit.getWorld(args[0]);
             final int x = Integer.parseInt(args[1]);
@@ -49,16 +50,16 @@ public class DataManager {
 
         // trusted
         final YamlConfiguration dataTrusted = new FileManager("trusted.yml", true).load();
-        for (String key : dataTrusted.getKeys(false)) {
+        for (final String key : dataTrusted.getKeys(false)) {
             final List<UUID> trustedPlayers = new ArrayList<>();
-            for (String key2 : dataTrusted.getStringList(key)) trustedPlayers.add(UUID.fromString(key2));
+            for (final String key2 : dataTrusted.getStringList(key)) trustedPlayers.add(UUID.fromString(key2));
             trusted.put(UUID.fromString(key), trustedPlayers);
         }
 
 
         // slots
         final YamlConfiguration dataSlots = new FileManager("slots.yml", true).load();
-        for (String key : dataSlots.getKeys(false)) {
+        for (final String key : dataSlots.getKeys(false)) {
             final UUID player = UUID.fromString(key);
             final int locks = dataSlots.getInt(key + ".locks");
             final int trusts = dataSlots.getInt(key + ".trusts");
@@ -82,8 +83,8 @@ public class DataManager {
      */
     public void save() {
         // locked.yml
-        YamlConfiguration lockedYaml = new YamlConfiguration();
-        for (Block block : locked.keySet()) {
+        final YamlConfiguration lockedYaml = new YamlConfiguration();
+        for (final Block block : locked.keySet()) {
             final String id = block.getWorld().getName() + "=" + block.getX() + "=" + block.getY() + "=" + block.getZ() + "=" + DataManager.lockedType.get(block);
 
             String placerString = null;
@@ -99,25 +100,25 @@ public class DataManager {
         }
         // Save to file
         try {
-            lockedYaml.save(new File(new File(Main.plugin.getDataFolder(), "data"), "locked.yml"));
+            if (!lockedYaml.getKeys(false).isEmpty()) lockedYaml.save(new File(new File(Main.plugin.getDataFolder(), "data"), "locked.yml"));
         } catch (IOException e) {
-            e.printStackTrace();
+            Main.plugin.getLogger().severe("Could not save data/locked.yml");
         }
 
 
         // trusted.yml
         final YamlConfiguration trustedYaml = new YamlConfiguration();
-        for (Map.Entry<UUID, List<UUID>> map : trusted.entrySet()) {
+        for (final Map.Entry<UUID, List<UUID>> map : trusted.entrySet()) {
             final List<String> trustedPlayers = new ArrayList<>();
-            for (UUID trustedPlayer : map.getValue()) trustedPlayers.add(trustedPlayer.toString());
+            for (final UUID trustedPlayer : map.getValue()) trustedPlayers.add(trustedPlayer.toString());
 
             trustedYaml.set(map.getKey().toString(), trustedPlayers);
         }
         // Save to file
         try {
-            trustedYaml.save(new File(new File(Main.plugin.getDataFolder(), "data"), "trusted.yml"));
+            if (!trustedYaml.getKeys(false).isEmpty()) trustedYaml.save(new File(new File(Main.plugin.getDataFolder(), "data"), "trusted.yml"));
         } catch (IOException e) {
-            e.printStackTrace();
+            Main.plugin.getLogger().severe("Could not save data/trusted.yml");
         }
 
 
@@ -133,9 +134,9 @@ public class DataManager {
         }
         // Save to file
         try {
-            slotsYaml.save(new File(new File(Main.plugin.getDataFolder(), "data"), "slots.yml"));
+            if (!slotsYaml.getKeys(false).isEmpty()) slotsYaml.save(new File(new File(Main.plugin.getDataFolder(), "data"), "slots.yml"));
         } catch (IOException e) {
-            e.printStackTrace();
+            Main.plugin.getLogger().severe("Could not save data/slots.yml");
         }
     }
 }

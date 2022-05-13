@@ -32,8 +32,7 @@ public class Main extends JavaPlugin {
     @Override
     public void onEnable() {
         plugin = this;
-
-        PluginManager pm = Bukkit.getPluginManager();
+        final PluginManager pm = Bukkit.getPluginManager();
 
         // Create config files
         new FileManager("config.yml", false).create();
@@ -105,7 +104,7 @@ public class Main extends JavaPlugin {
      * @param   completer   The tab completer ({@code null} = online players)
      */
     private void registerCommand(String name, CommandExecutor executor, TabCompleter completer) {
-        PluginCommand command = Bukkit.getPluginCommand(name);
+        final PluginCommand command = Bukkit.getPluginCommand(name);
         if (command != null) {
             command.setExecutor(executor);
             command.setTabCompleter(completer);

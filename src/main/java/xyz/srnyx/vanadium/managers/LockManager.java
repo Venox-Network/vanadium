@@ -74,7 +74,7 @@ public class LockManager {
      * @return  True if yes, false if no
      */
     public boolean isLockable() {
-        for (String lockableBlock : Main.lists.getStringList("lockable-blocks")) {
+        for (final String lockableBlock : Main.lists.getStringList("lockable-blocks")) {
             if (block.getType() == Material.getMaterial(lockableBlock.toUpperCase())) return true;
         }
         return false;
@@ -84,12 +84,12 @@ public class LockManager {
      * Show the owned, trusted, and locked blocks around a player using particles
      */
     public void showLockedLocations() {
-        List<Location> owned = new ArrayList<>();
-        List<Location> trusted = new ArrayList<>();
-        List<Location> locked = new ArrayList<>();
-        for (Block key : DataManager.locked.keySet()) {
+        final List<Location> owned = new ArrayList<>();
+        final List<Location> trusted = new ArrayList<>();
+        final List<Location> locked = new ArrayList<>();
+        for (final Block key : DataManager.locked.keySet()) {
             if (key.getLocation().getWorld() == player.getLocation().getWorld() && key.getLocation().distance(player.getLocation()) <= 15) {
-                UUID owner = new LockManager(key.getLocation().getBlock(), null).getLocker();
+                final UUID owner = new LockManager(key.getLocation().getBlock(), null).getLocker();
                 if (owner != null) {
                     if (owner.equals(player.getUniqueId())) {
                         owned.add(key.getLocation());
@@ -102,7 +102,7 @@ public class LockManager {
             }
         }
 
-        List<List<Location>> locations = Arrays.asList(owned, trusted, locked);
+        final List<List<Location>> locations = Arrays.asList(owned, trusted, locked);
         particleCube(locations.get(0), Color.LIME, 0.25);
         particleCube(locations.get(1), Color.YELLOW, 0.25);
         particleCube(locations.get(2), Color.RED, 0.25);
@@ -117,7 +117,7 @@ public class LockManager {
      */
     public void particleCube(List<Location> locations, Color color, double distance) {
         final List<Location> result = new ArrayList<>();
-        for (Location loc : locations) {
+        for (final Location loc : locations) {
             final Location corner1 = loc.clone();
             final Location corner2 = loc.clone().add(1, 1, 1);
 
@@ -145,7 +145,7 @@ public class LockManager {
                 }
             }
         }
-        for (Location loc : result) player.spawnParticle(Particle.REDSTONE, loc, 0, 0, 0, 0, new Particle.DustOptions(color, 0.7f));
+        for (final Location loc : result) player.spawnParticle(Particle.REDSTONE, loc, 0, 0, 0, 0, new Particle.DustOptions(color, 0.7f));
     }
 
     /**
@@ -166,7 +166,7 @@ public class LockManager {
 
         // Check If Player Placed Block
         if (!Main.config.getBoolean("allow-unplaced-locking") || !PlayerManager.hasScoreboardTag(player, "bypass")) {
-            UUID placer = new PlaceManager(block).getPlacer();
+            final UUID placer = new PlaceManager(block).getPlacer();
             if (placer == null || !placer.equals(player.getUniqueId())) {
                 player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1, 2);
 
@@ -191,7 +191,7 @@ public class LockManager {
         }
 
         // Check if player has enough empty slots
-        int slotCount = new SlotManager("locks", player).getCount();
+        final int slotCount = new SlotManager("locks", player).getCount();
         if (getLockedCount() >= slotCount) {
             new MessageManager("slots.limit")
                     .replace("%type%", "lock")
@@ -221,7 +221,7 @@ public class LockManager {
      */
     public void lock(ItemStack item) {
         if (item != null && item.getItemMeta() instanceof Damageable damage) {
-            int current = damage.getDamage();
+            final int current = damage.getDamage();
             if (current + 1 <= item.getType().getMaxDurability()) {
                 damage.setDamage(current + 1);
                 item.setItemMeta(damage);
@@ -275,14 +275,14 @@ public class LockManager {
         if (block.getType().toString().contains("_DOOR")) {
             if (new SlotManager("locks", player).getCount() > (getLockedCount() + 1)) {
                 //noinspection DuplicatedCode
-                Door door = (Door) block.getState().getBlockData();
+                final Door door = (Door) block.getState().getBlockData();
                 Location top = block.getLocation();
                 Location bottom = block.getLocation();
 
                 if (door.getHalf() == Bisected.Half.TOP) bottom = block.getLocation().subtract(0, 1, 0);
                 if (door.getHalf() == Bisected.Half.BOTTOM) top = block.getLocation().add(0, 1, 0);
 
-                for (Location location : new Location[]{top, bottom}) new LockManager(location.getBlock(), player).lock(null);
+                for (final Location location : new Location[]{top, bottom}) new LockManager(location.getBlock(), player).lock(null);
                 new LockManager(null, player).lock(item);
 
                 player.playSound(player.getLocation(), Sound.BLOCK_CHEST_LOCKED, 1, 2);
@@ -316,7 +316,7 @@ public class LockManager {
     public void checkLockDoor() {
         if (block.getType().toString().contains("_DOOR")) {
             //noinspection DuplicatedCode
-            Door door = (Door) block.getState().getBlockData();
+            final Door door = (Door) block.getState().getBlockData();
             Location top = block.getLocation();
             Location bottom = block.getLocation();
 
@@ -334,10 +334,10 @@ public class LockManager {
      * @param   two Location of the second block
      */
     private void location(Location one, Location two) {
-        Location[] locations = {one, two};
-        for (Location loc : locations) {
+        final Location[] locations = {one, two};
+        for (final Location loc : locations) {
             if (new LockManager(loc.getBlock(), null).isLocked()) {
-                UUID owner = new LockManager(loc.getBlock(), null).getLocker();
+                final UUID owner = new LockManager(loc.getBlock(), null).getLocker();
                 final Block block0 = locations[0].getBlock();
                 final Block block1 = locations[0].getBlock();
 
@@ -456,7 +456,7 @@ public class LockManager {
      * @param   two     The second block to unlock
      */
     private void attemptUnlockDouble(ItemStack item, Location one, Location two) {
-        for (Location location : new Location[]{one, two}) new LockManager(location.getBlock(), player).unlock(null);
+        for (final Location location : new Location[]{one, two}) new LockManager(location.getBlock(), player).unlock(null);
         new LockManager(null, player).unlock(item);
 
         player.playSound(player.getLocation(), Sound.BLOCK_CHEST_LOCKED, 1, 2);
@@ -472,7 +472,7 @@ public class LockManager {
      */
     public int getLockedCount() {
         int i = 0;
-        for (Block key : DataManager.locked.keySet()) if (Objects.equals(new LockManager(key, null).getLocker(), player.getUniqueId())) i++;
+        for (final Block key : DataManager.locked.keySet()) if (Objects.equals(new LockManager(key, null).getLocker(), player.getUniqueId())) i++;
         return i;
     }
 

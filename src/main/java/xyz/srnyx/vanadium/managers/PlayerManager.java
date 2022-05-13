@@ -16,7 +16,7 @@ public class PlayerManager {
      * @return          The {@code OfflinePlayer}
      */
     public static OfflinePlayer getOfflinePlayer(String player) {
-        for (OfflinePlayer op : Bukkit.getOfflinePlayers()) if (op.getName() != null && op.getName().equalsIgnoreCase(player)) return op;
+        for (final OfflinePlayer op : Bukkit.getOfflinePlayers()) if (op.getName() != null && op.getName().equalsIgnoreCase(player)) return op;
         return null;
     }
 
@@ -41,7 +41,7 @@ public class PlayerManager {
      * @return          True if vanished, false if not
      */
     public static boolean isVanished(Player player) {
-        for (MetadataValue meta : player.getMetadata("vanished")) if (meta.asBoolean()) return true;
+        for (final MetadataValue meta : player.getMetadata("vanished")) if (meta.asBoolean()) return true;
         return false;
     }
 
@@ -75,7 +75,7 @@ public class PlayerManager {
      * @return          True if yes, false if no
      */
     public static boolean hasScoreboardTag(Player player, String check) {
-        for (String tag : player.getScoreboardTags()) if (tag.equals(check)) return true;
+        for (final String tag : player.getScoreboardTags()) if (tag.equals(check)) return true;
         return false;
     }
 

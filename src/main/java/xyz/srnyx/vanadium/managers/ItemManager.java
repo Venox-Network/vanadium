@@ -31,7 +31,7 @@ public class ItemManager {
      * @return          The ItemManager instance
      */
     public ItemManager name(String name) {
-        ItemMeta meta = item.getItemMeta();
+        final ItemMeta meta = item.getItemMeta();
         if (meta != null) {
             meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
             item.setItemMeta(meta);
@@ -47,10 +47,10 @@ public class ItemManager {
      * @return          The ItemManager instance
      */
     public ItemManager lore(String lore) {
-        ItemMeta meta = item.getItemMeta();
+        final ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            List<String> entries = new ArrayList<>();
-            List<String> current = meta.getLore();
+            final List<String> entries = new ArrayList<>();
+            final List<String> current = meta.getLore();
             if (current != null) entries.addAll(current);
 
             entries.add(ChatColor.translateAlternateColorCodes('&', lore));
@@ -70,7 +70,7 @@ public class ItemManager {
      * @return              The ItemManager instance
      */
     public ItemManager enchant(Enchantment enchantment, int level) {
-        ItemMeta meta = item.getItemMeta();
+        final ItemMeta meta = item.getItemMeta();
         if (meta != null) {
             meta.addEnchant(enchantment, level, true);
             item.setItemMeta(meta);
@@ -86,7 +86,7 @@ public class ItemManager {
      * @return          The ItemManager instance
      */
     public ItemManager flag(ItemFlag flag) {
-        ItemMeta meta = item.getItemMeta();
+        final ItemMeta meta = item.getItemMeta();
         if (meta != null) {
             meta.addItemFlags(flag);
             item.setItemMeta(meta);
@@ -102,15 +102,15 @@ public class ItemManager {
     }
 
     public static boolean isSame(ItemStack one, ItemStack two) {
-        ItemMeta oneMeta = one.getItemMeta();
-        ItemMeta twoMeta = two.getItemMeta();
-
         if (!one.getType().equals(two.getType())) return false;
+
+        final ItemMeta oneMeta = one.getItemMeta();
+        final ItemMeta twoMeta = two.getItemMeta();
         if (oneMeta != null && twoMeta != null) {
             if (!oneMeta.getDisplayName().equals(twoMeta.getDisplayName())) return false;
             return oneMeta.getLore() == null || oneMeta.getLore().equals(twoMeta.getLore());
         }
 
-        return true;
+        return false;
     }
 }

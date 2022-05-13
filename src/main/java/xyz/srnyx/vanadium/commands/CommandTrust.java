@@ -43,8 +43,8 @@ public class CommandTrust implements TabExecutor {
 
     @SuppressWarnings("NullableProblems")
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        List<String> suggestions = new ArrayList<>();
-        List<String> results = new ArrayList<>();
+        final List<String> suggestions = new ArrayList<>();
+        final List<String> results = new ArrayList<>();
         final Player player = (Player) sender;
 
         if (args.length == 1) {
@@ -60,7 +60,7 @@ public class CommandTrust implements TabExecutor {
             }
         }
 
-        for (String suggestion : suggestions) if (suggestion.toLowerCase(Locale.ENGLISH).startsWith(args[args.length - 1].toLowerCase(Locale.ENGLISH))) results.add(suggestion);
+        for (final String suggestion : suggestions) if (suggestion.toLowerCase(Locale.ENGLISH).startsWith(args[args.length - 1].toLowerCase(Locale.ENGLISH))) results.add(suggestion);
         return results;
     }
 }

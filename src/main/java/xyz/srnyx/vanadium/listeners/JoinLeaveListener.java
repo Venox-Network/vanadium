@@ -17,7 +17,7 @@ public class JoinLeaveListener implements Listener {
      */
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
+        final Player player = event.getPlayer();
 
         // Enable bypass
         if (PlayerManager.hasScoreboardTag(player, "bypass")) CommandBypass.enable(player, true);

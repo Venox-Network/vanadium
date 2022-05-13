@@ -22,7 +22,10 @@ import xyz.srnyx.vanadium.managers.DamageManager;
 import xyz.srnyx.vanadium.managers.ItemsAdderManager;
 import xyz.srnyx.vanadium.managers.MessageManager;
 
-import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 
@@ -34,8 +37,8 @@ public class ItemsAdderListener implements Listener {
     public void interact(PlayerInteractEvent event) {
         final Player player = event.getPlayer();
         final ItemsAdderManager iam = new ItemsAdderManager(player);
-        final boolean leftClick = (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK);
-        final boolean rightClick = (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK);
+        final boolean leftClick = event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK;
+        final boolean rightClick = event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK;
 
         if (player.isSneaking()) {
             if (iam.notOnCooldown()) {
@@ -45,16 +48,16 @@ public class ItemsAdderListener implements Listener {
                     iam.durability(false, 2);
 
                     // TNT item
-                    Item tnt = player.getWorld().dropItem(player.getEyeLocation(), new ItemStack(Material.TNT));
+                    final Item tnt = player.getWorld().dropItem(player.getEyeLocation(), new ItemStack(Material.TNT));
                     tnt.setVelocity(player.getEyeLocation().getDirection().multiply(1.5)); // Makes the TNT item move forward
                     tnt.setPickupDelay(32767); // Make it so the TNT item can't be picked up
                     tnt.setCustomNameVisible(true);
                     tnt.setInvulnerable(true);
                     tnt.setGlowing(true);
                     // TNT item - Name
-                    final Map<Item, Long> timer = new HashMap<>();
+                    final Map<Item, Long> timer = new ConcurrentHashMap<>();
                     timer.put(tnt, System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(Main.config.getInt("custom-items.nyx_wand.tnt.fuse")));
-                    BukkitRunnable runnable = new BukkitRunnable() {
+                    final BukkitRunnable runnable = new BukkitRunnable() {
                         public void run() {
                             tnt.setCustomName(ChatColor.RED + "" + ChatColor.BOLD + (TimeUnit.MILLISECONDS.toSeconds(timer.get(tnt) - System.currentTimeMillis()) + 1));
                             tnt.getWorld().spawnParticle(Particle.END_ROD, tnt.getLocation(), 1, 0, 0, 0);
@@ -88,8 +91,8 @@ public class ItemsAdderListener implements Listener {
                     iam.durability(true, 6);
 
                     // Damage entities
-                    World world = player.getWorld();
-                    for (Entity entity : world.getEntities()) {
+                    final World world = player.getWorld();
+                    for (final Entity entity : world.getEntities()) {
                         if (entity instanceof LivingEntity entityLiving && entityLiving != player && entityLiving.hasLineOfSight(player)) {
                             if (entityLiving.getLocation().distance(player.getLocation()) <= Main.config.getInt("custom-items.chris_shield.damage.range")) {
                                 if (entityLiving instanceof Player livingPlayer) {

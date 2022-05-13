@@ -21,11 +21,11 @@ public class CommandBypass implements CommandExecutor {
     @SuppressWarnings("NullableProblems")
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (PlayerManager.noPermission(sender, "vanadium.bypass")) return true;
-        Player player = (Player) sender;
+        final Player player = (Player) sender;
 
         // If a player is specified, enable bypass for them instead of sender
         if (args.length == 1 && player.hasPermission("vanadium.bypass.others") && !Objects.equals(args[0], player.getName())) {
-            Player target = Bukkit.getPlayer(args[0]);
+            final Player target = Bukkit.getPlayer(args[0]);
             if (target != null) {
                 if (PlayerManager.hasScoreboardTag(target, "bypass")) {
                     target.removeScoreboardTag("bypass");

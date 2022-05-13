@@ -19,11 +19,11 @@ public class CommandTrustList implements CommandExecutor {
     @SuppressWarnings("NullableProblems")
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (PlayerManager.noPermission(sender, "vanadium.trustlist")) return true;
-        Player player = (Player) sender;
+        final Player player = (Player) sender;
 
-        if (args.length == 1 && (player.hasPermission("vanadium.trustlist.others"))) {
+        if (args.length == 1 && player.hasPermission("vanadium.trustlist.others")) {
             Player targetPlayer = null;
-            OfflinePlayer target = PlayerManager.getOfflinePlayer(args[0]);
+            final OfflinePlayer target = PlayerManager.getOfflinePlayer(args[0]);
             if (target != null) targetPlayer = Bukkit.getPlayer(target.getUniqueId());
 
             if (targetPlayer == null) {
@@ -42,15 +42,15 @@ public class CommandTrustList implements CommandExecutor {
     }
 
     private void trusted(Player player, Player target) {
-        List<UUID> trusted = DataManager.trusted.get(target.getUniqueId());
+        final List<UUID> trusted = DataManager.trusted.get(target.getUniqueId());
         new MessageManager("trusting.list.header")
                 .replace("%player%", target.getName())
                 .send(player);
         if (trusted.isEmpty()) {
             new MessageManager("trusting.list.empty").send(player);
         } else {
-            for (UUID id : trusted) {
-                Player idPlayer = Bukkit.getPlayer(id);
+            for (final UUID id : trusted) {
+                final Player idPlayer = Bukkit.getPlayer(id);
                 new MessageManager("trusting.list.item")
                         .replace("%player%", idPlayer != null ? idPlayer.getName() : null)
                         .send(player);

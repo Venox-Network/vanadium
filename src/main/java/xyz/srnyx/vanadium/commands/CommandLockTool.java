@@ -19,7 +19,7 @@ public class CommandLockTool implements CommandExecutor {
 
         // If a player is specified, give lock tool to them instead of sender
         if (args.length == 1 && player.hasPermission("vanadium.locktool.others")) {
-            Player target = Bukkit.getPlayer(args[0]);
+            final Player target = Bukkit.getPlayer(args[0]);
             if (target != null) {
                 target.getInventory().addItem(LockManager.getLockTool());
                 new MessageManager("locking.lock-tool.get")

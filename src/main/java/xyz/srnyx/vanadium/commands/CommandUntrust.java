@@ -7,11 +7,13 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
-import xyz.srnyx.vanadium.managers.*;
+import xyz.srnyx.vanadium.managers.DataManager;
+import xyz.srnyx.vanadium.managers.MessageManager;
+import xyz.srnyx.vanadium.managers.PlayerManager;
+import xyz.srnyx.vanadium.managers.TrustManager;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 
 
@@ -20,7 +22,7 @@ public class CommandUntrust implements TabExecutor {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (PlayerManager.isNotPlayer(sender)) return true;
         if (PlayerManager.noPermission(sender, "vanadium.untrust")) return true;
-        Player player = (Player) sender;
+        final Player player = (Player) sender;
 
         if (args.length == 1) {
             final OfflinePlayer target = PlayerManager.getOfflinePlayer(args[0]);
@@ -40,12 +42,12 @@ public class CommandUntrust implements TabExecutor {
 
     @SuppressWarnings("NullableProblems")
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        List<String> suggestions = new ArrayList<>();
-        List<String> results = new ArrayList<>();
-        Player player = (Player) sender;
+        final List<String> suggestions = new ArrayList<>();
+        final List<String> results = new ArrayList<>();
+        final Player player = (Player) sender;
 
-        if (args.length == 1) for (UUID id : DataManager.trusted.get(player.getUniqueId())) suggestions.add(Bukkit.getOfflinePlayer(id).getName());
-        for (String suggestion : suggestions) if (suggestion.toLowerCase(Locale.ENGLISH).startsWith(args[args.length - 1].toLowerCase(Locale.ENGLISH))) results.add(suggestion);
+        if (args.length == 1) for (final UUID id : DataManager.trusted.get(player.getUniqueId())) suggestions.add(Bukkit.getOfflinePlayer(id).getName());
+        for (final String suggestion : suggestions) if (suggestion.toLowerCase().startsWith(args[args.length - 1].toLowerCase())) results.add(suggestion);
 
         return results;
     }

@@ -46,7 +46,7 @@ public class FileManager {
                     Main.plugin.getLogger().info(ChatColor.translateAlternateColorCodes('&', "&aSuccessfully created &2" + name + " &afile"));
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                Main.plugin.getLogger().warning(ChatColor.translateAlternateColorCodes('&', "&cFailed to create &4" + name + " &cfile"));
             }
         } else {
             if (!configFolder.exists()) {
@@ -66,16 +66,9 @@ public class FileManager {
     /**
      * Loads a file
      *
-     * @return Returns the loaded file
+     * @return  the loaded file
      */
     public YamlConfiguration load() {
-        File file;
-        if (data) {
-            file = dataFolder;
-        } else {
-            file = configFolder;
-        }
-
-        return YamlConfiguration.loadConfiguration(new File(file, name));
+        return YamlConfiguration.loadConfiguration(new File(data ? dataFolder : configFolder, name));
     }
 }

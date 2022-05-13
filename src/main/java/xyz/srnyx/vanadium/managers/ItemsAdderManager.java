@@ -12,18 +12,16 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import xyz.srnyx.vanadium.Main;
 
-import javax.annotation.Nullable;
-
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 
 public class ItemsAdderManager {
     private final Player player;
-    private final Map<UUID, Long> cooldown = new HashMap<>();
-    public static final Map<UUID, ItemStack> axes = new HashMap<>();
+    private final Map<UUID, Long> cooldowns = new ConcurrentHashMap<>();
+    public static final Map<UUID, ItemStack> axes = new ConcurrentHashMap<>();
 
     /**
      * Constructor for {@link ItemsAdderManager}
@@ -47,15 +45,15 @@ public class ItemsAdderManager {
                 } else {
                     player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(
                             new MessageManager("custom-items.action-bar")
-                                    .replace("%seconds%", String.valueOf(TimeUnit.MILLISECONDS.toSeconds(cooldown.get(player.getUniqueId()) - System.currentTimeMillis()) + 1))
+                                    .replace("%seconds%", String.valueOf(TimeUnit.MILLISECONDS.toSeconds(cooldowns.get(player.getUniqueId()) - System.currentTimeMillis()) + 1))
                                     .string()));
                 }
             }
         }.runTaskTimer(Main.plugin, 0, 20);
 
         // Cooldown stuff
-        cooldown.remove(player.getUniqueId());
-        cooldown.put(player.getUniqueId(), System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(Main.config.getInt("custom-items.cooldown")));
+        cooldowns.remove(player.getUniqueId());
+        cooldowns.put(player.getUniqueId(), System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(Main.config.getInt("custom-items.cooldown")));
     }
 
     /**
@@ -64,7 +62,7 @@ public class ItemsAdderManager {
      * @return  True if the player is not on cooldown
      */
     public boolean notOnCooldown() {
-        if (cooldown.containsKey(player.getUniqueId())) return (cooldown.get(player.getUniqueId()) - System.currentTimeMillis()) <= 0;
+        if (cooldowns.containsKey(player.getUniqueId())) return (cooldowns.get(player.getUniqueId()) - System.currentTimeMillis()) <= 0;
         return true;
     }
 
@@ -75,9 +73,9 @@ public class ItemsAdderManager {
      * @return          True if the player is holding the specified custom item
      */
     public boolean holdingItem(boolean offhand, String item) {
-        @Nullable CustomStack mainCustom = CustomStack.byItemStack(player.getInventory().getItemInMainHand());
+        final CustomStack mainCustom = CustomStack.byItemStack(player.getInventory().getItemInMainHand());
         if (offhand) {
-            @Nullable CustomStack offCustom = CustomStack.byItemStack(player.getInventory().getItemInOffHand());
+            final CustomStack offCustom = CustomStack.byItemStack(player.getInventory().getItemInOffHand());
             return (mainCustom != null && mainCustom.getId().equals(item)) || (offCustom != null && offCustom.getId().equals(item));
         }
         return mainCustom != null && mainCustom.getId().equals(item);
@@ -90,10 +88,10 @@ public class ItemsAdderManager {
      * @param   durability  The amount of durability to negate
      */
     public void durability(boolean offhand, int durability) {
-        @Nullable CustomStack mainCustom = CustomStack.byItemStack(player.getInventory().getItemInMainHand());
+        final CustomStack mainCustom = CustomStack.byItemStack(player.getInventory().getItemInMainHand());
         if (mainCustom != null) mainCustom.setDurability(mainCustom.getDurability() - durability);
         if (offhand) {
-            @Nullable CustomStack offCustom = CustomStack.byItemStack(player.getInventory().getItemInOffHand());
+            final CustomStack offCustom = CustomStack.byItemStack(player.getInventory().getItemInOffHand());
             if (offCustom != null) offCustom.setDurability(offCustom.getDurability() - durability);
         }
     }
@@ -105,7 +103,7 @@ public class ItemsAdderManager {
      */
     public void axe(Arrow arrow) {
         // Update durability of axe before returning it
-        @Nullable CustomStack axe = CustomStack.byItemStack(axes.get(player.getUniqueId()));
+        final CustomStack axe = CustomStack.byItemStack(axes.get(player.getUniqueId()));
         if (axe != null) {
             axe.setDurability(axe.getDurability() - 2);
             axes.put(player.getUniqueId(), axe.getItemStack());

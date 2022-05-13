@@ -1,6 +1,7 @@
 package xyz.srnyx.vanadium.listeners;
 
 import org.apache.commons.lang.WordUtils;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -12,7 +13,10 @@ import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
-import xyz.srnyx.vanadium.managers.*;
+import xyz.srnyx.vanadium.managers.LockManager;
+import xyz.srnyx.vanadium.managers.MessageManager;
+import xyz.srnyx.vanadium.managers.PlayerManager;
+import xyz.srnyx.vanadium.managers.TrustManager;
 
 import java.util.UUID;
 
@@ -23,8 +27,8 @@ public class InteractListener implements Listener {
      */
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
-        Player player = event.getPlayer();
-        Block block = event.getClickedBlock();
+        final Player player = event.getPlayer();
+        final Block block = event.getClickedBlock();
 
         // If Holding Lock Tool
         if (new LockManager(null, player).holdingLockTool() && event.getHand() == EquipmentSlot.HAND && block != null) {
@@ -39,7 +43,7 @@ public class InteractListener implements Listener {
 
         // Check if locked
         if (block != null && new LockManager(block, player).isLockedForPlayer()) {
-            UUID owner = new LockManager(block, null).getLocker();
+            final UUID owner = new LockManager(block, null).getLocker();
             if (owner != null && !new TrustManager(player, Bukkit.getOfflinePlayer(owner)).isTrusted()) {
                 if (!(player.hasPermission("vanadium.command.bypass") && (player.isSneaking() || PlayerManager.hasScoreboardTag(player, "bypass")))) {
                     player.playSound(player.getLocation(), Sound.BLOCK_CHEST_LOCKED, 1, 1);

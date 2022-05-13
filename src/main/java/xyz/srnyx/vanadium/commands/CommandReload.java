@@ -18,7 +18,7 @@ public class CommandReload implements CommandExecutor {
         if (PlayerManager.noPermission(sender, "vanadium.reload")) return true;
 
         Main.loadFiles();
-        for (Player online: Bukkit.getOnlinePlayers()) {
+        for (final Player online: Bukkit.getOnlinePlayers()) {
             new SlotManager("locks", online).stop();
             new SlotManager("locks", online).start();
 

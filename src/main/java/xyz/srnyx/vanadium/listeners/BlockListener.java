@@ -30,8 +30,8 @@ public class BlockListener implements Listener {
      */
     @EventHandler
     public void onPlaceBlock(BlockPlaceEvent event) {
-        Player player = event.getPlayer();
-        Block block = event.getBlock();
+        final Player player = event.getPlayer();
+        final Block block = event.getBlock();
 
         // Check if Should Log Placer
         if (new LockManager(block, null).isLockable()) {
@@ -57,14 +57,15 @@ public class BlockListener implements Listener {
      */
     @EventHandler
     public void onBreakBlock(BlockBreakEvent event) {
-        Player player = event.getPlayer();
-        Block block = event.getBlock();
+        final Player player = event.getPlayer();
 
         // Check Holding Lock Tool
         if (new LockManager(null, player).holdingLockTool()) {
             event.setCancelled(true);
             return;
         }
+
+        final Block block = event.getBlock();
 
         // Check Locked Block
         if (!(player.hasPermission("vanadium.command.bypass") && (player.isSneaking() || PlayerManager.hasScoreboardTag(player, "bypass"))) && new LockManager(block, null).isLocked()) {
@@ -112,8 +113,8 @@ public class BlockListener implements Listener {
     @EventHandler
     public void onHopper(InventoryMoveItemEvent event) {
         if (event.getSource().getLocation() != null && event.getDestination().getLocation() != null && event.getDestination().getType() == InventoryType.HOPPER) {
-            UUID sourceOwner = new LockManager(event.getSource().getLocation().getBlock(), null).getLocker();
-            UUID destinationOwner = new LockManager(event.getDestination().getLocation().getBlock(), null).getLocker();
+            final UUID sourceOwner = new LockManager(event.getSource().getLocation().getBlock(), null).getLocker();
+            final UUID destinationOwner = new LockManager(event.getDestination().getLocation().getBlock(), null).getLocker();
             if (sourceOwner != null && destinationOwner == null || sourceOwner != null && !destinationOwner.equals(sourceOwner)) {
                 event.setCancelled(true);
             }

@@ -8,10 +8,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import xyz.srnyx.vanadium.Main;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 
@@ -19,8 +19,8 @@ public class SlotManager {
     private String type;
     private Player player;
     private OfflinePlayer op;
-    private static final Map<UUID, Long> locksCooldown = new HashMap<>();
-    private static final Map<UUID, Long> trustsCooldown = new HashMap<>();
+    private static final Map<UUID, Long> locksCooldown = new ConcurrentHashMap<>();
+    private static final Map<UUID, Long> trustsCooldown = new ConcurrentHashMap<>();
 
     /**
      * Constructor for SlotManager
@@ -115,7 +115,7 @@ public class SlotManager {
         new BukkitRunnable() {
             public void run() {
                 for (final Player online : Bukkit.getOnlinePlayers()) {
-                    SlotManager slot = new SlotManager(type, online);
+                    final SlotManager slot = new SlotManager(type, online);
                     if (slot.contains() && (slot.timeLeft() == null || slot.timeLeft() <= 0)) {
                         if (PlayerManager.isAFK(online)) {
                             slot.stop();
@@ -132,15 +132,8 @@ public class SlotManager {
      */
     private int getMultiplier() {
         for (final PermissionAttachmentInfo pai : player.getEffectivePermissions()) {
-            String perm = pai.getPermission();
-            if (perm.startsWith("vanadium.multiplier.")) {
-                try {
-                    return Integer.parseInt(perm.substring(perm.lastIndexOf(".") + 1));
-                } catch (NumberFormatException e) {
-                    e.printStackTrace();
-                    return 1;
-                }
-            }
+            final String perm = pai.getPermission();
+            if (perm.startsWith("vanadium.multiplier.")) return Integer.parseInt(perm.substring(perm.lastIndexOf('.') + 1));
         }
         return 1;
     }
@@ -149,8 +142,7 @@ public class SlotManager {
      * @return  The number of {@code type} slots the player has
      */
     public int getCount() {
-        int[] slots = DataManager.slots.get(op.getUniqueId());
-        int id = Objects.equals(type, "trusts") ? 1 : 0;
-        return slots != null ? slots[id] : 0;
+        final int[] slots = DataManager.slots.get(op.getUniqueId());
+        return slots != null ? slots[Objects.equals(type, "trusts") ? 1 : 0] : 0;
     }
 }

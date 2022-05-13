@@ -24,10 +24,10 @@ public class CommandSlot implements TabExecutor {
 
         //<player> <get|cooldown|start|stop|add|remove|set> <locks|trusts|all> [amount]
         if (args.length >= 3) {
-            Player player = Bukkit.getPlayer(args[0]);
+            final Player player = Bukkit.getPlayer(args[0]);
             if (player != null) {
-                String action = args[1];
-                String type = args[2];
+                final String action = args[1];
+                final String type = args[2];
 
                 int slots = 0;
                 if (Objects.equals(type, "locks")) slots = new SlotManager("locks", player).getCount();
@@ -37,11 +37,11 @@ public class CommandSlot implements TabExecutor {
                 String slot = slots == 1 ? "slot" : "slots";
 
                 //<player> <get|cooldown|start|stop> <locks|trusts|all>
-                boolean arg3action = action.equalsIgnoreCase("get")
+                final boolean arg3action = action.equalsIgnoreCase("get")
                         || action.equalsIgnoreCase("cooldown")
                         || action.equalsIgnoreCase("start")
                         || action.equalsIgnoreCase("stop");
-                boolean arg3type = type.equalsIgnoreCase("all")
+                final boolean arg3type = type.equalsIgnoreCase("all")
                         || type.equalsIgnoreCase("locks")
                         || type.equalsIgnoreCase("trusts");
 
@@ -58,7 +58,7 @@ public class CommandSlot implements TabExecutor {
                     }
 
                     //<player> <cooldown> <locks|trusts>
-                    Long timeLeft = new SlotManager(type, player).timeLeft();
+                    final Long timeLeft = new SlotManager(type, player).timeLeft();
                     if (action.equalsIgnoreCase("cooldown")) {
                         new MessageManager("slots.command.cooldown")
                                 .replace("%target%", player.getName())
@@ -76,7 +76,7 @@ public class CommandSlot implements TabExecutor {
                                 new SlotManager("trusts", player).start();
                                 player.removeScoreboardTag("stop-locks");
                                 player.removeScoreboardTag("stop-trusts");
-                            } else  {
+                            } else {
                                 new SlotManager(type, player).start();
                                 player.removeScoreboardTag("stop-" + type);
                             }
@@ -103,9 +103,9 @@ public class CommandSlot implements TabExecutor {
                 }
 
                 //<player> <add|remove|set> <locks|trusts> <amount>
-                boolean arg4 = action.equalsIgnoreCase("add") || action.equalsIgnoreCase("remove") || action.equalsIgnoreCase("set");
+                final boolean arg4 = action.equalsIgnoreCase("add") || action.equalsIgnoreCase("remove") || action.equalsIgnoreCase("set");
                 if (args.length == 4 && arg4) {
-                    int amount = Integer.parseInt(args[3]);
+                    final int amount = Integer.parseInt(args[3]);
 
                     if (action.equalsIgnoreCase("add")) slots += amount;
                     if (action.equalsIgnoreCase("remove")) slots -= amount;
@@ -136,7 +136,7 @@ public class CommandSlot implements TabExecutor {
     @SuppressWarnings("NullableProblems")
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
         final List<String> suggestions = new ArrayList<>();
-        List<String> results = new ArrayList<>();
+        final List<String> results = new ArrayList<>();
 
         if (args.length == 1) for (Player online : Bukkit.getOnlinePlayers()) suggestions.add(online.getName());
 
@@ -155,7 +155,7 @@ public class CommandSlot implements TabExecutor {
             if (Objects.equals(args[1], "start") || Objects.equals(args[1], "stop")) suggestions.add("all");
         }
 
-        for (String suggestion : suggestions) if (suggestion.toLowerCase().startsWith(args[args.length - 1].toLowerCase())) results.add(suggestion);
+        for (final String suggestion : suggestions) if (suggestion.toLowerCase().startsWith(args[args.length - 1].toLowerCase())) results.add(suggestion);
         return results;
     }
 }

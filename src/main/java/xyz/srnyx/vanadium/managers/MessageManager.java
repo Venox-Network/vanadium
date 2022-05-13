@@ -18,9 +18,9 @@ public class MessageManager {
      * @param   key The location of the message in the messages file
      */
     public MessageManager(String key) {
-        String string = Main.messages.getString(key);
+        final String string = Main.messages.getString(key);
         if (string != null) {
-            String prefix = Main.messages.getString("plugin.prefix");
+            final String prefix = Main.messages.getString("plugin.prefix");
             this.message = prefix != null ? string.replace("%prefix%", prefix) : string;
         } else this.message = key;
     }

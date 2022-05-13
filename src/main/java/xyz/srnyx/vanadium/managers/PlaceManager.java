@@ -23,7 +23,7 @@ public record PlaceManager(Block block) {
      * @return Whoever placed {@code block}
      */
     public UUID getPlacer() {
-        UUID[] data = DataManager.locked.get(block);
+        final UUID[] data = DataManager.locked.get(block);
         return data != null ? data[0] : null;
     }
 
@@ -57,14 +57,14 @@ public record PlaceManager(Block block) {
     public boolean attemptPlaceDoor(Player player) {
         if (block.getType().toString().contains("_DOOR")) {
             //noinspection DuplicatedCode
-            Door door = (Door) block.getState().getBlockData();
+            final Door door = (Door) block.getState().getBlockData();
             Location top = block.getLocation();
             Location bottom = block.getLocation();
 
             if (door.getHalf() == Bisected.Half.TOP) bottom = block.getLocation().subtract(0, 1, 0);
             if (door.getHalf() == Bisected.Half.BOTTOM) top = block.getLocation().add(0, 1, 0);
 
-            for (Location location : new Location[]{top, bottom}) new PlaceManager(location.getBlock()).place(player);
+            for (final Location location : new Location[]{top, bottom}) new PlaceManager(location.getBlock()).place(player);
 
             return true;
         }
@@ -94,14 +94,14 @@ public record PlaceManager(Block block) {
     public boolean attemptUnplaceDoor() {
         if (block.getType().toString().contains("_DOOR")) {
             //noinspection DuplicatedCode
-            Door door = (Door) block.getState().getBlockData();
+            final Door door = (Door) block.getState().getBlockData();
             Location top = block.getLocation();
             Location bottom = block.getLocation();
 
             if (door.getHalf() == Bisected.Half.TOP) bottom = block.getLocation().subtract(0, 1, 0);
             if (door.getHalf() == Bisected.Half.BOTTOM) top = block.getLocation().add(0, 1, 0);
 
-            for (Location location : new Location[]{top, bottom}) new PlaceManager(location.getBlock()).unplace();
+            for (final Location location : new Location[]{top, bottom}) new PlaceManager(location.getBlock()).unplace();
 
             return true;
         }

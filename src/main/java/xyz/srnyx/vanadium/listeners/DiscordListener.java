@@ -29,12 +29,12 @@ public class DiscordListener {
      */
     @Subscribe
     public void onDiscordReady(DiscordReadyEvent event) {
-        String name = DiscordUtil.getJda().getSelfUser().getName();
-        String discrim = DiscordUtil.getJda().getSelfUser().getDiscriminator();
+        final String name = DiscordUtil.getJda().getSelfUser().getName();
+        final String discrim = DiscordUtil.getJda().getSelfUser().getDiscriminator();
         Main.plugin.getLogger().info(ChatColor.GREEN + "Successfully connected to " + ChatColor.DARK_GREEN + name + "#" + discrim);
 
         if (linkChannel != null) {
-            TextChannel channel = DiscordUtil.getTextChannelById(linkChannel);
+            final TextChannel channel = DiscordUtil.getTextChannelById(linkChannel);
             if (channel != null) {
                 final List<Message> history = new MessageHistory(channel).retrievePast(100).complete();
                 if (history.size() > 1) {
@@ -63,7 +63,7 @@ public class DiscordListener {
             manager.link(discord, minecraft);
 
             if (manager.getUuid(discord) != null) {
-                Player player = Bukkit.getPlayer(manager.getUuid(discord));
+                final Player player = Bukkit.getPlayer(manager.getUuid(discord));
                 if (player != null) {
                     // Send success message to player on Minecraft
                     new MessageManager("linking.success.minecraft")

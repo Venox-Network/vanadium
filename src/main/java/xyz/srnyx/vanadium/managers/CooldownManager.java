@@ -2,14 +2,14 @@ package xyz.srnyx.vanadium.managers;
 
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @SuppressWarnings("unused")
 public class CooldownManager {
     private final UUID player;
-    private static final Map<UUID, Long> cooldown = new HashMap<>();
+    private static final Map<UUID, Long> cooldown = new ConcurrentHashMap<>();
 
     public CooldownManager(Player player) {
         this.player = player.getUniqueId();

@@ -30,7 +30,7 @@ public class TrustManager {
      * Get the number of players {@code player} has trusted
      */
     public int getTrustedCount() {
-        List<UUID> list = DataManager.trusted.get(player.getUniqueId());
+        final List<UUID> list = DataManager.trusted.get(player.getUniqueId());
         return list != null ? list.size() : 0;
     }
 
