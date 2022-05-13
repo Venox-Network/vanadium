@@ -76,7 +76,7 @@ public class ItemsAdderManager {
         final CustomStack mainCustom = CustomStack.byItemStack(player.getInventory().getItemInMainHand());
         if (offhand) {
             final CustomStack offCustom = CustomStack.byItemStack(player.getInventory().getItemInOffHand());
-            return (mainCustom != null && mainCustom.getId().equals(item)) || (offCustom != null && offCustom.getId().equals(item));
+            return mainCustom != null && mainCustom.getId().equals(item) || offCustom != null && offCustom.getId().equals(item);
         }
         return mainCustom != null && mainCustom.getId().equals(item);
     }

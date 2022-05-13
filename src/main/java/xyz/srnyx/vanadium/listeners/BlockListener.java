@@ -101,7 +101,7 @@ public class BlockListener implements Listener {
      */
     @EventHandler
     public void onFire(BlockBurnEvent event) {
-        Block block = event.getBlock();
+        final Block block = event.getBlock();
         if (new LockManager(block, null).isLocked()) {
             event.setCancelled(true);
         }

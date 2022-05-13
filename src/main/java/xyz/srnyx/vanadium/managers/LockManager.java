@@ -224,7 +224,7 @@ public class LockManager {
                 damage.setDamage(current + 1);
                 item.setItemMeta(damage);
             } else {
-                player.playSound(player.getLocation(),Sound.ENTITY_ITEM_BREAK, 1, 1);
+                player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1, 1);
                 item.setAmount(0);
             }
         }
