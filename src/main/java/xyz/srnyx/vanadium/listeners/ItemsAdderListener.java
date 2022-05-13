@@ -1,8 +1,9 @@
 package xyz.srnyx.vanadium.listeners;
 
-import dev.lone.itemsadder.api.CustomMob;
+import dev.lone.itemsadder.api.CustomEntity;
 
 import org.bukkit.*;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -138,12 +139,9 @@ public class ItemsAdderListener implements Listener {
 
         // nyx_dragon_spawn_egg
         if (iam.holdingItem(false, "nyx_dragon_spawn_egg") && rightClick && event.getClickedBlock() != null) {
-            final int x = event.getBlockFace().getModX();
-            final int y = event.getBlockFace().getModY();
-            final int z = event.getBlockFace().getModZ();
-            Bukkit.broadcastMessage(String.valueOf(x) + y + z);
-
-            CustomMob.spawn("vanadium:nyx_dragon", new Location(player.getWorld(), x, y, z));
+            final BlockFace blockFace = event.getBlockFace();
+            final Location loc = event.getClickedBlock().getLocation().add(blockFace.getModX(), blockFace.getModY(), blockFace.getModZ());
+            CustomEntity.spawn("vanadium:nyx_dragon", loc);
         }
     }
 
