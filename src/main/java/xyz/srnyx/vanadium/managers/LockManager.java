@@ -5,7 +5,6 @@ import dev.lone.itemsadder.api.CustomStack;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
-import org.bukkit.block.data.type.Door;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.DoubleChestInventory;
@@ -204,7 +203,7 @@ public class LockManager {
         // Attempt to lock double chest / door
         if (attemptLockDoubleChest(item) || attemptLockDoor(item)) return;
 
-        if (!(block.getState() instanceof Chest chest && chest.getInventory() instanceof DoubleChestInventory) && !(block.getState() instanceof Door)) {
+        if (!(block.getState() instanceof Chest chest && chest.getInventory() instanceof DoubleChestInventory) && !(block.getType().toString().contains("_DOOR"))) {
             lock(item, 1);
 
             player.playSound(player.getLocation(), Sound.BLOCK_CHEST_LOCKED, 1, 2);
@@ -287,7 +286,7 @@ public class LockManager {
      * @return  True if successful, false if not
      */
     public boolean attemptLockDoor(ItemStack item) {
-        if (block.getState() instanceof Door) {
+        if (block.getType().toString().contains("_DOOR")) {
             if (new SlotManager("locks", player).getCount() > (getLockedCount() + 1)) {
                 for (final Location location : Main.door(block)) new LockManager(location.getBlock(), player).lock(null, null);
                 lock(item, 1);
@@ -321,7 +320,7 @@ public class LockManager {
      * Checks if a door is locked
      */
     public void checkLockDoor() {
-        if (block.getState() instanceof Door) location(Main.door(block)[0], Main.door(block)[1]);
+        if (block.getType().toString().contains("_DOOR")) location(Main.door(block)[0], Main.door(block)[1]);
     }
 
     /**
@@ -379,7 +378,7 @@ public class LockManager {
         // Attempt to unlock double chest / door
         if (attemptUnlockDoubleChest(item) || attemptUnlockDoor(item)) return;
 
-        if (!(block.getState() instanceof Chest chest && chest.getInventory() instanceof DoubleChestInventory) && !(block.getState() instanceof Door)) {
+        if (!(block.getState() instanceof Chest chest && chest.getInventory() instanceof DoubleChestInventory) && !block.getType().toString().contains("_DOOR")) {
             unlock(item, 1);
 
             player.playSound(player.getLocation(), Sound.BLOCK_CHEST_LOCKED, 1, 2);
@@ -433,7 +432,7 @@ public class LockManager {
      * @return          True if unlock was successful, false if not
      */
     public boolean attemptUnlockDoor(ItemStack item) {
-        if (block.getState() instanceof Door) {
+        if (block.getType().toString().contains("_DOOR")) {
             attemptUnlockDouble(item, 1, Main.door(block)[0], Main.door(block)[1]);
             return true;
         }

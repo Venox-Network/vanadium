@@ -2,7 +2,6 @@ package xyz.srnyx.vanadium.managers;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.block.data.type.Door;
 import org.bukkit.entity.Player;
 
 import xyz.srnyx.vanadium.Main;
@@ -56,7 +55,7 @@ public record PlaceManager(Block block) {
      * @return True if successful, false if not
      */
     public boolean attemptPlaceDoor(Player player) {
-        if (block.getState() instanceof Door) {
+        if (block.getType().toString().contains("_DOOR")) {
             for (final Location location : Main.door(block)) new PlaceManager(location.getBlock()).place(player);
             return true;
         }
@@ -84,7 +83,7 @@ public record PlaceManager(Block block) {
      * @return True if successful, false if not
      */
     public boolean attemptUnplaceDoor() {
-        if (block.getState() instanceof Door) {
+        if (block.getType().toString().contains("_DOOR")) {
             for (final Location location : Main.door(block)) new PlaceManager(location.getBlock()).unplace();
             return true;
         }
