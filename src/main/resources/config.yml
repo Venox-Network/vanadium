@@ -60,7 +60,7 @@ custom-items:
       # Speed of the arrow
       speed: 2
       # How much damage the arrow will do
-      damage: 4
+      damage: 2
       # Time in seconds before it returns to the inventory
       return: 3
 
