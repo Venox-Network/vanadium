@@ -20,6 +20,16 @@ errors:
   invalid-arguments: "%prefix%&4&lERROR! &cInvalid arguments"
 
 
+# %discord% = The Discord account (username#tag) they are linked to
+# %minecraft% = The Minecraft account they are linked to
+# %uuid% = The Minecraft account's UUID they are linked to
+linking:
+  # %discord%
+  minecraft: "&b&lSMP &8[&9&lDISC&8] &9You've successfully linked your account to &x&0&0&3&6&a&a%discord%"
+  # %minecraft%, %uuid%
+  discord: "You've successfully linked your account to **`%minecraft%`** *(`%uuid%`)*"
+
+
 # %count% = Number of slots given
 # %type% = Type of slot
 # %slot% = "slot" if one, "slots" if multiple

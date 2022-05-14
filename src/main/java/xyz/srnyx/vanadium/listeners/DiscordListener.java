@@ -66,12 +66,12 @@ public class DiscordListener {
                 final Player player = Bukkit.getPlayer(manager.getUuid(discord));
                 if (player != null) {
                     // Send success message to player on Minecraft
-                    new MessageManager("linking.success.minecraft")
+                    new MessageManager("linking.minecraft")
                             .replace("%discord%", event.getAuthor().getAsTag())
                             .send(player);
 
                     // Send success message to user on Discord
-                    new MessageManager("linking.success.discord")
+                    new MessageManager("linking.discord")
                             .replace("%minecraft%", player.getName())
                             .replace("%uuid%", player.getUniqueId().toString())
                             .send(event.getAuthor());
