@@ -9,6 +9,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 public class ItemManager {
@@ -99,18 +100,5 @@ public class ItemManager {
      */
     public ItemStack get() {
         return item;
-    }
-
-    public static boolean isSame(ItemStack one, ItemStack two) {
-        if (!one.getType().equals(two.getType())) return false;
-
-        final ItemMeta oneMeta = one.getItemMeta();
-        final ItemMeta twoMeta = two.getItemMeta();
-        if (oneMeta != null && twoMeta != null) {
-            if (!oneMeta.getDisplayName().equals(twoMeta.getDisplayName())) return false;
-            return oneMeta.getLore() == null || oneMeta.getLore().equals(twoMeta.getLore());
-        }
-
-        return false;
     }
 }

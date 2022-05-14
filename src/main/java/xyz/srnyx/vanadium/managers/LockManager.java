@@ -5,6 +5,7 @@ import dev.lone.itemsadder.api.CustomStack;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
+import org.bukkit.block.data.type.Door;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.DoubleChestInventory;
@@ -12,6 +13,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 
+import org.bukkit.inventory.meta.ItemMeta;
 import xyz.srnyx.vanadium.Main;
 
 import org.apache.commons.lang.WordUtils;
@@ -202,8 +204,8 @@ public class LockManager {
         // Attempt to lock double chest / door
         if (attemptLockDoubleChest(item) || attemptLockDoor(item)) return;
 
-        if (!(block.getState() instanceof Chest chest && chest.getInventory() instanceof DoubleChestInventory) && !block.getType().toString().contains("_DOOR")) {
-            lock(item);
+        if (!(block.getState() instanceof Chest chest && chest.getInventory() instanceof DoubleChestInventory) && !(block.getState() instanceof Door)) {
+            lock(item, 1);
 
             player.playSound(player.getLocation(), Sound.BLOCK_CHEST_LOCKED, 1, 2);
             new MessageManager("locking.lock.success")
@@ -217,17 +219,33 @@ public class LockManager {
      *
      * @param   item    The item to damage
      */
-    public void lock(ItemStack item) {
-        if (item != null && item.getItemMeta() instanceof Damageable damage) {
-            final int current = damage.getDamage();
-            if (current + 1 <= item.getType().getMaxDurability()) {
-                damage.setDamage(current + 1);
+    public void lock(ItemStack item, Integer durability) {
+        if (item != null) {
+            final CustomStack custom = CustomStack.byItemStack(item);
+            if (custom != null) {
+                if (Objects.equals(custom.getId(), "lock_tool")) {
+                    final int newDmg = custom.getDurability() - durability;
+                    custom.setDurability(custom.getDurability() - durability);
+
+                    // Remove item if new durability is 0
+                    if (newDmg <= 0) {
+                        player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1, 1);
+                        item.setAmount(0);
+                    }
+                }
+            } else if (item.getItemMeta() instanceof Damageable damage) {
+                final int newDmg = damage.getDamage() - durability;
+                damage.setDamage(damage.getDamage() - durability);
                 item.setItemMeta(damage);
-            } else {
-                player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1, 1);
-                item.setAmount(0);
+
+                // Remove item if new durability is 0
+                if (newDmg <= 0) {
+                    player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1, 1);
+                    item.setAmount(0);
+                }
             }
         }
+
         if (block != null) DataManager.locked.put(block, new UUID[]{new PlaceManager(block).getPlacer(), player.getUniqueId()});
     }
 
@@ -244,9 +262,8 @@ public class LockManager {
             final int slotCount = new SlotManager("locks", player).getCount();
             if (slotCount > getLockedCount() + 1) {
                 for (final Location location : new Location[]{doubleChest.getLeftSide().getLocation(), doubleChest.getRightSide().getLocation()}) {
-                    new LockManager(location.getBlock(), player).lock(null);
+                    new LockManager(location.getBlock(), player).lock(item, 1);
                 }
-                new LockManager(null, player).lock(item);
 
                 player.playSound(player.getLocation(), Sound.BLOCK_CHEST_LOCKED, 1, 2);
                 new MessageManager("locking.lock.success")
@@ -270,10 +287,10 @@ public class LockManager {
      * @return  True if successful, false if not
      */
     public boolean attemptLockDoor(ItemStack item) {
-        if (block.getType().toString().contains("_DOOR")) {
+        if (block.getState() instanceof Door) {
             if (new SlotManager("locks", player).getCount() > (getLockedCount() + 1)) {
-                for (final Location location : Main.door(block)) new LockManager(location.getBlock(), player).lock(null);
-                new LockManager(null, player).lock(item);
+                for (final Location location : Main.door(block)) new LockManager(location.getBlock(), player).lock(null, null);
+                lock(item, 1);
 
                 player.playSound(player.getLocation(), Sound.BLOCK_CHEST_LOCKED, 1, 2);
                 new MessageManager("locking.lock.success")
@@ -304,7 +321,7 @@ public class LockManager {
      * Checks if a door is locked
      */
     public void checkLockDoor() {
-        if (block.getType().toString().contains("_DOOR")) location(Main.door(block)[0], Main.door(block)[1]);
+        if (block.getState() instanceof Door) location(Main.door(block)[0], Main.door(block)[1]);
     }
 
     /**
@@ -362,8 +379,8 @@ public class LockManager {
         // Attempt to unlock double chest / door
         if (attemptUnlockDoubleChest(item) || attemptUnlockDoor(item)) return;
 
-        if (!(block.getState() instanceof Chest chest && chest.getInventory() instanceof DoubleChestInventory) && !block.getType().toString().contains("_DOOR")) {
-            unlock(item);
+        if (!(block.getState() instanceof Chest chest && chest.getInventory() instanceof DoubleChestInventory) && !(block.getState() instanceof Door)) {
+            unlock(item, 1);
 
             player.playSound(player.getLocation(), Sound.BLOCK_CHEST_LOCKED, 1, 2);
             new MessageManager("locking.unlock.success")
@@ -377,16 +394,19 @@ public class LockManager {
      *
      * @param   item    The item to repair
      */
-    public void unlock(ItemStack item) {
-        if (item != null && item.getItemMeta() instanceof Damageable damage) {
-            if (damage.getDamage() - 1 <= item.getType().getMaxDurability()) {
-                damage.setDamage(damage.getDamage() - 1);
+    public void unlock(ItemStack item, Integer durability) {
+        if (item != null) {
+            final CustomStack custom = CustomStack.byItemStack(item);
+            if (custom != null) {
+                if (Objects.equals(custom.getId(), "lock_tool") && custom.getDurability() + durability <= custom.getMaxDurability()) {
+                    custom.setDurability(custom.getDurability() + durability);
+                }
+            } else if (item.getItemMeta() instanceof Damageable damage && damage.getDamage() + durability <= item.getType().getMaxDurability()) {
+                damage.setDamage(damage.getDamage() + durability);
                 item.setItemMeta(damage);
-            } else {
-                player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1, 1);
-                item.setAmount(0);
             }
         }
+
         if (block != null) DataManager.locked.put(block, new UUID[]{new PlaceManager(block).getPlacer(), null});
     }
 
@@ -399,7 +419,7 @@ public class LockManager {
      */
     public boolean attemptUnlockDoubleChest(ItemStack item) {
         if (block.getState() instanceof Chest chest && chest.getInventory() instanceof DoubleChestInventory doubleChest) {
-            attemptUnlockDouble(item, doubleChest.getLeftSide().getLocation(), doubleChest.getRightSide().getLocation());
+            attemptUnlockDouble(item, 2, doubleChest.getLeftSide().getLocation(), doubleChest.getRightSide().getLocation());
             return true;
         }
         return false;
@@ -413,8 +433,8 @@ public class LockManager {
      * @return          True if unlock was successful, false if not
      */
     public boolean attemptUnlockDoor(ItemStack item) {
-        if (block.getType().toString().contains("_DOOR")) {
-            attemptUnlockDouble(item, Main.door(block)[0], Main.door(block)[1]);
+        if (block.getState() instanceof Door) {
+            attemptUnlockDouble(item, 1, Main.door(block)[0], Main.door(block)[1]);
             return true;
         }
         return false;
@@ -427,9 +447,9 @@ public class LockManager {
      * @param   one     The first block to unlock
      * @param   two     The second block to unlock
      */
-    private void attemptUnlockDouble(ItemStack item, Location one, Location two) {
-        for (final Location location : new Location[]{one, two}) new LockManager(location.getBlock(), player).unlock(null);
-        new LockManager(null, player).unlock(item);
+    private void attemptUnlockDouble(ItemStack item, int dmg, Location one, Location two) {
+        for (final Location location : new Location[]{one, two}) new LockManager(location.getBlock(), player).unlock(null, null);
+        unlock(item, dmg);
 
         player.playSound(player.getLocation(), Sound.BLOCK_CHEST_LOCKED, 1, 2);
         new MessageManager("locking.unlock.success")
@@ -471,7 +491,25 @@ public class LockManager {
      * @return  True if holding, false if not
      */
     public boolean holdingLockTool() {
-        return ItemManager.isSame(player.getInventory().getItemInMainHand(), getLockTool());
+        final ItemStack item = player.getInventory().getItemInMainHand();
+
+        final CustomStack itemCustom = CustomStack.byItemStack(item);
+        if (itemCustom != null) {
+            // ItemsAdder
+            return Objects.equals(itemCustom.getId(), "lock_tool");
+        } else {
+            // Vanilla
+            final ItemMeta oneMeta = item.getItemMeta();
+            final ItemMeta twoMeta = getLockTool().getItemMeta();
+            if (oneMeta != null && twoMeta != null) {
+                final boolean type = Objects.equals(item.getType(), getLockTool().getType());
+                final boolean displayName = Objects.equals(oneMeta.getDisplayName(), twoMeta.getDisplayName());
+                final boolean lore = Objects.equals(oneMeta.getLore(), twoMeta.getLore());
+                return type && displayName && lore;
+            }
+        }
+
+        return false;
     }
 
     /**

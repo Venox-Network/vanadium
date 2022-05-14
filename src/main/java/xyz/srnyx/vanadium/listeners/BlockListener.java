@@ -1,6 +1,7 @@
 package xyz.srnyx.vanadium.listeners;
 
 import org.apache.commons.lang.WordUtils;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -33,17 +34,13 @@ public class BlockListener implements Listener {
         final Player player = event.getPlayer();
         final Block block = event.getBlock();
 
-        // Check if Should Log Placer
-        if (new LockManager(block, null).isLockable()) {
-            new PlaceManager(block).attemptPlace(player);
-        }
+        // Check if it should log placer
+        if (new LockManager(block, null).isLockable()) new PlaceManager(block).attemptPlace(player);
 
-        // Check Holding Lock Tool
-        if (new LockManager(null, player).holdingLockTool()) {
-            event.setCancelled(true);
-        }
+        // Check if holding lock tool
+        if (new LockManager(null, player).holdingLockTool()) event.setCancelled(true);
 
-        // Check if Locked double chest or door
+        // Check if locked double chest or door
         new BukkitRunnable() {
             public void run() {
                 new LockManager(block, player).checkLockDoubleChest();
@@ -83,9 +80,7 @@ public class BlockListener implements Listener {
         }
 
         // Check if Should Remove Placer
-        if (new PlaceManager(block).isPlaced()) {
-            new PlaceManager(block).attemptUnplace();
-        }
+        if (new PlaceManager(block).isPlaced()) new PlaceManager(block).attemptUnplace();
     }
 
     /**
@@ -101,10 +96,7 @@ public class BlockListener implements Listener {
      */
     @EventHandler
     public void onFire(BlockBurnEvent event) {
-        final Block block = event.getBlock();
-        if (new LockManager(block, null).isLocked()) {
-            event.setCancelled(true);
-        }
+        if (new LockManager(event.getBlock(), null).isLocked()) event.setCancelled(true);
     }
 
     /**
