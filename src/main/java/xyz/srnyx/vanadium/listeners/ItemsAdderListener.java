@@ -45,6 +45,7 @@ public class ItemsAdderListener implements Listener {
                 // nyx_wand
                 if (leftClick && iam.holdingItem(false, "nyx_wand")) {
                     iam.cooldown();
+                    ItemsAdderManager.cooldowns.put(player.getUniqueId(), System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(Main.config.getInt("custom-items.cooldown")));
                     iam.durability(false, 2);
 
                     // TNT item
@@ -87,8 +88,10 @@ public class ItemsAdderListener implements Listener {
                 // chris_shield
                 if (rightClick && iam.holdingItem(true, "chris_shield")) {
                     iam.cooldown();
-                    player.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, player.getLocation(), 20, 1, 1, 1);
+                    ItemsAdderManager.cooldowns.put(player.getUniqueId(), System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(Main.config.getInt("custom-items.cooldown")));
                     iam.durability(true, 6);
+
+                    player.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, player.getLocation(), 20, 1, 1, 1);
 
                     // Damage entities
                     final World world = player.getWorld();
@@ -109,7 +112,7 @@ public class ItemsAdderListener implements Listener {
             // chris_axe
             if (iam.holdingItem(false, "chris_axe")) {
                 // Lightning
-                if (leftClick) {
+                if (leftClick && iam.notOnCooldown()) {
                     player.getWorld().strikeLightning(player.getTargetBlock(null, Main.config.getInt("custom-items.chris_axe.lightning.range")).getLocation());
                     iam.durability(false, 4);
                 }
@@ -145,6 +148,9 @@ public class ItemsAdderListener implements Listener {
             final BlockFace blockFace = event.getBlockFace();
             final Location loc = event.getClickedBlock().getLocation().add(blockFace.getModX(), blockFace.getModY(), blockFace.getModZ());
             CustomEntity.spawn("vanadium:nyx_dragon", loc);
+
+            // Remove egg if they are not in creative mode
+            if (player.getGameMode() != GameMode.CREATIVE) player.getInventory().setItemInMainHand(new ItemStack(Material.AIR));
         }
     }
 
@@ -154,12 +160,12 @@ public class ItemsAdderListener implements Listener {
     @EventHandler
     public void damageEntity(EntityDamageByEntityEvent event) {
         if (event.getEntity() instanceof Player victim && event.getDamager() instanceof LivingEntity attacker) {
-            final ItemsAdderManager ItemsAdderManager = new ItemsAdderManager(victim);
-            if (victim.isBlocking() && ItemsAdderManager.holdingItem(true, "chris_shield")) {
+            final ItemsAdderManager iam = new ItemsAdderManager(victim);
+            if (victim.isBlocking() && iam.holdingItem(true, "chris_shield")) {
                 if (new Random().nextInt(5) == 0) {
                     attacker.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, Main.config.getInt("custom-items.chris_shield.block.duration") * 20, 0));
                     attacker.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, attacker.getLocation().add(0, 1.5, 0), 1, 0, 2, 0, 0);
-                    ItemsAdderManager.durability(true, 3);
+                    iam.durability(true, 3);
 
                     if (attacker instanceof Player attackerPlayer) {
                         // Message sent to victim
@@ -171,7 +177,7 @@ public class ItemsAdderListener implements Listener {
                                 .replace("%victim%", victim.getPlayerListName())
                                 .send(attackerPlayer);
                     }
-                } else ItemsAdderManager.durability(true, 1);
+                } else iam.durability(true, 1);
             }
         }
     }

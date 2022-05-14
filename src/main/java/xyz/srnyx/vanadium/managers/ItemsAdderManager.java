@@ -5,6 +5,8 @@ import dev.lone.itemsadder.api.CustomStack;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 
+import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -20,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 public class ItemsAdderManager {
     private final Player player;
-    private final Map<UUID, Long> cooldowns = new ConcurrentHashMap<>();
+    public static final Map<UUID, Long> cooldowns = new ConcurrentHashMap<>();
     public static final Map<UUID, ItemStack> axes = new ConcurrentHashMap<>();
 
     /**
@@ -50,10 +52,6 @@ public class ItemsAdderManager {
                 }
             }
         }.runTaskTimer(Main.plugin, 0, 20);
-
-        // Cooldown stuff
-        cooldowns.remove(player.getUniqueId());
-        cooldowns.put(player.getUniqueId(), System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(Main.config.getInt("custom-items.cooldown")));
     }
 
     /**
@@ -62,8 +60,9 @@ public class ItemsAdderManager {
      * @return  True if the player is not on cooldown
      */
     public boolean notOnCooldown() {
-        if (cooldowns.containsKey(player.getUniqueId())) return (cooldowns.get(player.getUniqueId()) - System.currentTimeMillis()) <= 0;
-        return true;
+        if (cooldowns.containsKey(player.getUniqueId())) {
+            return (cooldowns.get(player.getUniqueId()) - System.currentTimeMillis()) <= 0;
+        } else return true;
     }
 
     /**
@@ -89,10 +88,29 @@ public class ItemsAdderManager {
      */
     public void durability(boolean offhand, int durability) {
         final CustomStack mainCustom = CustomStack.byItemStack(player.getInventory().getItemInMainHand());
-        if (mainCustom != null) mainCustom.setDurability(mainCustom.getDurability() - durability);
+        if (mainCustom != null) {
+            final int newDmg = mainCustom.getDurability() - durability;
+            mainCustom.setDurability(newDmg);
+
+            // Remove item if new durability is 0
+            if (newDmg <= 0) {
+                player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1, 1);
+                player.getInventory().setItemInMainHand(new ItemStack(Material.AIR));
+            }
+        }
+
         if (offhand) {
             final CustomStack offCustom = CustomStack.byItemStack(player.getInventory().getItemInOffHand());
-            if (offCustom != null) offCustom.setDurability(offCustom.getDurability() - durability);
+            if (offCustom != null) {
+                final int newDmg = offCustom.getDurability() - durability;
+                offCustom.setDurability(newDmg);
+
+                // Remove item if new durability is 0
+                if (newDmg <= 0) {
+                    player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1, 1);
+                    player.getInventory().setItemInOffHand(new ItemStack(Material.AIR));
+                }
+            }
         }
     }
 
