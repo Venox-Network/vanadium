@@ -40,7 +40,7 @@ public class TrustManager {
      * @return  True if trusted, false if not
      */
     public boolean isTrusted() {
-        return DataManager.trusted.get(opId).contains(player.getUniqueId());
+        return DataManager.trusted.get(opId) != null && DataManager.trusted.get(opId).contains(player.getUniqueId());
     }
 
     /**
@@ -49,24 +49,40 @@ public class TrustManager {
     public void trust() {
         if (new SlotManager("trusts", player).getCount() > getTrustedCount()) {
             final List<UUID> trusted = DataManager.trusted.get(player.getUniqueId());
-            if (trusted != null && !trusted.contains(opId) && opId != player.getUniqueId()) {
-                trusted.add(opId);
-                DataManager.trusted.put(player.getUniqueId(), trusted);
-                new MessageManager("trusting.trust.success")
-                        .replace("%player%", opName)
-                        .send(player);
+            if (opId != player.getUniqueId()) {
+                if (trusted != null) {
+                    if (!trusted.isEmpty()) {
+                        if (!trusted.contains(opId)) {
+                            trusted.add(opId);
+                            new MessageManager("trusting.trust.success")
+                                    .replace("%player%", opName)
+                                    .send(player);
+                        } else {
+                            new MessageManager("trusting.trust.fail")
+                                    .replace("%player%", opName)
+                                    .send(player);
+                        }
+                    } else {
+                        trusted.add(opId);
+                        new MessageManager("trusting.trust.success")
+                                .replace("%player%", opName)
+                                .send(player);
+                    }
+                } else {
+                    DataManager.trusted.put(player.getUniqueId(), List.of(opId));
+                    new MessageManager("trusting.trust.success")
+                            .replace("%player%", opName)
+                            .send(player);
+                }
             } else {
-                new MessageManager("trusting.trust.fail")
-                        .replace("%player%", opName)
+                new MessageManager("trusting.trust.self")
                         .send(player);
             }
-        } else {
-            new MessageManager("slots.limit")
+        } else new MessageManager("slots.limit")
                     .replace("%type%", "trust")
                     .replace("%target%", opName)
                     .replace("%total%", String.valueOf(new SlotManager("trusts", player).getCount())) //.replaceAll("\\.0*$|(\\.\\d*?)0+$", "$1")
                     .send(player);
-        }
     }
 
     /**
@@ -76,7 +92,6 @@ public class TrustManager {
         final List<UUID> trusted = DataManager.trusted.get(player.getUniqueId());
         if (trusted != null && trusted.contains(opId)) {
             trusted.remove(opId);
-            DataManager.trusted.put(player.getUniqueId(), trusted);
             new MessageManager("trusting.untrust.success")
                     .replace("%player%", opName)
                     .send(player);

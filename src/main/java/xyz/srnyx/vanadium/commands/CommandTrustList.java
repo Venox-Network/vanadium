@@ -22,39 +22,39 @@ public class CommandTrustList implements CommandExecutor {
         final Player player = (Player) sender;
 
         if (args.length == 1 && player.hasPermission("vanadium.trustlist.others")) {
-            Player targetPlayer = null;
             final OfflinePlayer target = PlayerManager.getOfflinePlayer(args[0]);
-            if (target != null) targetPlayer = Bukkit.getPlayer(target.getUniqueId());
 
-            if (targetPlayer == null) {
+            if (target != null) {
+                trusted(player, target);
+            } else {
                 new MessageManager("errors.invalid-player")
                         .replace("%player%", args[0])
                         .send(player);
-                return true;
             }
 
-            trusted(player, targetPlayer);
             return true;
         }
 
-        trusted(player, player);
+        trusted(player, Bukkit.getOfflinePlayer(player.getUniqueId()));
         return true;
     }
 
-    private void trusted(Player player, Player target) {
+    private void trusted(Player player, OfflinePlayer target) {
         final List<UUID> trusted = DataManager.trusted.get(target.getUniqueId());
+
         new MessageManager("trusting.list.header")
                 .replace("%player%", target.getName())
                 .send(player);
-        if (trusted.isEmpty()) {
-            new MessageManager("trusting.list.empty").send(player);
-        } else {
+
+        if (trusted != null && !trusted.isEmpty()) {
             for (final UUID id : trusted) {
-                final Player idPlayer = Bukkit.getPlayer(id);
+                final OfflinePlayer idPlayer = Bukkit.getOfflinePlayer(id);
                 new MessageManager("trusting.list.item")
-                        .replace("%player%", idPlayer != null ? idPlayer.getName() : null)
+                        .replace("%player%", idPlayer.getName())
                         .send(player);
             }
+        } else {
+            new MessageManager("trusting.list.empty").send(player);
         }
     }
 }

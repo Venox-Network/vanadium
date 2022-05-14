@@ -110,6 +110,7 @@ trusting:
   trust:
     success: "%prefix%Successfully trusted &3%player%"
     fail: "%prefix%&4%player% &cis already trusted"
+    self: "%prefix%&cYou can't trust yourself!"
 
   # %player%
   untrust:

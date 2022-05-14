@@ -27,12 +27,14 @@ public class CommandTrust implements TabExecutor {
 
         if (args.length == 1) {
             final OfflinePlayer target = PlayerManager.getOfflinePlayer(args[0]);
+
             if (target == null) {
                 new MessageManager("errors.invalid-player")
                         .replace("%player%", args[0])
                         .send(player);
                 return true;
             }
+
             new TrustManager(player, target).trust();
             return true;
         }
