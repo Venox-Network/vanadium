@@ -119,7 +119,7 @@ public class ItemsAdderManager {
      *
      * @param   arrow   The arrow representing the axe
      */
-    public void axe(Arrow arrow) {
+    public void axe(Arrow arrow, int slot) {
         // Update durability of axe before returning it
         final CustomStack axe = CustomStack.byItemStack(axes.get(player.getUniqueId()));
         if (axe != null) {
@@ -128,7 +128,11 @@ public class ItemsAdderManager {
         }
 
         // Return the axe and remove the arrow
-        player.getInventory().addItem(axes.get(player.getUniqueId()));
+        if (player.getInventory().getItem(slot) == null) {
+            player.getInventory().setItem(slot, axes.get(player.getUniqueId()));
+        } else {
+            player.getInventory().addItem(axes.get(player.getUniqueId()));
+        }
         axes.remove(player.getUniqueId());
         arrow.remove();
     }

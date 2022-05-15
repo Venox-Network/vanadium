@@ -119,6 +119,8 @@ public class ItemsAdderListener implements Listener {
 
                 // Throw
                 if (rightClick) {
+                    int slot = player.getInventory().getHeldItemSlot();
+
                     // Remove axe
                     ItemsAdderManager.axes.put(player.getUniqueId(), player.getInventory().getItemInMainHand().clone());
                     player.getInventory().setItemInMainHand(new ItemStack(Material.AIR));
@@ -136,7 +138,7 @@ public class ItemsAdderListener implements Listener {
                     // Remove arrow after a few seconds
                     new BukkitRunnable() {
                         public void run() {
-                            if (arrow.isValid()) iam.axe(arrow);
+                            if (arrow.isValid()) iam.axe(arrow, slot);
                         }
                     }.runTaskLater(Main.plugin, Main.config.getInt("custom-items.chris_axe.throw.return") * 20L);
                 }
@@ -189,7 +191,7 @@ public class ItemsAdderListener implements Listener {
     public void projectile(ProjectileHitEvent event) {
         if (event.getEntity() instanceof Arrow arrow && arrow.getShooter() instanceof Player player) {
             if (arrow.getCustomName() != null && arrow.getCustomName().equals(ChatColor.DARK_AQUA + "" + ChatColor.BOLD + "AXE")) {
-                new ItemsAdderManager(player).axe(arrow);
+                new ItemsAdderManager(player).axe(arrow, player.getInventory().getHeldItemSlot());
 
                 // Play hit sound
                 if (event.getHitEntity() != null) player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, (float) 0.1, 1);
