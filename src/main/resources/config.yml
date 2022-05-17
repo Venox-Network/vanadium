@@ -71,3 +71,8 @@ custom-items:
       fuse: 3
       # True if the TNT should explode blocks
       blocks: false
+
+  # vanadium:vanadium_crossbow
+  vanadium_crossbow:
+    # Speed of the Ender Pearl
+    speed: 1.5
