@@ -51,20 +51,13 @@ public class TrustManager {
             final List<UUID> trusted = DataManager.trusted.get(player.getUniqueId());
             if (opId != player.getUniqueId()) {
                 if (trusted != null) {
-                    if (!trusted.isEmpty()) {
-                        if (!trusted.contains(opId)) {
-                            trusted.add(opId);
-                            new MessageManager("trusting.trust.success")
-                                    .replace("%player%", opName)
-                                    .send(player);
-                        } else {
-                            new MessageManager("trusting.trust.fail")
-                                    .replace("%player%", opName)
-                                    .send(player);
-                        }
-                    } else {
+                    if (trusted.isEmpty() || !trusted.contains(opId)) {
                         trusted.add(opId);
                         new MessageManager("trusting.trust.success")
+                                .replace("%player%", opName)
+                                .send(player);
+                    } else {
+                        new MessageManager("trusting.trust.fail")
                                 .replace("%player%", opName)
                                 .send(player);
                     }
