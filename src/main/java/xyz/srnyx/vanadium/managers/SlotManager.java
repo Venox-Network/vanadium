@@ -35,15 +35,6 @@ public class SlotManager {
     }
 
     /**
-     * Constructor for SlotManager
-     *
-     * @param   type    The type of slot ({@code locks} or {@code trusts})
-     */
-    public SlotManager(String type) {
-        if (type != null) this.type = type;
-    }
-
-    /**
      * Start {@code player}'s cooldown
      */
     public void start() {
@@ -111,20 +102,22 @@ public class SlotManager {
     /**
      * Adds/removes slots when the cooldown reaches 0
      */
-    public void check() {
-        new BukkitRunnable() {
-            public void run() {
-                for (final Player online : Bukkit.getOnlinePlayers()) {
-                    final SlotManager slot = new SlotManager(type, online);
-                    if (slot.contains() && (slot.timeLeft() == null || slot.timeLeft() <= 0)) {
-                        if (PlayerManager.isAFK(online)) {
-                            slot.stop();
-                            slot.start();
-                        } else slot.addSlot();
+    public static void check() {
+        for (String types : new String[]{"locks", "trusts"}) {
+            new BukkitRunnable() {
+                public void run() {
+                    for (final Player online : Bukkit.getOnlinePlayers()) {
+                        final SlotManager slot = new SlotManager(types, online);
+                        if (slot.contains() && (slot.timeLeft() == null || slot.timeLeft() <= 0)) {
+                            if (PlayerManager.isAFK(online)) {
+                                slot.stop();
+                                slot.start();
+                            } else slot.addSlot();
+                        }
                     }
                 }
-            }
-        }.runTaskTimer(Main.plugin, 0, 1);
+            }.runTaskTimer(Main.plugin, 0, 1);
+        }
     }
 
     /**

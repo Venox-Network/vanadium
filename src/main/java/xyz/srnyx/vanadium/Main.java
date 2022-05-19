@@ -31,8 +31,8 @@ public class Main extends JavaPlugin {
      */
     @Override
     public void onEnable() {
-        plugin = this;
         final PluginManager pm = Bukkit.getPluginManager();
+        plugin = this;
 
         // Create config files
         new FileManager("config.yml", false).create();
@@ -46,11 +46,10 @@ public class Main extends JavaPlugin {
 
         // Other stuff
         loadFiles();
-        registerRecipes();
         new DataManager().onEnable();
-        new LockManager(null, null).check();
-        new SlotManager("locks").check();
-        new SlotManager("trusts").check();
+        registerRecipes();
+        LockManager.check();
+        SlotManager.check();
 
         // Startup messages
         getLogger().info(ChatColor.DARK_AQUA + "=================");
@@ -61,6 +60,7 @@ public class Main extends JavaPlugin {
         registerCommand("bypass", new CommandBypass(), new TabEmpty());
         registerCommand("locktool", new CommandLockTool(), null);
         registerCommand("vreload", new CommandReload(), new TabEmpty());
+        registerCommand("vsave", new CommandSave(), new TabEmpty());
         registerCommand("slot", new CommandSlot(), null);
         registerCommand("trust", new CommandTrust(), null);
         registerCommand("trustlist", new CommandTrustList(), null);
@@ -71,11 +71,11 @@ public class Main extends JavaPlugin {
         pm.registerEvents(new InteractListener(), this);
         pm.registerEvents(new JoinLeaveListener(), this);
         pm.registerEvents(new MoveListener(), this);
-        pm.registerEvents(new ItemsAdderListener(), this);
 
         // Register plugin-specific stuff
         if (pm.getPlugin("DiscordSRV") != null) DiscordSRV.api.subscribe(new DiscordListener());
         if (pm.getPlugin("PlaceholderAPI") != null) new PlaceholderManager().register();
+        if (pm.getPlugin("ItemsAdder") != null) pm.registerEvents(new ItemsAdderListener(), this);
     }
 
     /**
@@ -99,7 +99,7 @@ public class Main extends JavaPlugin {
     /**
      * Register a command to the server
      *
-     * @param   name        The name of the plugin
+     * @param   name        The name of the command
      * @param   executor    The command executor
      * @param   completer   The tab completer ({@code null} = online players)
      */
@@ -129,6 +129,15 @@ public class Main extends JavaPlugin {
             // Add recipes
             Bukkit.getServer().addRecipe(locktool);
         }
+    }
+
+    /**
+     * Checks if ItemsAdder is installed
+     *
+     * @return  {@code true} if ItemsAdder is installed, {@code false} otherwise
+     */
+    public static boolean itemsAdderInstalled() {
+        return Bukkit.getPluginManager().getPlugin("ItemsAdder") != null;
     }
 
     /**

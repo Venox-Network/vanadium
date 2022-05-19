@@ -9,6 +9,7 @@ api-version: 1.18
 softdepend:
   - PlaceholderAPI
   - EssentialsX
+  - ItemsAdder
 depend:
   - DiscordSRV
 
@@ -37,6 +38,10 @@ commands:
     description: "Reloads the plugin files"
     usage: "Usage: /<command>"
     permission: vanadium.reload
+  vsave:
+    description: "Saves the plugin data"
+    usage: "Usage: /<command>"
+    permission: vanadium.save
   slot:
     description: "Manages player slots"
     usage: "Usage: /<command> <player> <type> [action] [amount]"
@@ -56,6 +61,7 @@ permissions:
       - vanadium.bypass
       - vanadium.untrust
       - vanadium.reload
+      - vanadium.save
       - vanadium.slot
   vanadium.bypass:
     description: "Gives access to /bypass"
@@ -76,7 +82,9 @@ permissions:
   vanadium.trust:
     description: "Gives access to /trust"
   vanadium.reload:
-    description: "Gives access to /reload"
+    description: "Gives access to /vreload"
+  vanadium.save:
+    description: "Gives access to /vsave"
   vanadium.slot:
     description: "Gives access to /slot"
   vanadium.multiplier.#:

@@ -29,8 +29,8 @@ lock-tool:
 # Amount of time to wait before giving a new slot.
 # Time unit is minutes.
 slot-cooldowns:
-  locks: 10
-  trusts: 30
+  locks: 30
+  trusts: 40
 
 
 # Settings for ItemsAdder custom items
@@ -68,7 +68,7 @@ custom-items:
   nyx_wand:
     tnt:
       # How long until the TNT explodes
-      fuse: 3
+      fuse: 1
       # True if the TNT should explode blocks
       blocks: false
 

@@ -168,8 +168,8 @@ public class ItemsAdderListener implements Listener {
         }
 
         // vanadium_crossbow
-        if (iam.holdingItem(true, "vanadium_crossbow") && cooldown && player.getInventory().getItemInMainHand().getItemMeta() instanceof CrossbowMeta cb) {
-            if (cb.hasChargedProjectiles() && rightClick) {
+        if (iam.holdingItem(true, "vanadium_crossbow") && rightClick && cooldown) {
+            if (player.getInventory().getItemInMainHand().getItemMeta() instanceof CrossbowMeta cb && cb.hasChargedProjectiles()) {
                 // Summon pearl
                 final Location loc = player.getEyeLocation().add(player.getLocation().getDirection());
                 final EnderPearl pearl = (EnderPearl) player.getWorld().spawnEntity(loc, EntityType.ENDER_PEARL);
@@ -213,8 +213,8 @@ public class ItemsAdderListener implements Listener {
      */
     @EventHandler
     public void shoot(EntityShootBowEvent event) {
-        if (event.getBow() != null) {
-            CustomStack custom = CustomStack.byItemStack(event.getBow());
+        if (event.getBow() != null && Main.itemsAdderInstalled()) {
+            final CustomStack custom = CustomStack.byItemStack(event.getBow());
             if (custom != null && custom.getId().equals("vanadium_crossbow")) {
                 event.setCancelled(true);
             }
