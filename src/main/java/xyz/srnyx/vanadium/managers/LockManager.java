@@ -92,7 +92,7 @@ public class LockManager {
                 if (owner != null) {
                     if (owner.equals(player.getUniqueId())) {
                         owned.add(key.getLocation());
-                    } else if (new TrustManager(player, Bukkit.getOfflinePlayer(owner)).isTrusted()) {
+                    } else if (new TrustManager(player, Bukkit.getOfflinePlayer(owner)).isTrusted(key)) {
                         trusted.add(key.getLocation());
                     } else {
                         locked.add(key.getLocation());
@@ -218,13 +218,14 @@ public class LockManager {
      *
      * @param   item    The item to damage
      */
-    public void lock(ItemStack item, Integer durability) {
+    public void lock(ItemStack item, Integer dmg) {
         if (item != null) {
-            final CustomStack custom = CustomStack.byItemStack(item);
-            if (custom != null) {
-                if (Objects.equals(custom.getId(), "lock_tool")) {
-                    final int newDmg = custom.getDurability() - durability;
-                    custom.setDurability(custom.getDurability() - durability);
+            if (Main.itemsAdderInstalled()) {
+                // ItemsAdder
+                final CustomStack custom = CustomStack.byItemStack(item);
+                if (custom != null && Objects.equals(custom.getId(), "lock_tool")) {
+                    final int newDmg = custom.getDurability() - dmg;
+                    custom.setDurability(custom.getDurability() - dmg);
 
                     // Remove item if new durability is 0
                     if (newDmg <= 0) {
@@ -232,13 +233,16 @@ public class LockManager {
                         item.setAmount(0);
                     }
                 }
-            } else if (item.getItemMeta() instanceof Damageable damage) {
-                final int newDmg = damage.getDamage() - durability;
-                damage.setDamage(damage.getDamage() - durability);
-                item.setItemMeta(damage);
+            } else if (item.getItemMeta() instanceof Damageable damageable) {
+                // Vanilla
+                int newDmg = damageable.getDamage() + dmg;
+                if (damageable.getDamage() == 0) newDmg = dmg;
+
+                damageable.setDamage(newDmg);
+                item.setItemMeta(damageable);
 
                 // Remove item if new durability is 0
-                if (newDmg <= 0) {
+                if (newDmg >= item.getType().getMaxDurability()) {
                     player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1, 1);
                     item.setAmount(0);
                 }
@@ -393,20 +397,24 @@ public class LockManager {
      *
      * @param   item    The item to repair
      */
-    public void unlock(ItemStack item, Integer durability) {
+    public void unlock(ItemStack item, Integer repair) {
         if (item != null) {
-            final CustomStack custom = CustomStack.byItemStack(item);
-            if (custom != null) {
-                if (Objects.equals(custom.getId(), "lock_tool") && custom.getDurability() + durability <= custom.getMaxDurability()) {
-                    custom.setDurability(custom.getDurability() + durability);
+            if (Main.itemsAdderInstalled()) {
+                // ItemsAdder
+                final CustomStack custom = CustomStack.byItemStack(item);
+                if (custom != null && Objects.equals(custom.getId(), "lock_tool") && custom.getDurability() + repair <= custom.getMaxDurability()) {
+                    custom.setDurability(custom.getDurability() + repair);
                 }
-            } else if (item.getItemMeta() instanceof Damageable damage && damage.getDamage() + durability <= item.getType().getMaxDurability()) {
-                damage.setDamage(damage.getDamage() + durability);
+            } else if (item.getItemMeta() instanceof Damageable damage && damage.getDamage() - repair <= item.getType().getMaxDurability()) {
+                damage.setDamage(damage.getDamage() - repair);
                 item.setItemMeta(damage);
             }
         }
 
-        if (block != null) DataManager.locked.put(block, new UUID[]{new PlaceManager(block).getPlacer(), null});
+        if (block != null) {
+            DataManager.locked.put(block, new UUID[]{new PlaceManager(block).getPlacer(), null});
+            DataManager.lockedTrusted.remove(block);
+        }
     }
 
     /**
@@ -492,10 +500,10 @@ public class LockManager {
     public boolean holdingLockTool() {
         final ItemStack item = player.getInventory().getItemInMainHand();
 
-        final CustomStack itemCustom = CustomStack.byItemStack(item);
-        if (itemCustom != null) {
+        if (Main.itemsAdderInstalled()) {
             // ItemsAdder
-            return Objects.equals(itemCustom.getId(), "lock_tool");
+            final CustomStack itemCustom = CustomStack.byItemStack(item);
+            if (itemCustom != null) return Objects.equals(itemCustom.getId(), "lock_tool");
         } else {
             // Vanilla
             final ItemMeta oneMeta = item.getItemMeta();
@@ -514,7 +522,7 @@ public class LockManager {
     /**
      * Checks if locked block types are still the same as the saved types
      */
-    public void check() {
+    public static void check() {
         for (final Block key : DataManager.locked.keySet()) {
             if (!key.getType().equals(DataManager.lockedType.get(key))) {
                 DataManager.locked.remove(key);

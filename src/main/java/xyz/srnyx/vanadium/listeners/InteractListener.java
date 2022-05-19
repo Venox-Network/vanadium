@@ -44,7 +44,7 @@ public class InteractListener implements Listener {
         // Check if locked
         if (block != null && new LockManager(block, player).isLockedForPlayer()) {
             final UUID owner = new LockManager(block, null).getLocker();
-            if (owner != null && !new TrustManager(player, Bukkit.getOfflinePlayer(owner)).isTrusted()) {
+            if (owner != null && !new TrustManager(player, Bukkit.getOfflinePlayer(owner)).isTrusted(block)) {
                 if (!(player.hasPermission("vanadium.command.bypass") && (player.isSneaking() || PlayerManager.hasScoreboardTag(player, "bypass")))) {
                     player.playSound(player.getLocation(), Sound.BLOCK_CHEST_LOCKED, 1, 1);
                     event.setCancelled(true);

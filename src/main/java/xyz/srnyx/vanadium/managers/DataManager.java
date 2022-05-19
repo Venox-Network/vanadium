@@ -16,14 +16,18 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DataManager {
     public static final Map<Block, UUID[]> locked = new ConcurrentHashMap<>();
     public static final Map<Block, Material> lockedType = new ConcurrentHashMap<>();
+    public static final Map<Block, List<UUID>> lockedTrusted = new ConcurrentHashMap<>();
+
     public static final Map<UUID, List<UUID>> trusted = new ConcurrentHashMap<>();
+
     public static final Map<UUID, int[]> slots = new ConcurrentHashMap<>();
+
 
     /**
      * Converts data on file to data in maps on plugin enable
      */
     public void onEnable() {
-        // locked
+        // locked, lockedType, lockedTrusted
         final YamlConfiguration dataLocked = new FileManager("locked.yml", true).load();
         for (final String key : dataLocked.getKeys(false)) {
             final String[] args = key.split("=");
@@ -31,22 +35,25 @@ public class DataManager {
             final int x = Integer.parseInt(args[1]);
             final int y = Integer.parseInt(args[2]);
             final int z = Integer.parseInt(args[3]);
-
-            final Block block = world != null ? world.getBlockAt(x, y, z) : null;
-            UUID placer = null;
-            UUID locker = null;
             final Material type = Material.valueOf(args[4]);
 
+            final Block block = world != null ? world.getBlockAt(x, y, z) : null;
+
+            UUID placer = null;
             final String placerString = dataLocked.getString(key + ".placer");
             if (placerString != null) placer = UUID.fromString(placerString);
 
+            UUID locker = null;
             final String lockerString = dataLocked.getString(key + ".locker");
             if (lockerString != null) locker = UUID.fromString(lockerString);
 
+            final List<UUID> trustedPlayers = new ArrayList<>();
+            for (final String key2 : dataLocked.getStringList(key + ".trusted")) trustedPlayers.add(UUID.fromString(key2));
+
             locked.put(block, new UUID[]{placer, locker});
             lockedType.put(block, type);
+            lockedTrusted.put(block, trustedPlayers);
         }
-
 
         // trusted
         final YamlConfiguration dataTrusted = new FileManager("trusted.yml", true).load();
@@ -55,7 +62,6 @@ public class DataManager {
             for (final String key2 : dataTrusted.getStringList(key)) trustedPlayers.add(UUID.fromString(key2));
             trusted.put(UUID.fromString(key), trustedPlayers);
         }
-
 
         // slots
         final YamlConfiguration dataSlots = new FileManager("slots.yml", true).load();
@@ -85,18 +91,22 @@ public class DataManager {
         // locked.yml
         final YamlConfiguration lockedYaml = new YamlConfiguration();
         for (final Block block : locked.keySet()) {
-            final String id = block.getWorld().getName() + "=" + block.getX() + "=" + block.getY() + "=" + block.getZ() + "=" + DataManager.lockedType.get(block);
+            final String id = block.getWorld().getName() + "=" + block.getX() + "=" + block.getY() + "=" + block.getZ() + "=" + lockedType.get(block);
 
             String placerString = null;
             final UUID placer = new PlaceManager(block).getPlacer();
             if (placer != null) placerString = placer.toString();
+            lockedYaml.set(id + ".placer", placerString);
 
             String lockerString = null;
             final UUID locker = new LockManager(block, null).getLocker();
             if (locker != null) lockerString = locker.toString();
-
-            lockedYaml.set(id + ".placer", placerString);
             lockedYaml.set(id + ".locker", lockerString);
+
+            final List<UUID> list = lockedTrusted.get(block);
+            final List<String> trustedPlayers = new ArrayList<>();
+            if (list != null && !list.isEmpty()) for (final UUID trustedPlayer : list) trustedPlayers.add(trustedPlayer.toString());
+            lockedYaml.set(id + ".trusted", trustedPlayers);
         }
         // Save to file
         try {

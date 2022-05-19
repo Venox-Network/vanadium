@@ -94,6 +94,8 @@ locking:
 
 # %target% = The targeted player in the command
 bypass:
+  actionbar: "&bBypass is currently enabled"
+
   enabled:
     self: "%prefix%Enabled bypass"
     # %target%
@@ -104,28 +106,42 @@ bypass:
     # %target%
     other: "%prefix%Disabled bypass for &3%target%"
 
-  actionbar: "&bBypass is currently enabled"
-
 
 # %player% = The targeted player in the command
+# %block% = Targeted block
 trusting:
+  self: "%prefix%&cYou can't trust yourself!"
+
   list:
-    # %player% = The player that used /trustlist or the first argument of /trustlist
-    header: "&3&l%player%'s Trustlist"
-    empty: "&b&oNo players trusted"
     # %player% = A player that's trusted
     item: "&3- &b%player%"
+    empty: "&b&oNo players trusted"
 
-  # %player%
-  trust:
-    success: "%prefix%Successfully trusted &3%player%"
-    fail: "%prefix%&4%player% &cis already trusted"
-    self: "%prefix%&cYou can't trust yourself!"
+  master:
+    # %player% = The player that used /trustlist or the target player
+    list-header: "&3&l%player%'s Trustlist"
 
-  # %player%
-  untrust:
-    success: "%prefix%Successfully untrusted &3%player%"
-    fail: "%prefix%&cYou don't have &4%player% &ctrusted"
+    # %player%
+    trust:
+     success: "%prefix%Successfully trusted &3%player%"
+     fail: "%prefix%&4%player% &cis already trusted"
+
+    # %player%
+    untrust:
+      success: "%prefix%Successfully untrusted &3%player%"
+      fail: "%prefix%&cYou don't have &4%player% &ctrusted"
+
+  # %player%, %block%
+  block:
+    list-header: "&3&l%player%'s Trustlist for %block%"
+
+    trust:
+      success: "%prefix%Successfully trusted &3%player%&b to &3%block%"
+      fail: "%prefix%&4%player% &cis already trusted to &4%block%"
+
+    untrust:
+      success: "%prefix%Successfully untrusted &3%player%&b from &3%block%"
+      fail: "%prefix%&cYou don't have &4%player% &ctrusted to &4%block%"
 
 
 # %seconds% = The number of seconds left in cooldown
