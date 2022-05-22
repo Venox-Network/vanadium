@@ -124,7 +124,7 @@ public class Main extends JavaPlugin {
                             " S ",
                             "S  ")
                     .setIngredient('S', Material.STICK)
-                    .setIngredient('A', Material.GOLD_INGOT);
+                    .setIngredient('A', Material.AMETHYST_SHARD);
 
             // Add recipes
             Bukkit.getServer().addRecipe(locktool);

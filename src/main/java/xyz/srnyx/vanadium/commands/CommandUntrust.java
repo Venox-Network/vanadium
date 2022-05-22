@@ -8,7 +8,13 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
-import xyz.srnyx.vanadium.managers.*;
+import org.jetbrains.annotations.NotNull;
+
+import xyz.srnyx.vanadium.managers.LockManager;
+import xyz.srnyx.vanadium.managers.MessageManager;
+import xyz.srnyx.vanadium.managers.PlayerManager;
+import xyz.srnyx.vanadium.managers.TrustManager;
+import xyz.srnyx.vanadium.managers.DataManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,9 +22,8 @@ import java.util.Objects;
 import java.util.UUID;
 
 
-@SuppressWarnings("NullableProblems")
 public class CommandUntrust implements TabExecutor {
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
         if (PlayerManager.isNotPlayer(sender)) return true;
         if (PlayerManager.noPermission(sender, "vanadium.untrust")) return true;
         final Player player = (Player) sender;
@@ -46,8 +51,13 @@ public class CommandUntrust implements TabExecutor {
                     return true;
                 }
 
-                if (Objects.equals(args[0], "block") && block != null && !lock.isLockedForPlayer()) {
-                    new TrustManager(player, target).untrustBlock(block);
+                if (Objects.equals(args[0], "block") && block != null) {
+                    if (!lock.isLockedForPlayer()) {
+                        new TrustManager(player, target).untrustBlock(block);
+                        return true;
+                    }
+
+                    new TrustManager(player, null).locked(block);
                     return true;
                 }
             }
@@ -57,7 +67,7 @@ public class CommandUntrust implements TabExecutor {
         return true;
     }
 
-    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, String[] args) {
         final List<String> suggestions = new ArrayList<>();
         final List<String> results = new ArrayList<>();
         final Player player = (Player) sender;

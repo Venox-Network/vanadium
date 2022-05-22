@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+
 @SuppressWarnings("unused")
 public class CooldownManager {
     private final UUID player;

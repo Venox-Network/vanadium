@@ -6,14 +6,15 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import org.jetbrains.annotations.NotNull;
+
 import xyz.srnyx.vanadium.managers.LockManager;
 import xyz.srnyx.vanadium.managers.MessageManager;
 import xyz.srnyx.vanadium.managers.PlayerManager;
 
 
 public class CommandLockTool implements CommandExecutor {
-    @SuppressWarnings("NullableProblems")
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
         if (PlayerManager.noPermission(sender, "vanadium.locktool")) return true;
         final Player player = (Player) sender;
 

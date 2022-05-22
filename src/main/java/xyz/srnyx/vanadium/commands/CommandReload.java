@@ -6,6 +6,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import org.jetbrains.annotations.NotNull;
+
 import xyz.srnyx.vanadium.Main;
 import xyz.srnyx.vanadium.managers.MessageManager;
 import xyz.srnyx.vanadium.managers.PlayerManager;
@@ -13,8 +15,7 @@ import xyz.srnyx.vanadium.managers.SlotManager;
 
 
 public class CommandReload implements CommandExecutor {
-    @SuppressWarnings("NullableProblems")
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
         if (PlayerManager.noPermission(sender, "vanadium.reload")) return true;
 
         Main.loadFiles();

@@ -30,7 +30,7 @@ public class BlockListener implements Listener {
      * Called when a block is placed
      */
     @EventHandler
-    public void onPlaceBlock(BlockPlaceEvent event) {
+    public void onBlockPlace(BlockPlaceEvent event) {
         final Player player = event.getPlayer();
         final Block block = event.getBlock();
 
@@ -53,7 +53,7 @@ public class BlockListener implements Listener {
      * Called when a block is broken
      */
     @EventHandler
-    public void onBreakBlock(BlockBreakEvent event) {
+    public void onBlockBreak(BlockBreakEvent event) {
         final Player player = event.getPlayer();
 
         // Check Holding Lock Tool
@@ -95,7 +95,7 @@ public class BlockListener implements Listener {
      * Called when a block burns
      */
     @EventHandler
-    public void onFire(BlockBurnEvent event) {
+    public void onBurn(BlockBurnEvent event) {
         if (new LockManager(event.getBlock(), null).isLocked()) event.setCancelled(true);
     }
 
@@ -103,7 +103,7 @@ public class BlockListener implements Listener {
      * Called when an item is moved from one inventory to another
      */
     @EventHandler
-    public void onHopper(InventoryMoveItemEvent event) {
+    public void onInventoryMove(InventoryMoveItemEvent event) {
         if (event.getSource().getLocation() != null && event.getDestination().getLocation() != null && event.getDestination().getType() == InventoryType.HOPPER) {
             final UUID sourceOwner = new LockManager(event.getSource().getLocation().getBlock(), null).getLocker();
             final UUID destinationOwner = new LockManager(event.getDestination().getLocation().getBlock(), null).getLocker();

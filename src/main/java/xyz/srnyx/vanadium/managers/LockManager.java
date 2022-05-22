@@ -11,8 +11,8 @@ import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
-
 import org.bukkit.inventory.meta.ItemMeta;
+
 import xyz.srnyx.vanadium.Main;
 
 import org.apache.commons.lang.WordUtils;
