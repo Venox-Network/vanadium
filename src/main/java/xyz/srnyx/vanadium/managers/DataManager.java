@@ -105,8 +105,10 @@ public class DataManager {
 
             final List<UUID> list = lockedTrusted.get(block);
             final List<String> trustedPlayers = new ArrayList<>();
-            if (list != null && !list.isEmpty()) for (final UUID trustedPlayer : list) trustedPlayers.add(trustedPlayer.toString());
-            lockedYaml.set(id + ".trusted", trustedPlayers);
+            if (list != null && !list.isEmpty()) {
+                for (final UUID trustedPlayer : list) trustedPlayers.add(trustedPlayer.toString());
+                lockedYaml.set(id + ".trusted", trustedPlayers);
+            } else lockedYaml.set(id + ".trusted", null);
         }
         // Save to file
         try {
