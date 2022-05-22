@@ -103,7 +103,7 @@ public class SlotManager {
      * Adds/removes slots when the cooldown reaches 0
      */
     public static void check() {
-        for (String types : new String[]{"locks", "trusts"}) {
+        for (final String types : new String[]{"locks", "trusts"}) {
             new BukkitRunnable() {
                 public void run() {
                     for (final Player online : Bukkit.getOnlinePlayers()) {

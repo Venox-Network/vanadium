@@ -30,17 +30,16 @@ public class PlaceholderManager extends PlaceholderExpansion {
 
     @Override
     public String onPlaceholderRequest(Player player, String params) {
-        final boolean afk = PlayerManager.isAFK(player);
-
         // %v_locked%
         if (params.equalsIgnoreCase("locked")) return String.valueOf(new LockManager(null, player).getLockedCount());
 
         // %v_trusted%
         if (params.equalsIgnoreCase("trusted")) return String.valueOf(new TrustManager(player, null).getTrustedCount());
 
-
         // %v_locks%
         if (params.equalsIgnoreCase("locks")) return String.valueOf(new SlotManager("locks", player).getCount());
+
+        final boolean afk = PlayerManager.isAFK(player);
 
         // %v_locks_time%
         if (params.equalsIgnoreCase("locks_time")) {
@@ -49,7 +48,6 @@ public class PlaceholderManager extends PlaceholderExpansion {
             }
             return "N/A";
         }
-
 
         // %v_trusts%
         if (params.equalsIgnoreCase("trusts")) return String.valueOf(new SlotManager("trusts", player).getCount());
@@ -61,7 +59,6 @@ public class PlaceholderManager extends PlaceholderExpansion {
             }
             return "N/A";
         }
-
 
         return null;
     }
