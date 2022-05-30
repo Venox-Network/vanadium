@@ -1,6 +1,6 @@
 description = "Vanadium"
-version = "0.3.1"
-group = "xyz.srnyx"
+version = "0.4.0"
+group = "network.venox"
 
 plugins {
     id("java")
