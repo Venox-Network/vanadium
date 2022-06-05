@@ -21,6 +21,7 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.CrossbowMeta;
+import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -169,10 +170,17 @@ public class ItemsAdderListener implements Listener {
         // vanadium_crossbow
         if (iam.holdingItem(true, "vanadium_crossbow") && rightClick && cooldown) {
             if (player.getInventory().getItemInMainHand().getItemMeta() instanceof CrossbowMeta cb && cb.hasChargedProjectiles()) {
+                // Velocity multiplier
+                double multiplier = Main.config.getDouble("custom-items.vanadium_crossbow.speed.arrow");
+                for (ItemStack list : cb.getChargedProjectiles()) if (list.getItemMeta() instanceof FireworkMeta meta) {
+                    final int power = meta.getPower();
+                    if (power != 0) multiplier = Main.config.getDouble("custom-items.vanadium_crossbow.speed.firework." + power);
+                }
+
                 // Summon pearl
                 final Location loc = player.getEyeLocation().add(player.getLocation().getDirection());
                 final EnderPearl pearl = (EnderPearl) player.getWorld().spawnEntity(loc, EntityType.ENDER_PEARL);
-                pearl.setVelocity(player.getEyeLocation().getDirection().multiply(Main.config.getDouble("custom-items.vanadium_crossbow.speed")));
+                pearl.setVelocity(player.getEyeLocation().getDirection().multiply(multiplier));
                 pearl.setPersistent(true);
                 pearl.setShooter(player);
             }
