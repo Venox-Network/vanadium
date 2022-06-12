@@ -4,6 +4,8 @@ import network.venox.vanadium.managers.DataManager;
 import network.venox.vanadium.managers.LockManager;
 import network.venox.vanadium.managers.MessageManager;
 import network.venox.vanadium.managers.PlayerManager;
+import network.venox.vanadium.managers.TrustManager;
+
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
@@ -13,8 +15,6 @@ import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
 import org.jetbrains.annotations.NotNull;
-
-import network.venox.vanadium.managers.TrustManager;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -68,11 +68,9 @@ public class ItemsAdderListener implements Listener {
             final Map<Item, Long> timer = new ConcurrentHashMap<>();
             timer.put(tnt, System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(fuse));
             // Decimal formatting stuff
-            final BukkitRunnable runnable = new BukkitRunnable() {
-                public void run() {
-                    tnt.setCustomName(ChatColor.RED + "" + ChatColor.BOLD + Math.round((timer.get(tnt) - System.currentTimeMillis()) / 100.0) / 10.0);
-                }
-            };
+            final BukkitRunnable runnable = new BukkitRunnable() {public void run() {
+                tnt.setCustomName(ChatColor.RED + "" + ChatColor.BOLD + Math.round((timer.get(tnt) - System.currentTimeMillis()) / 100.0) / 10.0);
+            }};
             runnable.runTaskTimer(Main.plugin, 0, 1);
 
             // Creeper
@@ -110,16 +108,15 @@ public class ItemsAdderListener implements Listener {
             // Damage entities
             final World world = player.getWorld();
             for (final Entity entity : world.getEntities()) {
-                if (entity instanceof LivingEntity entityLiving && entityLiving != player && entityLiving.hasLineOfSight(player)) {
-                    if (entityLiving.getLocation().distance(player.getLocation()) <= Main.config.getInt("custom-items.chris_shield.damage.range")) {
-                        if (entityLiving instanceof Player livingPlayer) {
-                            if (!livingPlayer.isBlocking())
-                                DamageManager.damage(entityLiving, Main.config.getInt("custom-items.chris_shield.damage.amount"));
-                        } else DamageManager.damage(entityLiving, Main.config.getInt("custom-items.chris_shield.damage.amount"));
+                if (!(entity instanceof LivingEntity entityLiving) || entityLiving == player || !entityLiving.hasLineOfSight(player)) return;
+                if (entityLiving.getLocation().distance(player.getLocation()) > Main.config.getInt("custom-items.chris_shield.damage.range")) return;
 
-                        entityLiving.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, entityLiving.getLocation().add(0, 1.5, 0), 1, 0, 0, 0);
-                    }
-                }
+                if (entityLiving instanceof Player livingPlayer) {
+                    if (livingPlayer.isBlocking()) return;
+                    DamageManager.damage(entityLiving, Main.config.getInt("custom-items.chris_shield.damage.amount"));
+                } else DamageManager.damage(entityLiving, Main.config.getInt("custom-items.chris_shield.damage.amount"));
+
+                entityLiving.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, entityLiving.getLocation().add(0, 1.5, 0), 1, 0, 0, 0);
             }
         }
 
@@ -149,11 +146,9 @@ public class ItemsAdderListener implements Listener {
 
                 // Remove arrow after a few seconds
                 final int slot = player.getInventory().getHeldItemSlot();
-                new BukkitRunnable() {
-                    public void run() {
-                        if (arrow.isValid()) iam.axe(arrow, slot);
-                    }
-                }.runTaskLater(Main.plugin, Main.config.getInt("custom-items.chris_axe.throw.return") * 20L);
+                new BukkitRunnable() {public void run() {
+                    if (arrow.isValid()) iam.axe(arrow, slot);
+                }}.runTaskLater(Main.plugin, Main.config.getInt("custom-items.chris_axe.throw.return") * 20L);
             }
         }
 
@@ -169,21 +164,21 @@ public class ItemsAdderListener implements Listener {
 
         // vanadium_crossbow
         if (iam.holdingItem(true, "vanadium_crossbow") && rightClick && cooldown) {
-            if (player.getInventory().getItemInMainHand().getItemMeta() instanceof CrossbowMeta cb && cb.hasChargedProjectiles()) {
-                // Velocity multiplier
-                double multiplier = Main.config.getDouble("custom-items.vanadium_crossbow.speed.arrow");
-                for (ItemStack list : cb.getChargedProjectiles()) if (list.getItemMeta() instanceof FireworkMeta meta) {
-                    final int power = meta.getPower();
-                    if (power != 0) multiplier = Main.config.getDouble("custom-items.vanadium_crossbow.speed.firework." + power);
-                }
+            if (!(player.getInventory().getItemInMainHand().getItemMeta() instanceof CrossbowMeta cb) || !cb.hasChargedProjectiles()) return;
 
-                // Summon pearl
-                final Location loc = player.getEyeLocation().add(player.getLocation().getDirection());
-                final EnderPearl pearl = (EnderPearl) player.getWorld().spawnEntity(loc, EntityType.ENDER_PEARL);
-                pearl.setVelocity(player.getEyeLocation().getDirection().multiply(multiplier));
-                pearl.setPersistent(true);
-                pearl.setShooter(player);
+            // Velocity multiplier
+            double multiplier = Main.config.getDouble("custom-items.vanadium_crossbow.speed.arrow");
+            for (ItemStack list : cb.getChargedProjectiles()) {
+                if (!(list.getItemMeta() instanceof FireworkMeta meta) || meta.getPower() == 0) return;
+                multiplier = Main.config.getDouble("custom-items.vanadium_crossbow.speed.firework." + meta.getPower());
             }
+
+            // Summon pearl
+            final Location loc = player.getEyeLocation().add(player.getLocation().getDirection());
+            final EnderPearl pearl = (EnderPearl) player.getWorld().spawnEntity(loc, EntityType.ENDER_PEARL);
+            pearl.setVelocity(player.getEyeLocation().getDirection().multiply(multiplier));
+            pearl.setPersistent(true);
+            pearl.setShooter(player);
         }
     }
 
@@ -192,30 +187,28 @@ public class ItemsAdderListener implements Listener {
      */
     @EventHandler
     public void damageEntity(EntityDamageByEntityEvent event) {
-        if (event.getEntity() instanceof Player victim && event.getDamager() instanceof LivingEntity attacker) {
-            final ItemsAdderManager iam = new ItemsAdderManager(victim);
-            if (iam.holdingItem(true, "chris_shield") && victim.isBlocking()) {
-                if (new Random().nextInt(5) != 0) {
-                    iam.durability(true, 1);
-                    return;
-                }
+        if (!(event.getEntity() instanceof Player victim) || !(event.getDamager() instanceof LivingEntity attacker)) return;
+        final ItemsAdderManager iam = new ItemsAdderManager(victim);
+        if (!iam.holdingItem(true, "chris_shield") || !victim.isBlocking()) return;
 
-                attacker.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, Main.config.getInt("custom-items.chris_shield.block.duration") * 20, 0));
-                attacker.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, attacker.getLocation().add(0, 1.5, 0), 1, 0, 2, 0, 0);
-                iam.durability(true, 3);
-
-                if (attacker instanceof Player attackerPlayer) {
-                    // Message sent to victim
-                    new MessageManager("custom-items.chris_shield.block.victim")
-                            .replace("%attacker%", attackerPlayer.getPlayerListName())
-                            .send(victim);
-                    // Message sent to attacker
-                    new MessageManager("custom-items.chris_shield.block.attacker")
-                            .replace("%victim%", victim.getPlayerListName())
-                            .send(attackerPlayer);
-                }
-            }
+        if (new Random().nextInt(5) != 0) {
+            iam.durability(true, 1);
+            return;
         }
+
+        attacker.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, Main.config.getInt("custom-items.chris_shield.block.duration") * 20, 0));
+        attacker.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, attacker.getLocation().add(0, 1.5, 0), 1, 0, 2, 0, 0);
+        iam.durability(true, 3);
+
+        if (!(attacker instanceof Player attackerPlayer)) return;
+        // Message sent to victim
+        new MessageManager("custom-items.chris_shield.block.victim")
+                .replace("%attacker%", attackerPlayer.getPlayerListName())
+                .send(victim);
+        // Message sent to attacker
+        new MessageManager("custom-items.chris_shield.block.attacker")
+                .replace("%victim%", victim.getPlayerListName())
+                .send(attackerPlayer);
     }
 
     /**
@@ -223,10 +216,10 @@ public class ItemsAdderListener implements Listener {
      */
     @EventHandler
     public void shoot(EntityShootBowEvent event) {
-        if (event.getBow() != null && Main.itemsAdderInstalled()) {
-            final CustomStack custom = CustomStack.byItemStack(event.getBow());
-            if (custom != null && custom.getId().equals("vanadium_crossbow")) event.setCancelled(true);
-        }
+        if (event.getBow() == null || !Main.itemsAdderInstalled()) return;
+
+        final CustomStack custom = CustomStack.byItemStack(event.getBow());
+        if (custom != null && custom.getId().equals("vanadium_crossbow")) event.setCancelled(true);
     }
 
     /**
@@ -234,14 +227,11 @@ public class ItemsAdderListener implements Listener {
      */
     @EventHandler
     public void projectile(ProjectileHitEvent event) {
-        if (event.getEntity() instanceof Arrow arrow && arrow.getShooter() instanceof Player player) {
-            if (arrow.getCustomName() != null && arrow.getCustomName().equals(ChatColor.DARK_AQUA + "" + ChatColor.BOLD + "AXE")) {
-                new ItemsAdderManager(player).axe(arrow, player.getInventory().getHeldItemSlot());
+        if (!(event.getEntity() instanceof Arrow arrow) || !(arrow.getShooter() instanceof Player player)) return;
+        if (arrow.getCustomName() == null || !arrow.getCustomName().equals(ChatColor.DARK_AQUA + "" + ChatColor.BOLD + "AXE")) return;
 
-                // Play hit sound
-                if (event.getHitEntity() != null) player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, (float) 0.1, 1);
-            }
-        }
+        new ItemsAdderManager(player).axe(arrow, player.getInventory().getHeldItemSlot());
+        if (event.getHitEntity() != null) player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, (float) 0.1, 1);
     }
 
     /**
@@ -250,8 +240,6 @@ public class ItemsAdderListener implements Listener {
     @EventHandler
     public void explode(EntityExplodeEvent event) {
         final boolean name = Objects.equals(event.getEntity().getCustomName(), ChatColor.DARK_AQUA + "" + ChatColor.BOLD + "SRNYX BOMB");
-        if (!Main.config.getBoolean("custom-items.nyx_wand.tnt.blocks") && event.getEntity().getType() == EntityType.CREEPER && name) {
-            event.blockList().clear();
-        }
+        if (!Main.config.getBoolean("custom-items.nyx_wand.tnt.blocks") && event.getEntity().getType() == EntityType.CREEPER && name) event.blockList().clear();
     }
 }

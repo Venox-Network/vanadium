@@ -54,16 +54,13 @@ public class PlayerManager {
      * @return              True if player & has permission, false if non-player or doesn't have permission
      */
     public static boolean noPermission(CommandSender sender, String permission) {
-        if (sender instanceof Player player) {
-            if (player.hasPermission(permission)) {
-                return false;
-            } else {
-                new MessageManager("errors.no-permission")
-                        .replace("%permission%", permission)
-                        .send(player);
-                return true;
-            }
-        } else return false;
+        if (!(sender instanceof Player player)) return false;
+        if (player.hasPermission(permission)) return false;
+
+        new MessageManager("errors.no-permission")
+                .replace("%permission%", permission)
+                .send(player);
+        return true;
     }
 
     /**

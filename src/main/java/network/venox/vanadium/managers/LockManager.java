@@ -412,10 +412,9 @@ public class LockManager {
             }
         }
 
-        if (block != null) {
-            DataManager.locked.put(block, new UUID[]{new PlaceManager(block).getPlacer(), null});
-            DataManager.lockedTrusted.remove(block);
-        }
+        if (block == null) return;
+        DataManager.locked.put(block, new UUID[]{new PlaceManager(block).getPlacer(), null});
+        DataManager.lockedTrusted.remove(block);
     }
 
     /**
@@ -426,11 +425,9 @@ public class LockManager {
      * @return          True if unlock was successful, false if not
      */
     public boolean attemptUnlockDoubleChest(ItemStack item) {
-        if (block.getState() instanceof Chest chest && chest.getInventory() instanceof DoubleChestInventory doubleChest) {
-            attemptUnlockDouble(item, 2, doubleChest.getLeftSide().getLocation(), doubleChest.getRightSide().getLocation());
-            return true;
-        }
-        return false;
+        if (!(block.getState() instanceof Chest chest) || !(chest.getInventory() instanceof DoubleChestInventory doubleChest)) return false;
+        attemptUnlockDouble(item, 2, doubleChest.getLeftSide().getLocation(), doubleChest.getRightSide().getLocation());
+        return true;
     }
 
     /**
@@ -441,11 +438,9 @@ public class LockManager {
      * @return          True if unlock was successful, false if not
      */
     public boolean attemptUnlockDoor(ItemStack item) {
-        if (block.getType().toString().contains("_DOOR")) {
-            attemptUnlockDouble(item, 1, Main.door(block)[0], Main.door(block)[1]);
-            return true;
-        }
-        return false;
+        if (!block.getType().toString().contains("_DOOR")) return false;
+        attemptUnlockDouble(item, 1, Main.door(block)[0], Main.door(block)[1]);
+        return true;
     }
 
     /**
@@ -505,13 +500,11 @@ public class LockManager {
         // Vanilla
         final ItemMeta oneMeta = item.getItemMeta();
         final ItemMeta twoMeta = getLockTool().getItemMeta();
-        if (oneMeta != null && twoMeta != null) {
-            final boolean type = Objects.equals(item.getType(), getLockTool().getType());
-            final boolean displayName = Objects.equals(oneMeta.getDisplayName(), twoMeta.getDisplayName());
-            final boolean lore = Objects.equals(oneMeta.getLore(), twoMeta.getLore());
-            return type && displayName && lore;
-        }
+        if (oneMeta == null || twoMeta == null) return false;
 
-        return false;
+        final boolean type = Objects.equals(item.getType(), getLockTool().getType());
+        final boolean displayName = Objects.equals(oneMeta.getDisplayName(), twoMeta.getDisplayName());
+        final boolean lore = Objects.equals(oneMeta.getLore(), twoMeta.getLore());
+        return type && displayName && lore;
     }
 }

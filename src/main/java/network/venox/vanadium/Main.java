@@ -129,10 +129,13 @@ public class Main extends JavaPlugin {
      */
     private void registerCommand(String name, CommandExecutor executor, TabCompleter completer) {
         final PluginCommand command = Bukkit.getPluginCommand(name);
-        if (command != null) {
-            command.setExecutor(executor);
-            command.setTabCompleter(completer);
-        } else getLogger().warning("Could not register command " + ChatColor.DARK_RED + name);
+        if (command == null) {
+            getLogger().warning("Could not register command " + ChatColor.DARK_RED + name);
+            return;
+        }
+
+        command.setExecutor(executor);
+        command.setTabCompleter(completer);
     }
 
     /**

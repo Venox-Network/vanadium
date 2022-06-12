@@ -22,14 +22,9 @@ public class BypassManager {
             new MessageManager("bypass.enabled.self").send(player);
         }
 
-        new BukkitRunnable() {
-            public void run() {
-                if (!PlayerManager.isVanished(player)) {
-                    player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(new MessageManager("bypass.actionbar").string()));
-                }
-
-                if (!PlayerManager.hasScoreboardTag(player, "bypass")) cancel();
-            }
-        }.runTaskTimer(Main.plugin, 0, 40);
+        new BukkitRunnable() {public void run() {
+            if (!PlayerManager.isVanished(player)) player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(new MessageManager("bypass.actionbar").string()));
+            if (!PlayerManager.hasScoreboardTag(player, "bypass")) cancel();
+        }}.runTaskTimer(Main.plugin, 0, 40);
     }
 }

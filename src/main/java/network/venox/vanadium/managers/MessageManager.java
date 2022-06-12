@@ -19,10 +19,13 @@ public class MessageManager {
      */
     public MessageManager(String key) {
         final String string = Main.messages.getString(key);
-        if (string != null) {
-            final String prefix = Main.messages.getString("plugin.prefix");
-            this.message = prefix != null ? string.replace("%prefix%", prefix) : string;
-        } else this.message = key;
+        if (string == null) {
+            this.message = key;
+            return;
+        }
+
+        final String prefix = Main.messages.getString("plugin.prefix");
+        this.message = prefix != null ? string.replace("%prefix%", prefix) : string;
     }
 
     /**

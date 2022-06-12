@@ -1,6 +1,7 @@
 package network.venox.vanadium.managers;
 
 import network.venox.vanadium.Main;
+
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
 

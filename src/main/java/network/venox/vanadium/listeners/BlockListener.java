@@ -1,10 +1,15 @@
 package network.venox.vanadium.listeners;
 
 import network.venox.vanadium.Main;
+import network.venox.vanadium.managers.LockManager;
+import network.venox.vanadium.managers.MessageManager;
 import network.venox.vanadium.managers.PlaceManager;
+import network.venox.vanadium.managers.PlayerManager;
+
 import org.apache.commons.lang.WordUtils;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -16,11 +21,8 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import network.venox.vanadium.managers.LockManager;
-import network.venox.vanadium.managers.MessageManager;
-import network.venox.vanadium.managers.PlayerManager;
 
 import java.util.UUID;
 
@@ -105,12 +107,14 @@ public class BlockListener implements Listener {
      */
     @EventHandler
     public void onInventoryMove(InventoryMoveItemEvent event) {
-        if (event.getSource().getLocation() != null && event.getDestination().getLocation() != null && event.getDestination().getType() == InventoryType.HOPPER) {
-            final UUID sourceOwner = new LockManager(event.getSource().getLocation().getBlock(), null).getLocker();
-            final UUID destinationOwner = new LockManager(event.getDestination().getLocation().getBlock(), null).getLocker();
-            if (sourceOwner != null && destinationOwner == null || sourceOwner != null && !destinationOwner.equals(sourceOwner)) {
-                event.setCancelled(true);
-            }
-        }
+        final Location source = event.getSource().getLocation();
+        final Inventory destination = event.getDestination();
+        if (source == null || destination.getLocation() == null || destination.getType() != InventoryType.HOPPER) return;
+
+        final UUID sourceOwner = new LockManager(source.getBlock(), null).getLocker();
+        final UUID destinationOwner = new LockManager(destination.getLocation().getBlock(), null).getLocker();
+        if ((sourceOwner == null || destinationOwner != null) && (sourceOwner == null || destinationOwner.equals(sourceOwner))) return;
+
+        event.setCancelled(true);
     }
 }

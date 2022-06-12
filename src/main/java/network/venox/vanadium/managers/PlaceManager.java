@@ -53,11 +53,9 @@ public record PlaceManager(Block block) {
      * @return  True if successful, false if not
      */
     public boolean attemptPlaceDoor(Player player) {
-        if (block.getType().toString().contains("_DOOR")) {
-            for (final Location location : Main.door(block)) new PlaceManager(location.getBlock()).place(player);
-            return true;
-        }
-        return false;
+        if (!block.getType().toString().contains("_DOOR")) return false;
+        for (final Location location : Main.door(block)) new PlaceManager(location.getBlock()).place(player);
+        return true;
     }
 
     /**
@@ -80,10 +78,8 @@ public record PlaceManager(Block block) {
      * @return  True if successful, false if not
      */
     public boolean attemptUnplaceDoor() {
-        if (block.getType().toString().contains("_DOOR")) {
-            for (final Location location : Main.door(block)) new PlaceManager(location.getBlock()).unplace();
-            return true;
-        }
-        return false;
+        if (!block.getType().toString().contains("_DOOR")) return false;
+        for (final Location location : Main.door(block)) new PlaceManager(location.getBlock()).unplace();
+        return true;
     }
 }

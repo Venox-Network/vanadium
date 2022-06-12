@@ -12,16 +12,18 @@ import github.scarsz.discordsrv.util.DiscordUtil;
 
 import network.venox.vanadium.Main;
 import network.venox.vanadium.managers.MessageManager;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 
 public class DiscordListener {
-    public static final String linkChannel = Main.config.getString("link-channel");
+    private final String linkChannel = Main.config.getString("link-channel");
 
     /**
      * Called when the bot is ready
@@ -32,18 +34,16 @@ public class DiscordListener {
         final String discrim = DiscordUtil.getJda().getSelfUser().getDiscriminator();
         Main.plugin.getLogger().info(ChatColor.GREEN + "Successfully connected to " + ChatColor.DARK_GREEN + name + "#" + discrim);
 
-        if (linkChannel != null) {
-            final TextChannel channel = DiscordUtil.getTextChannelById(linkChannel);
-            if (channel != null) {
-                final List<Message> history = new MessageHistory(channel).retrievePast(100).complete();
-                if (history.size() == 1) {
-                    channel.deleteMessageById(history.get(0).getId()).queue();
-                    return;
-                }
+        if (linkChannel == null) return;
+        final TextChannel channel = DiscordUtil.getTextChannelById(linkChannel);
+        if (channel == null) return;
+        final List<Message> history = new MessageHistory(channel).retrievePast(100).complete();
 
-                if (history.size() > 1) channel.deleteMessages(history).queue();
-            }
+        if (history.size() == 1) {
+            channel.deleteMessageById(history.get(0).getId()).queue();
+            return;
         }
+        if (history.size() > 1) channel.deleteMessages(history).queue();
     }
 
     /**
@@ -52,33 +52,34 @@ public class DiscordListener {
     @Subscribe
     public void onGuildMessageReceive(DiscordGuildMessageReceivedEvent event) {
         final AccountLinkManager manager = DiscordSRV.getPlugin().getAccountLinkManager();
+        final Map<String, UUID> codes = manager.getLinkingCodes();
         final String message = event.getMessage().getContentStripped();
+
+        if (!codes.containsKey(message) || linkChannel == null || !event.getChannel().getId().equals(linkChannel)) return;
+
+        final UUID minecraft = codes.get(message);
         final String discord = event.getAuthor().getId();
 
-        if (manager.getLinkingCodes().containsKey(message) && linkChannel != null && event.getChannel().getId().equals(linkChannel)) {
-            final UUID minecraft = manager.getLinkingCodes().get(message);
+        manager.unlink(discord);
+        manager.unlink(minecraft);
+        manager.link(discord, minecraft);
 
-            manager.unlink(discord);
-            manager.unlink(minecraft);
-            manager.link(discord, minecraft);
+        if (manager.getUuid(discord) != null) {
+            final Player player = Bukkit.getPlayer(manager.getUuid(discord));
+            if (player != null) {
+                // Send success message to player on Minecraft
+                new MessageManager("linking.minecraft")
+                        .replace("%discord%", event.getAuthor().getAsTag())
+                        .send(player);
 
-            if (manager.getUuid(discord) != null) {
-                final Player player = Bukkit.getPlayer(manager.getUuid(discord));
-                if (player != null) {
-                    // Send success message to player on Minecraft
-                    new MessageManager("linking.minecraft")
-                            .replace("%discord%", event.getAuthor().getAsTag())
-                            .send(player);
-
-                    // Send success message to user on Discord
-                    new MessageManager("linking.discord")
-                            .replace("%minecraft%", player.getName())
-                            .replace("%uuid%", player.getUniqueId().toString())
-                            .send(event.getAuthor());
-                }
+                // Send success message to user on Discord
+                new MessageManager("linking.discord")
+                        .replace("%minecraft%", player.getName())
+                        .replace("%uuid%", player.getUniqueId().toString())
+                        .send(event.getAuthor());
             }
-
-            event.getMessage().delete().queue();
         }
+
+        event.getMessage().delete().queue();
     }
 }

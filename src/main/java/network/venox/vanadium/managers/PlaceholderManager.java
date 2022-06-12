@@ -49,10 +49,8 @@ public class PlaceholderManager extends PlaceholderExpansion {
 
         // %v_locks_time%
         if (params.equalsIgnoreCase("locks_time")) {
-            if (new LockSlotManager(player).timeLeft() != null) {
-                return afk ? "N/A" : String.valueOf(TimeUnit.MILLISECONDS.toMinutes(new LockSlotManager(player).timeLeft()));
-            }
-            return "N/A";
+            if (new LockSlotManager(player).timeLeft() == null) return "N/A";
+            return afk ? "N/A" : String.valueOf(TimeUnit.MILLISECONDS.toMinutes(new LockSlotManager(player).timeLeft()));
         }
 
         // %v_trusts%
@@ -60,10 +58,8 @@ public class PlaceholderManager extends PlaceholderExpansion {
         
         // %v_trusts_time%
         if (params.equalsIgnoreCase("trusts_time")) {
-            if (new TrustSlotManager(player).timeLeft() != null) {
-                return afk ? "N/A" : String.valueOf(TimeUnit.MILLISECONDS.toMinutes(new TrustSlotManager(player).timeLeft()));
-            }
-            return "N/A";
+            if (new TrustSlotManager(player).timeLeft() == null) return "N/A";
+            return afk ? "N/A" : String.valueOf(TimeUnit.MILLISECONDS.toMinutes(new TrustSlotManager(player).timeLeft()));
         }
 
         return null;

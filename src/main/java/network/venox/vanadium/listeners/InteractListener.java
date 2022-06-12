@@ -3,6 +3,8 @@ package network.venox.vanadium.listeners;
 import network.venox.vanadium.managers.LockManager;
 import network.venox.vanadium.managers.MessageManager;
 import network.venox.vanadium.managers.PlayerManager;
+import network.venox.vanadium.managers.TrustManager;
+
 import org.apache.commons.lang.WordUtils;
 
 import org.bukkit.Bukkit;
@@ -15,8 +17,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
-
-import network.venox.vanadium.managers.TrustManager;
 
 import java.util.UUID;
 
@@ -48,16 +48,17 @@ public class InteractListener implements Listener {
         // Check if locked
         if (block != null && new LockManager(block, player).isLockedForPlayer()) {
             final UUID owner = new LockManager(block, null).getLocker();
-            if (owner != null && !new TrustManager(player, Bukkit.getOfflinePlayer(owner)).isTrusted(block)) {
-                if (!(player.hasPermission("vanadium.command.bypass") && (player.isSneaking() || PlayerManager.hasScoreboardTag(player, "bypass")))) {
-                    player.playSound(player.getLocation(), Sound.BLOCK_CHEST_LOCKED, 1, 1);
-                    event.setCancelled(true);
-                }
-                new MessageManager("locking.block-locked")
-                        .replace("%block%", WordUtils.capitalizeFully(block.getType().name().replace("_", " ")))
-                        .replace("%player%", Bukkit.getOfflinePlayer(new LockManager(block, null).getLocker()).getName())
-                        .send(player);
+            if (owner == null || new TrustManager(player, Bukkit.getOfflinePlayer(owner)).isTrusted(block)) return;
+
+            if (!(player.hasPermission("vanadium.command.bypass") && (player.isSneaking() || PlayerManager.hasScoreboardTag(player, "bypass")))) {
+                player.playSound(player.getLocation(), Sound.BLOCK_CHEST_LOCKED, 1, 1);
+                event.setCancelled(true);
             }
+
+            new MessageManager("locking.block-locked")
+                    .replace("%block%", WordUtils.capitalizeFully(block.getType().name().replace("_", " ")))
+                    .replace("%player%", Bukkit.getOfflinePlayer(new LockManager(block, null).getLocker()).getName())
+                    .send(player);
         }
     }
 

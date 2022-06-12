@@ -32,10 +32,10 @@ public class ItemManager {
      */
     public ItemManager name(String name) {
         final ItemMeta meta = item.getItemMeta();
-        if (meta != null) {
-            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
-            item.setItemMeta(meta);
-        }
+        if (meta == null) return this;
+
+        meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
+        item.setItemMeta(meta);
         return this;
     }
 
@@ -48,16 +48,16 @@ public class ItemManager {
      */
     public ItemManager lore(String lore) {
         final ItemMeta meta = item.getItemMeta();
-        if (meta != null) {
-            final List<String> entries = new ArrayList<>();
-            final List<String> current = meta.getLore();
-            if (current != null) entries.addAll(current);
+        if (meta == null) return this;
 
-            entries.add(ChatColor.translateAlternateColorCodes('&', lore));
+        final List<String> entries = new ArrayList<>();
+        final List<String> current = meta.getLore();
+        if (current != null) entries.addAll(current);
 
-            meta.setLore(entries);
-            item.setItemMeta(meta);
-        }
+        entries.add(ChatColor.translateAlternateColorCodes('&', lore));
+
+        meta.setLore(entries);
+        item.setItemMeta(meta);
         return this;
     }
 
@@ -71,10 +71,10 @@ public class ItemManager {
      */
     public ItemManager enchant(Enchantment enchantment, int level) {
         final ItemMeta meta = item.getItemMeta();
-        if (meta != null) {
-            meta.addEnchant(enchantment, level, true);
-            item.setItemMeta(meta);
-        }
+        if (meta == null) return this;
+
+        meta.addEnchant(enchantment, level, true);
+        item.setItemMeta(meta);
         return this;
     }
 
@@ -87,10 +87,10 @@ public class ItemManager {
      */
     public ItemManager flag(ItemFlag flag) {
         final ItemMeta meta = item.getItemMeta();
-        if (meta != null) {
-            meta.addItemFlags(flag);
-            item.setItemMeta(meta);
-        }
+        if (meta == null) return this;
+
+        meta.addItemFlags(flag);
+        item.setItemMeta(meta);
         return this;
     }
 
