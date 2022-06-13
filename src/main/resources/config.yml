@@ -76,10 +76,10 @@ custom-items:
   vanadium_crossbow:
     speed:
       # Speeed of the Ender Pearl when using an arrow
-      arrow: 1.5
+      arrow: 1.8
 
       # Speed of the Ender Pearl when using a Firework (per-charge)
       firework:
-        1: 1.8
-        2: 2.0
+        1: 2.0
+        2: 2.25
         3: 2.5
