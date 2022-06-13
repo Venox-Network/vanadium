@@ -38,6 +38,8 @@ public class ItemsAdderManager {
      * Does the universal cooldown stuff
      */
     public void cooldown() {
+        cooldowns.put(player.getUniqueId(), System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(Main.config.getInt("custom-items.cooldown")));
+
         // Display action bar
         new BukkitRunnable() {
             public void run() {

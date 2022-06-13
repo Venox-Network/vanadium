@@ -46,12 +46,9 @@ public class ItemsAdderListener implements Listener {
         final boolean leftClick = event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK;
         final boolean rightClick = event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK;
 
-        final long time = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(Main.config.getInt("custom-items.cooldown"));
-
         // nyx_wand
         if (iam.holdingItem(false, "nyx_wand") && leftClick && sneaking && cooldown) {
             iam.cooldown();
-            ItemsAdderManager.cooldowns.put(player.getUniqueId(), time);
             iam.durability(false, 2);
 
             // TNT item
@@ -100,7 +97,6 @@ public class ItemsAdderListener implements Listener {
         // chris_shield
         if (iam.holdingItem(true, "chris_shield") && rightClick && sneaking && cooldown) {
             iam.cooldown();
-            ItemsAdderManager.cooldowns.put(player.getUniqueId(), time);
             iam.durability(true, 6);
 
             player.getWorld().spawnParticle(Particle.EXPLOSION_NORMAL, player.getLocation(), 20, 1, 1, 1);
@@ -124,8 +120,10 @@ public class ItemsAdderListener implements Listener {
         if (iam.holdingItem(false, "chris_axe")) {
             // Lightning
             if (leftClick && cooldown) {
-                player.getWorld().strikeLightning(player.getTargetBlock(null, Main.config.getInt("custom-items.chris_axe.lightning.range")).getLocation());
+                iam.cooldown();
                 iam.durability(false, 4);
+                
+                player.getWorld().strikeLightning(player.getTargetBlock(null, Main.config.getInt("custom-items.chris_axe.lightning.range")).getLocation());
             }
 
             // Throw
