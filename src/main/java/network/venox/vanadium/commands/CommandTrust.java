@@ -1,5 +1,6 @@
 package network.venox.vanadium.commands;
 
+import network.venox.vanadium.Main;
 import network.venox.vanadium.managers.DataManager;
 import network.venox.vanadium.managers.LockManager;
 import network.venox.vanadium.managers.MessageManager;
@@ -7,12 +8,15 @@ import network.venox.vanadium.managers.PlayerManager;
 import network.venox.vanadium.managers.TrustManager;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
+import org.bukkit.block.Chest;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.DoubleChestInventory;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -32,12 +36,13 @@ public class CommandTrust implements TabExecutor {
 
         if (args.length == 1 && (block == null || !lock.isLockable())) {
             final OfflinePlayer target = PlayerManager.getOfflinePlayer(args[0]);
-            new TrustManager(player, target).trust();
+            new TrustManager(player, target).trustPlayer();
             return true;
         }
 
         if (args.length == 2) {
             final OfflinePlayer target = PlayerManager.getOfflinePlayer(args[1]);
+            final TrustManager trust = new TrustManager(player, target);
 
             if (target == null) {
                 new MessageManager("errors.invalid-player")
@@ -47,19 +52,43 @@ public class CommandTrust implements TabExecutor {
             }
 
             if (Objects.equals(args[0], "master")) {
-                new TrustManager(player, target).trust();
+                trust.trustPlayer();
                 return true;
             }
 
-            if (Objects.equals(args[0], "block") && block != null) {
-                if (lock.isLockedForPlayer()) {
-                    new TrustManager(player, null).locked(block);
-                    return true;
+            if (!Objects.equals(args[0], "block") || block == null) return true;
+
+            // Cancel if block is locked for player
+            if (lock.isLockedForPlayer()) {
+                trust.locked(block);
+                return true;
+            }
+
+            // Cancel if player is trying to trust themselves
+            if (target.getUniqueId() == player.getUniqueId()) {
+                new MessageManager("trusting.self").send(player);
+                return true;
+            }
+
+            // Attempt trust door
+            if (block.getType().toString().contains("_DOOR")) {
+                for (final Location door : Main.door(block)) trust.trustBlock(door.getBlock(), true);
+                trust.success("trust", block);
+                return true;
+            }
+
+            // Attempt trust Double Chest
+            if (block.getState() instanceof Chest chest && chest.getInventory() instanceof DoubleChestInventory doubleChest) {
+                for (final Location loc : new Location[]{doubleChest.getLeftSide().getLocation(), doubleChest.getRightSide().getLocation()}) {
+                    trust.trustBlock(loc.getBlock(), true);
                 }
-
-                new TrustManager(player, target).trustBlock(block);
+                trust.success("trust", block);
                 return true;
             }
+
+            // Trust block
+            trust.trustBlock(block, false);
+            return true;
         }
 
         new MessageManager("errors.invalid-arguments").send(player);

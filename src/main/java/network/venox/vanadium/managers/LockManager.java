@@ -199,17 +199,18 @@ public class LockManager {
             return;
         }
 
-        // Attempt to lock double chest / door
-        if (attemptLockDoubleChest(item) || attemptLockDoor(item)) return;
+        // Attempt lock double chest
+        if (block.getState() instanceof Chest chest && chest.getInventory() instanceof DoubleChestInventory && attemptLockDoubleChest(item)) return;
 
-        if (!(block.getState() instanceof Chest chest && chest.getInventory() instanceof DoubleChestInventory) && !(block.getType().toString().contains("_DOOR"))) {
-            lock(item, 1);
+        // Attempt lock door
+        if (block.getType().toString().contains("_DOOR") && attemptLockDoor(item)) return;
 
-            player.playSound(player.getLocation(), Sound.BLOCK_CHEST_LOCKED, 1, 2);
-            new MessageManager("locking.lock.success")
-                    .replace("%block%", name)
-                    .send(player);
-        }
+        // Lock block
+        lock(item, 1);
+        player.playSound(player.getLocation(), Sound.BLOCK_CHEST_LOCKED, 1, 2);
+        new MessageManager("locking.lock.success")
+                .replace("%block%", name)
+                .send(player);
     }
 
     /**
@@ -259,29 +260,28 @@ public class LockManager {
      * @return          True if successful, false if not
      */
     public boolean attemptLockDoubleChest(ItemStack item) {
-        // Check if block is a double chest
-        if (block.getState() instanceof Chest chest && chest.getInventory() instanceof DoubleChestInventory doubleChest) {
-            final int slotCount = new LockSlotManager().getCount(player.getUniqueId());
-            if (slotCount <= getLockedCount() + 1) {
-                new MessageManager("slots.limit")
-                        .replace("%type%", "lock")
-                        .replace("%target%", name)
-                        .replace("%total%", String.valueOf(slotCount)) //.replaceAll("\\.0*$|(\\.\\d*?)0+$", "$1")
-                        .send(player);
-                return false;
-            }
+        final Chest chest = (Chest) block.getState();
+        final DoubleChestInventory doubleChest = (DoubleChestInventory) chest.getInventory();
 
-            for (final Location location : new Location[]{doubleChest.getLeftSide().getLocation(), doubleChest.getRightSide().getLocation()}) {
-                new LockManager(location.getBlock(), player).lock(item, 1);
-            }
-
-            player.playSound(player.getLocation(), Sound.BLOCK_CHEST_LOCKED, 1, 2);
-            new MessageManager("locking.lock.success")
-                    .replace("%block%", name)
+        final int slotCount = new LockSlotManager().getCount(player.getUniqueId());
+        if (slotCount <= getLockedCount() + 1) {
+            new MessageManager("slots.limit")
+                    .replace("%type%", "lock")
+                    .replace("%target%", name)
+                    .replace("%total%", String.valueOf(slotCount)) //.replaceAll("\\.0*$|(\\.\\d*?)0+$", "$1")
                     .send(player);
-            return true;
+            return false;
         }
-        return false;
+
+        for (final Location location : new Location[]{doubleChest.getLeftSide().getLocation(), doubleChest.getRightSide().getLocation()}) {
+            new LockManager(location.getBlock(), player).lock(item, 1);
+        }
+
+        player.playSound(player.getLocation(), Sound.BLOCK_CHEST_LOCKED, 1, 2);
+        new MessageManager("locking.lock.success")
+                .replace("%block%", name)
+                .send(player);
+        return true;
     }
 
     /**
@@ -313,40 +313,25 @@ public class LockManager {
     }
 
     /**
-     * Checks if a double chest is locked
-     */
-    public void checkLockDoubleChest() {
-        if (block.getState() instanceof Chest chest && chest.getInventory() instanceof DoubleChestInventory doubleChest) {
-            location(doubleChest.getRightSide().getLocation(), doubleChest.getLeftSide().getLocation());
-        }
-    }
-
-    /**
-     * Checks if a door is locked
-     */
-    public void checkLockDoor() {
-        if (block.getType().toString().contains("_DOOR")) location(Main.door(block)[0], Main.door(block)[1]);
-    }
-
-    /**
      * Locks 2 blocks, used for double chests and doors
      *
      * @param   one Location of the first block
      * @param   two Location of the second block
      */
-    private void location(Location one, Location two) {
+    public void doubleLock(Location one, Location two) {
         final Location[] locations = {one, two};
         for (final Location loc : locations) {
-            if (new LockManager(loc.getBlock(), null).isLocked()) {
-                final UUID owner = new LockManager(loc.getBlock(), null).getLocker();
-                final Block block0 = locations[0].getBlock();
-                final Block block1 = locations[0].getBlock();
+            final LockManager lock = new LockManager(loc.getBlock(), null);
+            if (!lock.isLocked()) return;
 
-                DataManager.locked.put(block0, new UUID[]{owner, owner});
-                DataManager.locked.put(block1, new UUID[]{owner, owner});
+            final UUID owner = lock.getLocker();
+            final Block block0 = locations[0].getBlock();
+            final Block block1 = locations[0].getBlock();
 
-                player.playSound(player.getLocation(), Sound.BLOCK_CHEST_LOCKED, 1, 2);
-            }
+            DataManager.locked.put(block0, new UUID[]{owner, owner});
+            DataManager.locked.put(block1, new UUID[]{owner, owner});
+
+            player.playSound(player.getLocation(), Sound.BLOCK_CHEST_LOCKED, 1, 2);
         }
     }
 

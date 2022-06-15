@@ -12,6 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
+import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -21,6 +22,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -35,6 +37,7 @@ public class BlockListener implements Listener {
     public void onBlockPlace(BlockPlaceEvent event) {
         final Player player = event.getPlayer();
         final Block block = event.getBlock();
+        final LockManager lock = new LockManager(block, player);
 
         // Check if it should log placer
         if (new LockManager(block, null).isLockable()) new PlaceManager(block).attemptPlace(player);
@@ -45,9 +48,13 @@ public class BlockListener implements Listener {
         // Check if locked double chest or door
         new BukkitRunnable() {
             public void run() {
-                final LockManager lock = new LockManager(block, player);
-                lock.checkLockDoubleChest();
-                lock.checkLockDoor();
+                // Double chest
+                if (block.getState() instanceof Chest chest && chest.getInventory() instanceof DoubleChestInventory doubleChest) {
+                    lock.doubleLock(doubleChest.getRightSide().getLocation(), doubleChest.getLeftSide().getLocation());
+                }
+
+                // Door
+                if (block.getType().toString().contains("_DOOR")) lock.doubleLock(Main.door(block)[0], Main.door(block)[1]);
             }
         }.runTaskLater(Main.plugin, 1);
     }
