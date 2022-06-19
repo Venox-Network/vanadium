@@ -1,5 +1,6 @@
 package network.venox.vanadium.managers;
 
+import com.olliez4.interface4.util.ActionBar;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 
@@ -23,7 +24,7 @@ public class BypassManager {
         }
 
         new BukkitRunnable() {public void run() {
-            if (!PlayerManager.isVanished(player)) player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(new MessageManager("bypass.actionbar").string()));
+            if (!PlayerManager.isVanished(player)) ActionBar.send(player, new MessageManager("bypass.actionbar").string());
             if (!PlayerManager.hasScoreboardTag(player, "bypass")) cancel();
         }}.runTaskTimer(Main.plugin, 0, 40);
     }
