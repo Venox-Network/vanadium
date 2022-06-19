@@ -2,7 +2,7 @@ package network.venox.vanadium.managers;
 
 import network.venox.vanadium.managers.slots.TrustSlotManager;
 
-import org.apache.commons.lang.WordUtils;
+import org.apache.commons.lang3.text.WordUtils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;

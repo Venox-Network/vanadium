@@ -6,7 +6,7 @@ import network.venox.vanadium.managers.MessageManager;
 import network.venox.vanadium.managers.PlaceManager;
 import network.venox.vanadium.managers.PlayerManager;
 
-import org.apache.commons.lang.WordUtils;
+import org.apache.commons.lang3.text.WordUtils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

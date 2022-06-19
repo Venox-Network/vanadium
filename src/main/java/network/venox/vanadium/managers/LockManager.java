@@ -5,6 +5,8 @@ import dev.lone.itemsadder.api.CustomStack;
 import network.venox.vanadium.Main;
 import network.venox.vanadium.managers.slots.LockSlotManager;
 
+import org.apache.commons.lang3.text.WordUtils;
+
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
@@ -15,8 +17,6 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
-
-import org.apache.commons.lang.WordUtils;
 
 import java.util.*;
 
