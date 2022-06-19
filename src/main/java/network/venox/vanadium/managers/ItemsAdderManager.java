@@ -7,13 +7,17 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 import network.venox.vanadium.Main;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Player;
+import org.bukkit.block.Block;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.BlockIterator;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 
 public class ItemsAdderManager {
     private final Player player;
-    public static final Map<UUID, Long> cooldowns = new ConcurrentHashMap<>();
+    private static final Map<UUID, Long> cooldowns = new ConcurrentHashMap<>();
     public static final Map<UUID, ItemStack> axes = new ConcurrentHashMap<>();
 
     /**
@@ -114,6 +118,42 @@ public class ItemsAdderManager {
                 }
             }
         }
+    }
+
+    public Entity getTarget(int range) {
+        final List<Entity> nearby = player.getNearbyEntities(range, range, range);
+        final BlockIterator iterator = new BlockIterator(player, range);
+        Block block;
+        Location loc;
+        int bx;
+        int by;
+        int bz;
+        double ex;
+        double ey;
+        double ez;
+
+        // loop through player's line of sight
+        while (iterator.hasNext()) {
+            block = iterator.next();
+            bx = block.getX();
+            by = block.getY();
+            bz = block.getZ();
+
+            // check for entities near this block in the line of sight
+            for (Entity entity : nearby) {
+                loc = entity.getLocation();
+                ex = loc.getX();
+                ey = loc.getY();
+                ez = loc.getZ();
+
+                if ((bx - 0.75 <= ex && ex <= bx + 1.75) && (bz - 0.75 <= ez && ez <= bz + 1.75) && (by - 1 <= ey && ey <= by + 2.5)) {
+                    // entity is close enough, set target and stop
+                    return entity;
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
