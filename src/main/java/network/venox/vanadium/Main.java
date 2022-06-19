@@ -97,9 +97,9 @@ public class Main extends JavaPlugin {
         pm.registerEvents(new MoveListener(), this);
 
         // Register plugin-specific stuff
-        if (pm.getPlugin("DiscordSRV") != null) DiscordSRV.api.subscribe(new DiscordListener());
-        if (pm.getPlugin("PlaceholderAPI") != null) new PlaceholderManager().register();
-        if (pm.getPlugin("ItemsAdder") != null) pm.registerEvents(new ItemsAdderListener(), this);
+        if (pm.isPluginEnabled("DiscordSRV")) DiscordSRV.api.subscribe(new DiscordListener());
+        if (pm.isPluginEnabled("PlaceholderAPI")) new PlaceholderManager().register();
+        if (pm.isPluginEnabled("ItemsAdder")) pm.registerEvents(new ItemsAdderListener(), this);
     }
 
     /**
@@ -144,7 +144,7 @@ public class Main extends JavaPlugin {
      * @return  {@code true} if ItemsAdder is installed, {@code false} otherwise
      */
     public static boolean itemsAdderInstalled() {
-        return Bukkit.getPluginManager().getPlugin("ItemsAdder") != null;
+        return Bukkit.getPluginManager().isPluginEnabled("ItemsAdder");
     }
 
     /**
