@@ -2,6 +2,8 @@ package network.venox.vanadium.managers;
 
 import com.earth2me.essentials.Essentials;
 
+import com.olliez4.interface4.util.PluginUtils;
+
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -84,7 +86,7 @@ public class PlayerManager {
      * @return          True if AFK, false if not
      */
     public static boolean isAFK(Player player) {
-        final Essentials essentials = (Essentials) Bukkit.getPluginManager().getPlugin("Essentials");
+        final Essentials essentials = (Essentials) PluginUtils.getMain("Essentials");
         return essentials != null && essentials.getUser(player).isAfk();
     }
 }
