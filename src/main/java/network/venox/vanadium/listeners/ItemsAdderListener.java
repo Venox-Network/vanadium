@@ -1,5 +1,7 @@
 package network.venox.vanadium.listeners;
 
+import com.olliez4.interface4.util.ParticleUtils;
+
 import dev.lone.itemsadder.api.CustomEntity;
 import dev.lone.itemsadder.api.CustomStack;
 
@@ -14,10 +16,7 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.entity.EntityShootBowEvent;
-import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.CrossbowMeta;
@@ -71,27 +70,25 @@ public class ItemsAdderListener implements Listener {
             runnable.runTaskTimer(Main.plugin, 0, 1);
 
             // Creeper
-            new BukkitRunnable() {
-                public void run() {
-                    // Remove the TNT item from timer map
-                    timer.remove(tnt);
-                    // "Kill" the TNT item
-                    tnt.remove();
-                    // Cancel name changing runnable
-                    runnable.cancel();
+            new BukkitRunnable() {public void run() {
+                // Remove the TNT item from timer map
+                timer.remove(tnt);
+                // "Kill" the TNT item
+                tnt.remove();
+                // Cancel name changing runnable
+                runnable.cancel();
 
-                    // Summon creeper
-                    final Creeper creeper = (Creeper) tnt.getWorld().spawnEntity(tnt.getLocation(), EntityType.CREEPER);
-                    creeper.setCustomName(ChatColor.DARK_AQUA + "" + ChatColor.BOLD + "SRNYX BOMB");
-                    creeper.setExplosionRadius(2);
-                    creeper.setExplosionRadius(4);
-                    creeper.setCustomNameVisible(false);
-                    creeper.setInvisible(true);
-                    creeper.setSilent(true);
-                    creeper.setAI(false);
-                    creeper.explode();
-                }
-            }.runTaskLater(Main.plugin, fuse * 20L);
+                // Summon creeper
+                final Creeper creeper = (Creeper) tnt.getWorld().spawnEntity(tnt.getLocation(), EntityType.CREEPER);
+                creeper.setCustomName(ChatColor.DARK_AQUA + "" + ChatColor.BOLD + "SRNYX BOMB");
+                creeper.setExplosionRadius(2);
+                creeper.setExplosionRadius(4);
+                creeper.setCustomNameVisible(false);
+                creeper.setInvisible(true);
+                creeper.setSilent(true);
+                creeper.setAI(false);
+                creeper.explode();
+            }}.runTaskLater(Main.plugin, fuse * 20L);
         }
 
         // chris_shield
@@ -122,7 +119,7 @@ public class ItemsAdderListener implements Listener {
             if (leftClick && cooldown) {
                 iam.cooldown();
                 iam.durability(false, 4);
-                
+
                 player.getWorld().strikeLightning(player.getTargetBlock(null, Main.config.getInt("custom-items.chris_axe.lightning.range")).getLocation());
             }
 
@@ -167,8 +164,9 @@ public class ItemsAdderListener implements Listener {
             // Velocity multiplier
             double multiplier = Main.config.getDouble("custom-items.vanadium_crossbow.speed.arrow");
             for (ItemStack list : cb.getChargedProjectiles()) {
-                if (!(list.getItemMeta() instanceof FireworkMeta meta) || meta.getPower() == 0) return;
-                multiplier = Main.config.getDouble("custom-items.vanadium_crossbow.speed.firework." + meta.getPower());
+                if (list.getItemMeta() instanceof FireworkMeta meta && meta.getPower() != 0) {
+                    multiplier = Main.config.getDouble("custom-items.vanadium_crossbow.speed.firework." + meta.getPower());
+                }
             }
 
             // Summon pearl
@@ -177,6 +175,47 @@ public class ItemsAdderListener implements Listener {
             pearl.setVelocity(player.getEyeLocation().getDirection().multiply(multiplier));
             pearl.setPersistent(true);
             pearl.setShooter(player);
+        }
+
+        if (player.getInventory().getItemInMainHand().getType() == Material.BLAZE_ROD && cooldown) {
+            if (!(iam.getTarget(15) instanceof LivingEntity target) || target instanceof Warden) return;
+            iam.cooldown();
+
+            // warden_companion
+            if (leftClick) {
+                final Warden warden = (Warden) player.getWorld().spawnEntity(player.getLocation(), EntityType.WARDEN);
+
+                final BukkitRunnable runnable = new BukkitRunnable() {public void run() {
+                    // Keep targeted entity as Warden's target
+                    warden.setAnger(target, 100);
+
+                    // Spawn particles over target
+                    target.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, target.getLocation().add(0, 1.5, 0), 1, 0, 0, 0);
+
+                    if (target.isDead()) {
+                        warden.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, warden.getLocation().add(0, 0.5, 0), 1);
+                        warden.remove();
+                        this.cancel();
+                    }
+                }};
+                runnable.runTaskTimer(Main.plugin, 0, 20);
+
+                // Warden despawn timer
+                new BukkitRunnable() {public void run() {
+                    warden.remove();
+                    if (!runnable.isCancelled()) runnable.cancel();
+                }}.runTaskLater(Main.plugin, 300);
+            }
+
+            // skulk_blaster
+            if (rightClick) {
+                // Visual/sound
+                ParticleUtils.drawLine(player.getLocation().add(0, 1, 0), target.getLocation().add(0, 0.5, 0), 1, Particle.SONIC_BOOM);
+                player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WARDEN_TENDRIL_CLICKS, 1, 1);
+
+                // Damage target
+                DamageManager.damage(target, 10);
+            }
         }
     }
 
