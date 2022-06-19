@@ -6,7 +6,12 @@ plugin:
   # This will be what %prefix% is in all the other messages
   # %prefix% can be used in any message in this file as many times as you want
   prefix: "&b&lSMP &8[&3&lV&8] &b"
-  reload: "%prefix%&3Vanadium &bsuccessfully reloaded"
+
+  # This will be what's used to split between message, hover message, and command
+  # Default: "@@"
+  splitter: "@@"
+
+  reload: "%prefix%&3Vanadium &bsuccessfully reloaded@@&b/%command%@@/%command%"
 
 
 # %permission% = The permission the player must have
@@ -14,7 +19,7 @@ plugin:
 errors:
   console-forbidden: "%prefix%&4&lERROR! &cYou must be a player to run this command"
   # %permission%
-  no-permission: "%prefix%&4&lERROR! &cYou must have &4%permission% &cto run this command"
+  no-permission: "%prefix%&4&lERROR! &cYou don't have the required permissions to run this command@@&4%permission%"
   # %player%
   invalid-player: "%prefix%&4&lERROR! &4%player% &cis not a valid player"
   invalid-arguments: "%prefix%&4&lERROR! &cInvalid arguments"
@@ -39,26 +44,26 @@ linking:
 # %target% = The targeted player/block
 slots:
   # %count%, %type%, %slot%, %total%, %next, %minute%
-  add: "%prefix%You've gained &3%count% %type% &b%slot% for being online (new total: &3%total%&b)! Next one in &3%next% &b%minute%."
+  add: "%prefix%You've gained &3%count% %type% &b%slot% for being online (next: &3%next% &b%minute%)!@@&bNew total: &3%total%"
   # %type%, %total%, %target%
-  limit: "%prefix%&cFailed to %type% &4%target%&c! You've reached your limit of &4%total% %type%s&c."
+  limit: "%prefix%&cFailed to %type% &4%target%&c!@@&cYou've reached your limit of &4%total% %type%s"
 
   # %type%, %target%
   command:
     # %slot%, %total%
     get: "%prefix%&3%target% &bhas &3%total% &b%type% %slot%"
     # %next% = Time remaining
-    cooldown: "%prefix%&3%target% &bhas &3%next% &buntil their next &3%type% &bslot"
+    cooldown: "%prefix%&3%target% &bhas &3%next% &buntil their next &3%type% &bslot@@&b/%command%@@/%command%"
     # %count%, %slot%, %total%
-    add: "%prefix%You've given &3%count% &b%type% %slot% to &3%target% &b(new total: &3%total%&b)"
+    add: "%prefix%You've given &3%count% &b%type% %slot% to &3%target%@@&bNew total: &3%total%"
     # %count%, %slot%, %total%
-    remove: "%prefix%You've taken &3%count% &b%type% %slot% from &3%target% &b(new total: &3%total%&b)"
+    remove: "%prefix%You've taken &3%count% &b%type% %slot% from &3%target%@@&bNew total: &3%total%"
     # %count%, %slot%, %total%
-    set: "%prefix%You've set &3%target%&b's %type% %slot% to &3%count%"
+    set: "%prefix%You've set &3%target%&b's %type% %slot% to &3%count%@@&b/%command%@@/%command%"
     # %type%, %target%
-    start: "%prefix%You've started &3%type% &bslot gaining for &3%target%"
+    start: "%prefix%You've started &3%type% &bslot gaining for &3%target%@@&b/%command%@@/%command%"
     # %type%, %target%
-    stop: "%prefix%You've stopped &3%type% &bslot gaining for &3%target%"
+    stop: "%prefix%You've stopped &3%type% &bslot gaining for &3%target%@@&b/%command%@@/%command%"
 
 
 # %block% = The block that was targeted
@@ -87,9 +92,9 @@ locking:
 
   lock-tool:
     # %player% = The player that gave the Lock Tool
-    get: "%prefix%You have been given a &3Lock Tool &bby &3%player%"
+    get: "%prefix%You have been given a &3Lock Tool &bby &3%player%@@&b/%command%@@/%command%"
     # %player% = The player that got the Lock Tool
-    give: "%prefix%You have given &3%player% &ba &3Lock Tool"
+    give: "%prefix%You have given &3%player% &ba &3Lock Tool@@&b/%command%@@/%command%"
 
 
 # %target% = The targeted player in the command
@@ -97,25 +102,25 @@ bypass:
   actionbar: "&bBypass is currently enabled"
 
   enabled:
-    self: "%prefix%Enabled bypass"
+    self: "%prefix%Enabled bypass@@&b/%command%@@/%command%"
     # %target%
-    other: "%prefix%Enabled bypass for &3%target%"
+    other: "%prefix%Enabled bypass for &3%target%@@&b/%command%@@/%command%"
 
   disabled:
-    self: "%prefix%Disabled bypass"
+    self: "%prefix%Disabled bypass@@&b/%command%@@/%command%"
     # %target%
-    other: "%prefix%Disabled bypass for &3%target%"
+    other: "%prefix%Disabled bypass for &3%target%@@&b/%command%@@/%command%"
 
 
 # %player% = The targeted player in the command
 # %block% = Targeted block
 trusting:
-  self: "%prefix%&cYou can't trust yourself!"
+  self: "%prefix%&cYou can't trust yourself!@@&c/%command%@@/%command%"
 
   list:
     # %player% = A player that's trusted
     item: "&3- &b%player%"
-    empty: "&b&oNo players trusted"
+    empty: "&b&oNo players trusted@@&bUse &3/trust &bto trust players!@@/trust "
 
   master:
     # %player% = The player that used /trustlist or the target player
@@ -136,12 +141,12 @@ trusting:
     list-header: "&3&l%player%'s Trustlist for %block%"
 
     trust:
-      success: "%prefix%Successfully trusted &3%player%&b to &3%block%"
-      fail: "%prefix%&4%player% &cis already trusted to &4%block%"
+      success: "%prefix%Successfully trusted &3%player%&b to &3%block%@@&b/%command%@@/%command%"
+      fail: "%prefix%&4%player% &cis already trusted to &4%block%@@&c/%command%@@/%command%"
 
     untrust:
-      success: "%prefix%Successfully untrusted &3%player%&b from &3%block%"
-      fail: "%prefix%&cYou don't have &4%player% &ctrusted to &4%block%"
+      success: "%prefix%Successfully untrusted &3%player%&b from &3%block%@@&b/%command%@@/%command%"
+      fail: "%prefix%&cYou don't have &4%player% &ctrusted to &4%block%@@&c/%command%@@/%command%"
 
 
 # %seconds% = The number of seconds left in cooldown
@@ -150,9 +155,10 @@ trusting:
 custom-items:
   # %seconds%
   action-bar: "&3%seconds% &bseconds left"
+
   chris_shield:
     block:
       # %attacker%
-      victim: "&bYou're shield has given slowness to &3%attacker%&b!"
+      victim: "&bYou're shield has given slowness to &3%attacker%&b!@@&3Chris' Shield"
       # %victim%
-      attacker: "&3%victim%&b's shield has given you weakness!"
+      attacker: "&3%victim%&b's shield has given you weakness!@@&3Chris' Shield"

@@ -23,10 +23,10 @@ import java.util.concurrent.TimeUnit;
 
 
 public class CommandSlot implements TabExecutor {
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
         if (PlayerManager.noPermission(sender, "vanadium.slot")) return true;
         if (args.length < 3) {
-            new MessageManager("errors.invalid-arguments").send(sender);
+            new MessageManager("errors.invalid-arguments", cmd, args).send(sender);
             return true;
         }
 
@@ -36,7 +36,7 @@ public class CommandSlot implements TabExecutor {
         final String type = args[2];
 
         if (player == null) {
-            new MessageManager("errors.invalid-player")
+            new MessageManager("errors.invalid-player", cmd, args)
                     .replace("%player%", args[0])
                     .send(sender);
             return true;
@@ -62,7 +62,7 @@ public class CommandSlot implements TabExecutor {
         if (args.length == 3 && arg3action && arg3type) {
             final Player playerOnline = player.getPlayer();
             if (playerOnline == null) {
-                new MessageManager("errors.invalid-player")
+                new MessageManager("errors.invalid-player", cmd, args)
                         .replace("%player%", args[0])
                         .send(sender);
                 return true;
@@ -70,7 +70,7 @@ public class CommandSlot implements TabExecutor {
 
             //<player> <get> <locks|trusts>
             if (action.equalsIgnoreCase("get")) {
-                new MessageManager("slots.command.get")
+                new MessageManager("slots.command.get", cmd, args)
                         .replace("%target%", player.getName())
                         .replace("%total%", String.valueOf(slots).replaceAll("\\.0*$|(\\.\\d*?)0+$", "$1"))
                         .replace("%type%", type.substring(0, type.length() - 1))
@@ -82,7 +82,7 @@ public class CommandSlot implements TabExecutor {
             //<player> <cooldown> <locks|trusts>
             if (action.equalsIgnoreCase("cooldown")) {
                 final Long timeLeft = new SlotManager().timeLeft(playerOnline, type);
-                new MessageManager("slots.command.cooldown")
+                new MessageManager("slots.command.cooldown", cmd, args)
                         .replace("%target%", player.getName())
                         .replace("%type%", type.substring(0, type.length() - 1))
                         .replace("%next%", timeLeft != null ? TimeUnit.MILLISECONDS.toSeconds(timeLeft) + " seconds" : "N/A (stopped)")
@@ -93,7 +93,7 @@ public class CommandSlot implements TabExecutor {
             //<player> <start|stop> <locks|trusts|all>
             if (action.equalsIgnoreCase("start") || action.equalsIgnoreCase("stop")) {
                 new SlotManager().startStop(playerOnline, type, action);
-                new MessageManager("slots.command." + action)
+                new MessageManager("slots.command." + action, cmd, args)
                         .replace("%target%", player.getName())
                         .replace("%type%", type.equalsIgnoreCase("all") ? "all" : type.substring(0, type.length() - 1))
                         .send(sender);
@@ -113,7 +113,7 @@ public class CommandSlot implements TabExecutor {
             if (Objects.equals(type, "locks")) DataManager.slots.put(player.getUniqueId(), new int[]{amount, new TrustSlotManager().getCount(player.getUniqueId())});
             if (Objects.equals(type, "trusts")) DataManager.slots.put(player.getUniqueId(), new int[]{new LockSlotManager().getCount(player.getUniqueId()), amount});
 
-            new MessageManager("slots.command." + action)
+            new MessageManager("slots.command." + action, cmd, args)
                     .replace("%target%", player.getName())
                     .replace("%count%", String.valueOf(amount).replaceAll("\\.0*$|(\\.\\d*?)0+$", "$1"))
                     .replace("%type%", type.substring(0, type.length() - 1))

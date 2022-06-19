@@ -27,15 +27,15 @@ public class CommandBypass implements CommandExecutor {
 
             if (PlayerManager.hasScoreboardTag(target, "bypass")) {
                 target.removeScoreboardTag("bypass");
-                new MessageManager("bypass.disabled.self").send(target);
-                new MessageManager("bypass.disabled.other")
+                new MessageManager("bypass.disabled.self", cmd, args).send(target);
+                new MessageManager("bypass.disabled.other", cmd, args)
                         .replace("%target%", args[0])
                         .send(sender);
                 return true;
             }
 
             new BypassManager().enable(target, false);
-            new MessageManager("bypass.enabled.other")
+            new MessageManager("bypass.enabled.other", cmd, args)
                     .replace("%target%", args[0])
                     .send(sender);
             return true;
@@ -43,7 +43,7 @@ public class CommandBypass implements CommandExecutor {
 
         if (PlayerManager.hasScoreboardTag(player, "bypass")) {
             player.removeScoreboardTag("bypass");
-            new MessageManager("bypass.disabled.self").send(player);
+            new MessageManager("bypass.disabled.self", cmd, args).send(player);
             return true;
         }
 

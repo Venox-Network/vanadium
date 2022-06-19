@@ -24,10 +24,10 @@ public class CommandLockTool implements CommandExecutor {
             if (target == null) return true;
 
             target.getInventory().addItem(LockManager.getLockTool());
-            new MessageManager("locking.lock-tool.get")
+            new MessageManager("locking.lock-tool.get", cmd, args)
                     .replace("%player%", player.getName())
                     .send(target);
-            new MessageManager("locking.lock-tool.give")
+            new MessageManager("locking.lock-tool.give", cmd, args)
                     .replace("%target%", args[0])
                     .send(sender);
             return true;
@@ -35,7 +35,7 @@ public class CommandLockTool implements CommandExecutor {
 
         // Give lock tool to sender
         player.getInventory().addItem(LockManager.getLockTool());
-        new MessageManager("locking.lock-tool.get")
+        new MessageManager("locking.lock-tool.get", cmd, args)
                 .replace("%player%", player.getName())
                 .send(sender);
         return true;

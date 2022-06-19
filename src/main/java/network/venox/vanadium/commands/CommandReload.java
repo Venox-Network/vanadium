@@ -31,7 +31,7 @@ public class CommandReload implements CommandExecutor {
             new TrustSlotManager(online).start();
         }
 
-        new MessageManager("plugin.reload").send(sender);
+        new MessageManager("plugin.reload", cmd, args).send(sender);
         return true;
     }
 }

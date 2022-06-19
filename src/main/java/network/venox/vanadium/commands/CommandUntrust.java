@@ -45,7 +45,7 @@ public class CommandUntrust implements TabExecutor {
             final TrustManager trust = new TrustManager(player, target);
 
             if (target == null) {
-                new MessageManager("errors.invalid-player")
+                new MessageManager("errors.invalid-player", cmd, args)
                         .replace("%player%", args[0])
                         .send(player);
                 return true;
@@ -85,7 +85,7 @@ public class CommandUntrust implements TabExecutor {
             return true;
         }
 
-        new MessageManager("errors.invalid-arguments").send(player);
+        new MessageManager("errors.invalid-arguments", cmd, args).send(player);
         return true;
     }
 

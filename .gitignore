@@ -4,3 +4,6 @@
 # Gradle
 .gradle/
 build/
+
+# Dependencies
+libs/*.jar

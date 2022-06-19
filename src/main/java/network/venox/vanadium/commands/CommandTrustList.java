@@ -59,7 +59,7 @@ public class CommandTrustList implements TabExecutor {
             if (player.hasPermission("vanadium.trustlist.others")) {
                 final OfflinePlayer target = PlayerManager.getOfflinePlayer(args[0]);
                 if (target == null) {
-                    new MessageManager("errors.invalid-player")
+                    new MessageManager("errors.invalid-player", cmd, args)
                             .replace("%player%", args[0])
                             .send(player);
                     return true;
@@ -73,7 +73,7 @@ public class CommandTrustList implements TabExecutor {
         if (args.length == 2 && block != null && lock.isLocked() && player.hasPermission("vanadium.trustlist.others")) {
             final OfflinePlayer target = PlayerManager.getOfflinePlayer(args[1]);
             if (target == null) {
-                new MessageManager("errors.invalid-player")
+                new MessageManager("errors.invalid-player", cmd, args)
                         .replace("%player%", args[0])
                         .send(player);
                 return true;
@@ -84,11 +84,11 @@ public class CommandTrustList implements TabExecutor {
                 return true;
             }
 
-            new MessageManager("errors.invalid-arguments").send(player);
+            new MessageManager("errors.invalid-arguments", cmd, args).send(player);
             return true;
         }
 
-        new MessageManager("errors.invalid-arguments").send(player);
+        new MessageManager("errors.invalid-arguments", cmd, args).send(player);
         return true;
     }
 

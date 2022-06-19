@@ -45,7 +45,7 @@ public class CommandTrust implements TabExecutor {
             final TrustManager trust = new TrustManager(player, target);
 
             if (target == null) {
-                new MessageManager("errors.invalid-player")
+                new MessageManager("errors.invalid-player", cmd, args)
                         .replace("%player%", args[1])
                         .send(player);
                 return true;
@@ -66,7 +66,7 @@ public class CommandTrust implements TabExecutor {
 
             // Cancel if player is trying to trust themselves
             if (target.getUniqueId() == player.getUniqueId()) {
-                new MessageManager("trusting.self").send(player);
+                new MessageManager("trusting.self", cmd, args).send(player);
                 return true;
             }
 
@@ -91,7 +91,7 @@ public class CommandTrust implements TabExecutor {
             return true;
         }
 
-        new MessageManager("errors.invalid-arguments").send(player);
+        new MessageManager("errors.invalid-arguments", cmd, args).send(player);
         return true;
     }
 
