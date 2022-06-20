@@ -33,6 +33,8 @@ import java.util.concurrent.TimeUnit;
 
 
 public class ItemsAdderListener implements Listener {
+    static final Map<Warden, LivingEntity> entities = new ConcurrentHashMap<>();
+
     /**
      * Called when a player interacts
      */
@@ -184,6 +186,7 @@ public class ItemsAdderListener implements Listener {
             // warden_companion
             if (leftClick) {
                 final Warden warden = (Warden) player.getWorld().spawnEntity(player.getLocation(), EntityType.WARDEN);
+                entities.put(warden, target);
 
                 final BukkitRunnable runnable = new BukkitRunnable() {public void run() {
                     // Keep targeted entity as Warden's target
@@ -192,19 +195,26 @@ public class ItemsAdderListener implements Listener {
                     // Spawn particles over target
                     target.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, target.getLocation().add(0, 1.5, 0), 1, 0, 0, 0);
 
-                    if (target.isDead()) {
-                        warden.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, warden.getLocation().add(0, 0.5, 0), 1);
+                    if (target.isDead() && !warden.isDead()) {
                         warden.remove();
-                        this.cancel();
+                        entities.remove(warden);
+                        warden.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, warden.getLocation().add(0, 0.5, 0), 1);
+                        cancel();
                     }
+
+                    if (warden.isDead()) cancel();
                 }};
                 runnable.runTaskTimer(Main.plugin, 0, 20);
 
                 // Warden despawn timer
                 new BukkitRunnable() {public void run() {
-                    warden.remove();
+                    if (!warden.isDead()) {
+                        warden.remove();
+                        entities.remove(warden);
+                        warden.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, warden.getLocation().add(0, 0.5, 0), 1);
+                    }
                     if (!runnable.isCancelled()) runnable.cancel();
-                }}.runTaskLater(Main.plugin, 300);
+                }}.runTaskLater(Main.plugin, Main.config.getInt("custom-items.warden_companion.despawn") * 20L);
             }
 
             // skulk_blaster
@@ -214,7 +224,7 @@ public class ItemsAdderListener implements Listener {
                 player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WARDEN_TENDRIL_CLICKS, 1, 1);
 
                 // Damage target
-                DamageManager.damage(target, 10);
+                DamageManager.damage(target, Main.config.getInt("custom-items.skulk_blaster.damage"));
             }
         }
     }
@@ -224,10 +234,34 @@ public class ItemsAdderListener implements Listener {
      */
     @EventHandler
     public void damageEntity(EntityDamageByEntityEvent event) {
-        if (!(event.getEntity() instanceof Player victim) || !(event.getDamager() instanceof LivingEntity attacker)) return;
-        final ItemsAdderManager iam = new ItemsAdderManager(victim);
-        if (!iam.holdingItem(true, "chris_shield") || !victim.isBlocking()) return;
+        if (!(event.getEntity() instanceof LivingEntity victim) || !(event.getDamager() instanceof LivingEntity attacker)) return;
 
+
+        // warden_companion
+
+        if (attacker instanceof Warden && entities.containsKey(attacker)) {
+            for (Map.Entry<Warden, LivingEntity> entry : entities.entrySet()) {
+                final Warden warden = entry.getKey();
+                final LivingEntity target = entry.getValue();
+
+                if (victim != target) {
+                    event.setCancelled(true);
+                    return;
+                }
+
+                warden.remove();
+                entities.remove(warden);
+                warden.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, warden.getLocation().add(0, 0.5, 0), 1);
+            }
+            return;
+        }
+
+
+        // chris_shield
+
+        if (!(event.getEntity() instanceof Player victimPlayer)) return;
+        final ItemsAdderManager iam = new ItemsAdderManager(victimPlayer);
+        if (!iam.holdingItem(true, "chris_shield") || !victimPlayer.isBlocking()) return;
         if (new Random().nextInt(5) != 0) {
             iam.durability(true, 1);
             return;
@@ -241,10 +275,10 @@ public class ItemsAdderListener implements Listener {
         // Message sent to victim
         new MessageManager("custom-items.chris_shield.block.victim")
                 .replace("%attacker%", attackerPlayer.getPlayerListName())
-                .send(victim);
+                .send(victimPlayer);
         // Message sent to attacker
         new MessageManager("custom-items.chris_shield.block.attacker")
-                .replace("%victim%", victim.getPlayerListName())
+                .replace("%victim%", victimPlayer.getPlayerListName())
                 .send(attackerPlayer);
     }
 

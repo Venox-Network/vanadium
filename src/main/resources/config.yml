@@ -83,3 +83,11 @@ custom-items:
         1: 2.0
         2: 2.25
         3: 2.5
+
+  warden_companion:
+    # How many seconds until the Warden despawns
+    despawn: 20
+
+  skulk_blaster:
+    # How much damage the blaster does
+    damage: 10
