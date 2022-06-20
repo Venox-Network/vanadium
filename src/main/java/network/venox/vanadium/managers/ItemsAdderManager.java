@@ -1,15 +1,13 @@
 package network.venox.vanadium.managers;
 
-import dev.lone.itemsadder.api.CustomStack;
+import com.olliez4.interface4.util.ActionBar;
 
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
+import dev.lone.itemsadder.api.CustomStack;
 
 import network.venox.vanadium.Main;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
@@ -45,20 +43,15 @@ public class ItemsAdderManager {
         cooldowns.put(player.getUniqueId(), System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(Main.config.getInt("custom-items.cooldown")));
 
         // Display action bar
-        new BukkitRunnable() {
-            public void run() {
-                final String seconds = String.valueOf(TimeUnit.MILLISECONDS.toSeconds(cooldowns.get(player.getUniqueId()) - System.currentTimeMillis()) + 1);
-                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(
-                        new MessageManager("custom-items.action-bar")
-                                .replace("%seconds%", seconds)
-                                .string()));
+        new BukkitRunnable() {public void run() {
+            final String seconds = String.valueOf(TimeUnit.MILLISECONDS.toSeconds(cooldowns.get(player.getUniqueId()) - System.currentTimeMillis()) + 1);
+            ActionBar.send(player, new MessageManager("custom-items.action-bar").replace("%seconds%", seconds).string());
 
-                if (notOnCooldown()) {
-                    player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(""));
-                    cancel();
-                }
+            if (notOnCooldown()) {
+                ActionBar.send(player, "");
+                cancel();
             }
-        }.runTaskTimer(Main.plugin, 0, 20);
+        }}.runTaskTimer(Main.plugin, 0, 10);
     }
 
     /**

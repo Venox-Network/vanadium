@@ -1,8 +1,6 @@
 package network.venox.vanadium.managers;
 
 import com.olliez4.interface4.util.ActionBar;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 
 import network.venox.vanadium.Main;
 
