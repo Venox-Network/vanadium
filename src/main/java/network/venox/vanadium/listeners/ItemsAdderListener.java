@@ -240,19 +240,10 @@ public class ItemsAdderListener implements Listener {
         // warden_companion
 
         if (attacker instanceof Warden && entities.containsKey(attacker)) {
-            for (Map.Entry<Warden, LivingEntity> entry : entities.entrySet()) {
-                final Warden warden = entry.getKey();
-                final LivingEntity target = entry.getValue();
-
-                if (victim != target) {
-                    event.setCancelled(true);
-                    return;
-                }
-
-                warden.remove();
-                entities.remove(warden);
-                warden.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, warden.getLocation().add(0, 0.5, 0), 1);
-            }
+            if (victim != entities.get(attacker)) event.setCancelled(true);
+            attacker.remove();
+            entities.remove(attacker);
+            attacker.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, attacker.getLocation().add(0, 0.5, 0), 1);
             return;
         }
 
