@@ -75,7 +75,7 @@ public class TrustSlotManager {
 
         new MessageManager("slots.add")
                 .replace("%count%", String.valueOf(multiplier).replaceAll("\\.0*$|(\\.\\d*?)0+$", "$1"))
-                .replace("%type%", "trusts")
+                .replace("%type%", "trust")
                 .replace("%slot%", multiplier == 1 ? "slot" : "slots")
                 .replace("%total%", String.valueOf(count).replaceAll("\\.0*$|(\\.\\d*?)0+$", "$1"))
                 .replace("%next%", String.valueOf(Main.config.getInt("slot-cooldowns.trusts")))
