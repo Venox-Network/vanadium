@@ -1,17 +1,82 @@
+# --- JSON COMPONENTS ---
+# There are 6 different types of JSON components that can be used to send messages (each one can have hover text):
+# - "text"      A string of text that when hovered over, shows text.
+# - "prompt"    A string of text that when clicked, will put text into the player's chat box.
+# - "clipboard" A string of text that when clicked, will copy the text to the player's clipboard.
+# - "chat"      A string of text that when clicked, will force the player to send a chat message.
+# - "command"   A string of text that when clicked, will force the player to run a command.
+# - "web"       A string of text that when clicked, will open a web page.
+#
+# The characters you put in plugin.splitter are used to split the message into the component arguments.
+# By default, the splitter is "@@", which is what will be used in the examples below.
+#
+# This is the format of a single message, all single messages are "prompt" components:
+key1: "display1@@hover1@@prompt1"
+# Sent to player: "display1"
+# Shown on hover: "hover1"
+# Put in player's chat bar when clicked: "prompt1"
+#
+# "display1" cannot be empty. If it is, the message will not be sent.
+# "hover1" can be empty. If it is, a normal (non-JSON) message will be sent.
+# "prompt1" can be empty. If it is, a "text" message will be sent.
+#
+# These are the formats of an advanced message, all advanced message components depend on what they're sub-key start with:
+key2:
+  text: "display2@@hover2"
+  # Sent to player: "display3"
+  # Shown on hover: "hover3"
+  prompt: "display3@@hover3@@prompt2"
+  # Sent to player: "display4"
+  # Shown on hover: "hover4"
+  # Put in player's chat bar when clicked: "prompt2"
+  clipboard: "display4@@hover4@@clipboard1"
+  # Sent to player: "display5"
+  # Shown on hover: "hover5"
+  # Copied to player's clipboard when clicked: "clipboard1"
+  chat: "display5@@hover5@@chat1"
+  # Sent to player: "display6"
+  # Shown on hover: "hover6"
+  # Chat message sent by player when clicked: "chat1"
+  command: "display6@@hover6@@command1"
+  # Sent to player: "display7"
+  # Shown on hover: "hover7"
+  # Command sent by player when clicked: "command1"
+  web: "display7@@hover7@@web1"
+  # Sent to player: "display8"
+  # Shown on hover: "hover8"
+  # Website prompted to open when clicked: "web1"
+#
+# All the messages in the above example will be strung together into a single message.
+# This way you can create something like this: "[Accept] [Decline]". When clicking on one of the options, it can run different functions/commands.
+#
+# "display" cannot be empty. If it is, the message will not be sent.
+# "hover" can be empty. If it is, a normal (non-JSON) message will be sent.
+# "prompt", "clipboard", "chat", "command", and "web" can be empty. If they are, a "text" message will be sent.
+#
+# To have multiple of the same components in a message, you simply have to put any text after the component's name:
+key3:
+  command-accept: "[Accept]@@Accept the request@@accept"
+  command-decline: "[Decline]@@Decline the request@@deny"
+# The name of a "text" sub-key doesn't matter since it's the default component.
+# --- END JSON COMPONENTS ---
+#
+#
+# --- OTHER ---
 # If a message does not have any placeholders listed above it, it means it doesn't have any placeholders.
 # Placeholders may be reassigned per message so please double-check you're using each one correctly!
+# --- END OTHER ---
 
 
 plugin:
+  # This will be what's used to split the different arguments of a component.
+  # Default: "@@"
+  splitter: "@@"
+
   # This will be what %prefix% is in all the other messages
   # %prefix% can be used in any message in this file as many times as you want
   prefix: "&b&lSMP &8[&3&lV&8] &b"
 
-  # This will be what's used to split between message, hover message, and command
-  # Default: "@@"
-  splitter: "@@"
-
-  reload: "%prefix%&3Vanadium &bsuccessfully reloaded@@&b/%command%@@/%command%"
+  reload: "%prefix%&3Vanadium &bsuccessfully reloaded@@&b%command%@@%command%"
 
 
 # %permission% = The permission the player must have
@@ -53,17 +118,17 @@ slots:
     # %slot%, %total%
     get: "%prefix%&3%target% &bhas &3%total% &b%type% %slot%"
     # %next% = Time remaining
-    cooldown: "%prefix%&3%target% &bhas &3%next% &buntil their next &3%type% &bslot@@&b/%command%@@/%command%"
+    cooldown: "%prefix%&3%target% &bhas &3%next% &buntil their next &3%type% &bslot@@&b%command%@@%command%"
     # %count%, %slot%, %total%
     add: "%prefix%You've given &3%count% &b%type% %slot% to &3%target%@@&bNew total: &3%total%"
     # %count%, %slot%, %total%
     remove: "%prefix%You've taken &3%count% &b%type% %slot% from &3%target%@@&bNew total: &3%total%"
     # %count%, %slot%, %total%
-    set: "%prefix%You've set &3%target%&b's %type% %slot% to &3%count%@@&b/%command%@@/%command%"
+    set: "%prefix%You've set &3%target%&b's %type% %slot% to &3%count%@@&b%command%@@%command%"
     # %type%, %target%
-    start: "%prefix%You've started &3%type% &bslot gaining for &3%target%@@&b/%command%@@/%command%"
+    start: "%prefix%You've started &3%type% &bslot gaining for &3%target%@@&b%command%@@%command%"
     # %type%, %target%
-    stop: "%prefix%You've stopped &3%type% &bslot gaining for &3%target%@@&b/%command%@@/%command%"
+    stop: "%prefix%You've stopped &3%type% &bslot gaining for &3%target%@@&b%command%@@%command%"
 
 
 # %block% = The block that was targeted
@@ -92,9 +157,9 @@ locking:
 
   lock-tool:
     # %player% = The player that gave the Lock Tool
-    get: "%prefix%You have been given a &3Lock Tool &bby &3%player%@@&b/%command%@@/%command%"
+    get: "%prefix%You have been given a &3Lock Tool &bby &3%player%@@&b%command%@@%command%"
     # %player% = The player that got the Lock Tool
-    give: "%prefix%You have given &3%player% &ba &3Lock Tool@@&b/%command%@@/%command%"
+    give: "%prefix%You have given &3%player% &ba &3Lock Tool@@&b%command%@@%command%"
 
 
 # %target% = The targeted player in the command
@@ -102,20 +167,20 @@ bypass:
   actionbar: "&bBypass is currently enabled"
 
   enabled:
-    self: "%prefix%Enabled bypass@@&b/%command%@@/%command%"
+    self: "%prefix%Enabled bypass@@&b%command%@@%command%"
     # %target%
-    other: "%prefix%Enabled bypass for &3%target%@@&b/%command%@@/%command%"
+    other: "%prefix%Enabled bypass for &3%target%@@&b%command%@@%command%"
 
   disabled:
-    self: "%prefix%Disabled bypass@@&b/%command%@@/%command%"
+    self: "%prefix%Disabled bypass@@&b%command%@@%command%"
     # %target%
-    other: "%prefix%Disabled bypass for &3%target%@@&b/%command%@@/%command%"
+    other: "%prefix%Disabled bypass for &3%target%@@&b%command%@@%command%"
 
 
 # %player% = The targeted player in the command
 # %block% = Targeted block
 trusting:
-  self: "%prefix%&cYou can't trust yourself!@@&c/%command%@@/%command%"
+  self: "%prefix%&cYou can't trust yourself!@@&c%command%@@%command%"
 
   list:
     # %player% = A player that's trusted
@@ -141,12 +206,12 @@ trusting:
     list-header: "&3&l%player%'s Trustlist for %block%"
 
     trust:
-      success: "%prefix%Successfully trusted &3%player%&b to &3%block%@@&b/%command%@@/%command%"
-      fail: "%prefix%&4%player% &cis already trusted to &4%block%@@&c/%command%@@/%command%"
+      success: "%prefix%Successfully trusted &3%player%&b to &3%block%@@&b%command%@@%command%"
+      fail: "%prefix%&4%player% &cis already trusted to &4%block%@@&c%command%@@%command%"
 
     untrust:
-      success: "%prefix%Successfully untrusted &3%player%&b from &3%block%@@&b/%command%@@/%command%"
-      fail: "%prefix%&cYou don't have &4%player% &ctrusted to &4%block%@@&c/%command%@@/%command%"
+      success: "%prefix%Successfully untrusted &3%player%&b from &3%block%@@&b%command%@@%command%"
+      fail: "%prefix%&cYou don't have &4%player% &ctrusted to &4%block%@@&c%command%@@%command%"
 
 
 # %seconds% = The number of seconds left in cooldown
