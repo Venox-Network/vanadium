@@ -134,7 +134,6 @@ public class TrustManager {
      * Add {@code targetId} to the list of trusted players for {@code block}
      */
     public void trustBlock(Block block, boolean two) {
-        //noinspection DuplicatedCode
         final List<UUID> lockedTrusted = DataManager.lockedTrusted.get(block);
         List<UUID> trusted = new ArrayList<>();
         if (lockedTrusted != null) trusted = new ArrayList<>(lockedTrusted);
@@ -187,7 +186,6 @@ public class TrustManager {
      * Remove {@code targetId} from the list of trusted players for {@code block}
      */
     public void untrustBlock(Block block, boolean two) {
-        //noinspection DuplicatedCode
         final List<UUID> lockedTrusted = DataManager.lockedTrusted.get(block);
         List<UUID> trusted = new ArrayList<>();
         if (lockedTrusted != null) trusted = new ArrayList<>(lockedTrusted);
