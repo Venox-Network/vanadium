@@ -179,53 +179,53 @@ public class ItemsAdderListener implements Listener {
             pearl.setShooter(player);
         }
 
-        if (player.getInventory().getItemInMainHand().getType() == Material.BLAZE_ROD && cooldown) {
+        // warden_horn
+        if (iam.holdingItem(false, "warden_horn") && rightClick && cooldown) {
             if (!(iam.getTarget(15) instanceof LivingEntity target) || target instanceof Warden) return;
             iam.cooldown();
+            final Warden warden = (Warden) player.getWorld().spawnEntity(player.getLocation(), EntityType.WARDEN);
+            entities.put(warden, target);
 
-            // warden_companion
-            if (leftClick) {
-                final Warden warden = (Warden) player.getWorld().spawnEntity(player.getLocation(), EntityType.WARDEN);
-                entities.put(warden, target);
+            final BukkitRunnable runnable = new BukkitRunnable() {public void run() {
+                // Keep targeted entity as Warden's target
+                warden.setAnger(target, 100);
 
-                final BukkitRunnable runnable = new BukkitRunnable() {public void run() {
-                    // Keep targeted entity as Warden's target
-                    warden.setAnger(target, 100);
+                // Spawn particles over target
+                target.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, target.getLocation().add(0, 1.5, 0), 1, 0, 0, 0);
 
-                    // Spawn particles over target
-                    target.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, target.getLocation().add(0, 1.5, 0), 1, 0, 0, 0);
+                if (target.isDead() && !warden.isDead()) {
+                    warden.remove();
+                    entities.remove(warden);
+                    warden.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, warden.getLocation().add(0, 0.5, 0), 1);
+                    cancel();
+                }
 
-                    if (target.isDead() && !warden.isDead()) {
-                        warden.remove();
-                        entities.remove(warden);
-                        warden.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, warden.getLocation().add(0, 0.5, 0), 1);
-                        cancel();
-                    }
+                if (warden.isDead()) cancel();
+            }};
+            runnable.runTaskTimer(Main.plugin, 0, 20);
 
-                    if (warden.isDead()) cancel();
-                }};
-                runnable.runTaskTimer(Main.plugin, 0, 20);
+            // Warden despawn timer
+            new BukkitRunnable() {public void run() {
+                if (!warden.isDead()) {
+                    warden.remove();
+                    entities.remove(warden);
+                    warden.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, warden.getLocation().add(0, 0.5, 0), 1);
+                }
+                if (!runnable.isCancelled()) runnable.cancel();
+            }}.runTaskLater(Main.plugin, Main.config.getInt("custom-items.warden_horn.despawn") * 20L);
+        }
 
-                // Warden despawn timer
-                new BukkitRunnable() {public void run() {
-                    if (!warden.isDead()) {
-                        warden.remove();
-                        entities.remove(warden);
-                        warden.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, warden.getLocation().add(0, 0.5, 0), 1);
-                    }
-                    if (!runnable.isCancelled()) runnable.cancel();
-                }}.runTaskLater(Main.plugin, Main.config.getInt("custom-items.warden_companion.despawn") * 20L);
-            }
+        // skulk_blaster
+        if (iam.holdingItem(false, "skulk_blaster") && rightClick && cooldown) {
+            if (!(iam.getTarget(15) instanceof LivingEntity target)) return;
+            iam.cooldown();
 
-            // skulk_blaster
-            if (rightClick) {
-                // Visual/sound
-                ParticleUtils.drawLine(player.getLocation().add(0, 1, 0), target.getLocation().add(0, 0.5, 0), 1, Particle.SONIC_BOOM);
-                player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WARDEN_TENDRIL_CLICKS, 1, 1);
+            // Visual/sound
+            ParticleUtils.drawLine(player.getLocation().add(0, 1, 0), target.getLocation().add(0, 0.5, 0), 1, Particle.SONIC_BOOM);
+            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WARDEN_TENDRIL_CLICKS, 1, 1);
 
-                // Damage target
-                DamageManager.damage(target, Main.config.getInt("custom-items.skulk_blaster.damage"));
-            }
+            // Damage target
+            DamageManager.damage(target, Main.config.getInt("custom-items.skulk_blaster.damage"));
         }
     }
 
@@ -237,7 +237,7 @@ public class ItemsAdderListener implements Listener {
         if (!(event.getEntity() instanceof LivingEntity victim) || !(event.getDamager() instanceof LivingEntity attacker)) return;
 
 
-        // warden_companion
+        // warden_horn
 
         if (attacker instanceof Warden && entities.containsKey(attacker)) {
             if (victim != entities.get(attacker)) event.setCancelled(true);

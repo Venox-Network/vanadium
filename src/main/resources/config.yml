@@ -84,7 +84,7 @@ custom-items:
         2: 2.25
         3: 2.5
 
-  warden_companion:
+  warden_horn:
     # How many seconds until the Warden despawns
     despawn: 20
 
