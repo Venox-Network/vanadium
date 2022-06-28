@@ -13,14 +13,12 @@ public class SlotManager {
      * Runs {@link LockSlotManager#check} and {@link TrustSlotManager#check} for every online player every tick
      */
     public void runCheck() {
-        new BukkitRunnable() {
-            public void run() {
-                for (final Player online : Bukkit.getOnlinePlayers()) {
-                    new LockSlotManager(online).check();
-                    new TrustSlotManager(online).check();
-                }
+        new BukkitRunnable() {public void run() {
+            for (final Player online : Bukkit.getOnlinePlayers()) {
+                new LockSlotManager(online).check();
+                new TrustSlotManager(online).check();
             }
-        }.runTaskTimer(Main.plugin, 0, 1);
+        }}.runTaskTimer(Main.plugin, 0, 1);
     }
 
     /**

@@ -87,12 +87,7 @@ public class LockSlotManager {
      * Adds/removes slots when the cooldown reaches 0
      */
     public void check() {
-        if (PlayerManager.isAFK(player)) {
-            stop();
-            start();
-            return;
-        }
-
+        if (PlayerManager.isAFK(player)) return;
         if (contains() && (timeLeft() == null || timeLeft() <= 0)) addSlot();
     }
 
