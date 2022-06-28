@@ -55,7 +55,11 @@ public class DiscordListener {
         final Map<String, UUID> codes = manager.getLinkingCodes();
         final String message = event.getMessage().getContentStripped();
 
-        if (!codes.containsKey(message) || linkChannel == null || !event.getChannel().getId().equals(linkChannel)) return;
+        if (linkChannel == null || !event.getChannel().getId().equals(linkChannel)) return;
+
+        event.getMessage().delete().queue();
+
+        if (!codes.containsKey(message)) return;
 
         final UUID minecraft = codes.get(message);
         final String discord = event.getAuthor().getId();
@@ -79,7 +83,5 @@ public class DiscordListener {
                         .send(event.getAuthor());
             }
         }
-
-        event.getMessage().delete().queue();
     }
 }
