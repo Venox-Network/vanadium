@@ -120,7 +120,7 @@ public class BlockListener implements Listener {
 
         final UUID sourceOwner = new LockManager(source.getBlock(), null).getLocker();
         final UUID destinationOwner = new LockManager(destination.getLocation().getBlock(), null).getLocker();
-        if ((sourceOwner == null || destinationOwner != null) && (sourceOwner == null || destinationOwner.equals(sourceOwner))) return;
+        if (sourceOwner == null || (destinationOwner != null && destinationOwner.equals(sourceOwner))) return;
 
         event.setCancelled(true);
     }

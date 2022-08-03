@@ -65,7 +65,9 @@ public class LockManager {
      * @return  The locker
      */
     public UUID getLocker() {
-        return DataManager.locked.get(block)[1];
+        final UUID locker = DataManager.locked.get(block)[1];
+        if (DataManager.locked.containsKey(block) && locker != null) return locker;
+        return null;
     }
 
     /**
