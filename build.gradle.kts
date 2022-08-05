@@ -13,7 +13,7 @@ repositories {
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.19-R0.1-SNAPSHOT")
-    @Suppress("VulnerableLibrariesLocal")
+    @Suppress("VulnerableLibrariesLocal", "RedundantSuppression")
     compileOnly("com.discordsrv:discordsrv:1.25.0")
     compileOnly("me.clip:placeholderapi:2.11.1")
     compileOnly("net.essentialsx:EssentialsX:2.19.4")
