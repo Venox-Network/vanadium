@@ -26,8 +26,9 @@ public class FileManager {
      */
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public void create() {
+        if (!configFolder.exists()) configFolder.mkdir();
+
         if (data) {
-            if (!configFolder.exists()) configFolder.mkdir();
             if (!dataFolder.exists()) dataFolder.mkdir();
 
             try {
@@ -39,7 +40,6 @@ public class FileManager {
             return;
         }
 
-        if (!configFolder.exists()) configFolder.mkdir();
         if (new File(configFolder, name).exists()) return;
         Main.plugin.saveResource(name, false);
     }

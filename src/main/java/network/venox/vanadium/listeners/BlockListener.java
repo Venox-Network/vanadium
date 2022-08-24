@@ -26,6 +26,7 @@ import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import javax.annotation.Nullable;
 import java.util.UUID;
 
 
@@ -118,8 +119,8 @@ public class BlockListener implements Listener {
         final Inventory destination = event.getDestination();
         if (source == null || destination.getLocation() == null || destination.getType() != InventoryType.HOPPER) return;
 
-        final UUID sourceOwner = new LockManager(source.getBlock(), null).getLocker();
-        final UUID destinationOwner = new LockManager(destination.getLocation().getBlock(), null).getLocker();
+        @Nullable final UUID sourceOwner = new LockManager(source.getBlock(), null).getLocker();
+        @Nullable final UUID destinationOwner = new LockManager(destination.getLocation().getBlock(), null).getLocker();
         if (sourceOwner == null || (destinationOwner != null && destinationOwner.equals(sourceOwner))) return;
 
         event.setCancelled(true);
